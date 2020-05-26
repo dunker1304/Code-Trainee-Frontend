@@ -1,0 +1,38 @@
+.header-menu {
+  padding: 60px 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 99;
+  .header-btn {
+    display: flex;
+    justify-content: flex-end;
+    li {
+      list-style: none;
+      width: 150px;
+      margin-right: 20px;
+      text-align: center;
+      .fill-btn {
+        background-color: #ffffff;
+        color: #000000;
+        border-radius: 4px;
+        box-shadow: 0px 11px 24px 0px rgba(0, 0, 0, 0.3);
+        display: block;
+        padding: 15px 25px;
+        text-transform: uppercase;
+        border-radius: 4px;
+        font-size: 15px;
+        font-weight: 700;
+      }
+    }
+  }
+}
+.logo-wrapper {
+  display: flex;
+  align-items: center;
+  .logo-title {
+    font-size: 33px;
+    color: white;
+  }
+}

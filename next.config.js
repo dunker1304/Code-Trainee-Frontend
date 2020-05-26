@@ -1,8 +1,7 @@
-const withSass = require('@zeit/next-sass')
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 const { ANALYZE } = process.env
 
-module.exports = withSass({
+module.exports = {
   generateBuildId: async () => {
     return require('child_process').execSync('git rev-parse HEAD').toString().replace('\n', '')
   },
@@ -28,4 +27,4 @@ module.exports = withSass({
 
     return config
   }
-})
+}
