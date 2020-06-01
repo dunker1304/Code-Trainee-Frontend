@@ -3,7 +3,9 @@ import Head from 'next/head'
 // import { connect } from 'react-redux'
 import { Button, Upload, message } from 'antd'
 import { UpCircleOutlined } from '@ant-design/icons'
+import CodeTrainee from 'hocs';
 
+@CodeTrainee
 class Index extends Component {
   render() {
     return (
