@@ -3,7 +3,9 @@ import Head from 'next/head'
 // import { connect } from 'react-redux'
 import { Button, Upload, message } from 'antd'
 import { UpCircleOutlined } from '@ant-design/icons'
+import CodeTrainee from 'hocs';
 
+@CodeTrainee
 class Index extends Component {
   render() {
     return (
@@ -27,7 +29,7 @@ class Index extends Component {
                 <div className="col-sm-6 col-12">
                   <ul className='header-btn'>
                     <li><a className='fill-btn'>Sign in</a></li>
-                    <li><a className='fill-btn'>Register</a></li>
+                    <li><a className='fill-btn'>Sign up</a></li>
                   </ul>
                 </div>
               </div>
