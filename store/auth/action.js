@@ -7,10 +7,9 @@ export const loadUserInfo = () => {
       axios
         .get(url)
         .then( res => {
-          console.log(res.data.get[0], 'ressponese')
           dispatch({
             type: 'LOADED_USER_INFO',
-            payload: res.data.get[0]
+            payload: res.data.get
           })
           resolve(res)
         })

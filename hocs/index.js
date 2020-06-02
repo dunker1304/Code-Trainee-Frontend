@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { LocaleProvider } from 'antd'
 import Cookies from 'universal-cookie'
 import Router from 'next-router'
-import { loadUserInfo } from 'actions'
+import { loadUserInfo } from '../store/auth/action'
 const cookies = new Cookies();
 
 export default Page => {
@@ -41,9 +41,7 @@ export default Page => {
 
     render() {
       return (
-        <LocaleProvider>
-          <Page {...this.props} />
-        </LocaleProvider>
+        <Page {...this.props} />
       )
     }
   }

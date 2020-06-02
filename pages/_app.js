@@ -1,7 +1,7 @@
 // import App from 'next/app'
 
 import '../styles/main.scss'
-import { wrapper } from 'store';
+import { wrapper } from '../store/store';
 import App, { Container } from 'next/app'
 import { Provider } from 'react-redux'
 import withRedux from 'next-redux-wrapper';
@@ -33,7 +33,6 @@ class MyApp extends App {
 
   render() {
     const { Component, pageProps } = this.props
-    console.log(this.props, 'propasdhlk')
     return (
       <Component {...pageProps} />
     )
