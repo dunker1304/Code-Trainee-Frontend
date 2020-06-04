@@ -1,12 +1,33 @@
 import React, { Component } from 'react'
 import Head from 'next/head'
-// import { connect } from 'react-redux'
-import { Button, Upload, message } from 'antd'
+ import { connect } from 'react-redux'
+import { Button, Upload, message, Modal } from 'antd'
 import { UpCircleOutlined } from '@ant-design/icons'
 import CodeTrainee from 'hocs';
+import { GoogleLogin } from 'react-google-login';
+import * as action from "../store/auth/action"
 
 @CodeTrainee
 class Index extends Component {
+  state = { visible: false };
+
+  showModal = () => {
+    this.setState({
+      visible: true,
+    });
+  };
+
+  hideModal = ()=> {
+    this.setState({
+      visible : false
+    })
+  }
+
+  responseGoogle = (res) => {
+    this.props.authGoogle(res.accessToken)
+    console.log(res);
+  }
+
   render() {
     return (
       <>
@@ -26,10 +47,24 @@ class Index extends Component {
                   <img src='../static/images/logo.png' alt='logo' width='70px'/>
                   <span className='logo-title'>Code Trainee</span>
                 </div>
+                <Modal
+                  title="Basic Modal"
+                  visible={this.state.visible}
+                  footer = {null}
+                  onOk={this.hideModal}
+                  onCancel={this.hideModal}
+                >
+                  <GoogleLogin
+                    clientId="1034737051172-tt6rkd713lmdub59e7qakoi3o5o0b15s.apps.googleusercontent.com"
+                    buttonText="Login"
+                    onSuccess={this.responseGoogle}
+                    onFailure={this.responseGoogle}
+                  />,
+                </Modal>
                 <div className="col-sm-6 col-12">
                   <ul className='header-btn'>
                     <li><a className='fill-btn'>Sign in</a></li>
-                    <li><a className='fill-btn'>Sign up</a></li>
+                    <li><button className='fill-btn'  onClick={this.showModal}>Sign up</button></li>
                   </ul>
                 </div>
               </div>
@@ -189,4 +224,10 @@ class Index extends Component {
   }
 }
 
-export default Index
+function mapStateToProps(state) {
+  return {
+    errorMessage: state.auth.errorMessage
+  }
+}
+
+export default connect(mapStateToProps,action)(Index)

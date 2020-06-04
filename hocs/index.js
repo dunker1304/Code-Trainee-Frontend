@@ -20,13 +20,13 @@ export default Page => {
       contextType.accessToken = accessToken;
       if (isServer) {
         if (accessToken) {
-          await dispatch(loadUserInfo(accessToken))
+         // await dispatch(loadUserInfo(accessToken))
         } else {
           res.redirect('/signin')
         }
       } else {
         if (true) {
-          await dispatch(loadUserInfo())
+         // await dispatch(loadUserInfo())
         } else {
           window.location.href = "http://localhost:3000/signin";
         }
