@@ -54,12 +54,8 @@ class Index extends Component {
                   onOk={this.hideModal}
                   onCancel={this.hideModal}
                 >
-                  <GoogleLogin
-                    clientId="1034737051172-tt6rkd713lmdub59e7qakoi3o5o0b15s.apps.googleusercontent.com"
-                    buttonText="Login"
-                    onSuccess={this.responseGoogle}
-                    onFailure={this.responseGoogle}
-                  />,
+      
+                  <a href = 'http://localhost:1337/oauth/google/'>Login via google</a>
                 </Modal>
                 <div className="col-sm-6 col-12">
                   <ul className='header-btn'>
