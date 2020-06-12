@@ -25,10 +25,10 @@ export default Page => {
           res.redirect('/signin')
         }
       } else {
-        if (true) {
+        if (accessToken) {
           await dispatch(loadUserInfo())
         } else {
-          window.location.href = "http://localhost:3000/signin";
+          window.location.href = "http://localhost:3000/playground";
         }
       }
 
