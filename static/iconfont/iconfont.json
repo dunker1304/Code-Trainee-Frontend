@@ -1,0 +1,23 @@
+{
+  "id": "1884170",
+  "name": "capstone",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon",
+  "description": "",
+  "glyphs": [
+    {
+      "icon_id": "13165611",
+      "name": "setting",
+      "font_class": "setting-copy",
+      "unicode": "e600",
+      "unicode_decimal": 58880
+    },
+    {
+      "icon_id": "13287947",
+      "name": "warning",
+      "font_class": "warning",
+      "unicode": "e601",
+      "unicode_decimal": 58881
+    }
+  ]
+}

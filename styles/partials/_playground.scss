@@ -2,3 +2,39 @@ div#playground {
   width: 100% !important;
   height: 65vh !important;
 }
+
+.footer-playground {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  .question-fast-picker {
+    width: 100%;
+    bottom: 0;
+    padding: 10px 0px 10px 20px;
+    display: flex;
+    align-items: center;
+    button.ant-btn {
+      display: flex;
+      align-items: center;
+      svg {
+        margin-right: 5px;
+      }
+    }
+  }
+  
+  .action-code-editor {
+    display: flex;
+    width: 100%;
+    bottom: 0;
+    padding: 10px 0px;
+    justify-content: space-between;
+    .action {
+      display: flex;
+    }
+    button.ant-btn {
+      display: flex;
+      align-items: center;
+    }
+  }
+}
+
