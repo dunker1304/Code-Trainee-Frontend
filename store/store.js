@@ -1,8 +1,7 @@
 import thunkMiddleware from 'redux-thunk'
 import { createStore, applyMiddleware, compose, combineReducers } from 'redux'
-import { MakeStore, createWrapper, Context , HYDRATE } from 'next-redux-wrapper'
+import { createWrapper, HYDRATE } from 'next-redux-wrapper'
 import auth from './auth/reducer'
-
 
 // const initStore = (initState = {}) => {
 //   const store = createStore(

@@ -48,7 +48,7 @@ const Playground = props => {
       source_code: code,
       question_id: '1'
     }
-    axios.post('http://localhost:1337/api/test', data)
+    axios.post('http://localhost:1337/api/submissions', data)
       .then(res => {
         console.log(res, 'dunker alo')
         setTestCaseProps(res.data)
