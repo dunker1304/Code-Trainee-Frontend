@@ -4,29 +4,11 @@ import Head from 'next/head'
 import { Button, Upload, message, Modal } from 'antd'
 import { UpCircleOutlined } from '@ant-design/icons'
 import CodeTrainee from 'hocs';
-import { GoogleLogin } from 'react-google-login';
 import * as action from "../store/auth/action"
+import Login from "../components/Login"
 
 @CodeTrainee
 class Index extends Component {
-  state = { visible: false };
-
-  showModal = () => {
-    this.setState({
-      visible: true,
-    });
-  };
-
-  hideModal = ()=> {
-    this.setState({
-      visible : false
-    })
-  }
-
-  responseGoogle = (res) => {
-    this.props.authGoogle(res.accessToken)
-    console.log(res);
-  }
 
   render() {
     return (
@@ -48,19 +30,22 @@ class Index extends Component {
                   <span className='logo-title'>Code Trainee</span>
                 </div>
                 <Modal
-                  title="Basic Modal"
-                  visible={this.state.visible}
+                  style={{ top: 20 }}
+                  closable = {false}
+                  visible={this.props.isShowLogin.isShow}
                   footer = {null}
-                  onOk={this.hideModal}
-                  onCancel={this.hideModal}
+                  onOk={()=> this.props.displayLogin(false,1)}
+                  onCancel={()=> this.props.displayLogin(false,1)}
+                  wrapClassName = 'login-modal'
+                  className="my-modal-class"
                 >
       
-                  <a href = 'http://localhost:1337/oauth/google/'>Login via google</a>
+                 <Login  type = {this.props.isShowLogin.type ?this.props.isShowLogin.type:1 }></Login>
                 </Modal>
                 <div className="col-sm-6 col-12">
                   <ul className='header-btn'>
-                    <li><a className='fill-btn'>Sign in</a></li>
-                    <li><button className='fill-btn'  onClick={this.showModal}>Sign up</button></li>
+                    <li><a className='fill-btn'  onClick={()=>this.props.displayLogin(true,1)}>Sign in</a></li>
+                    <li><a className='fill-btn'  onClick={()=>this.props.displayLogin(true,2)}>Sign up</a></li>
                   </ul>
                 </div>
               </div>
@@ -222,7 +207,8 @@ class Index extends Component {
 
 function mapStateToProps(state) {
   return {
-    errorMessage: state.auth.errorMessage
+    errorMessage: state.auth.errorMessage,
+    isShowLogin : state.auth.isShowLogin
   }
 }
 

@@ -1,7 +1,8 @@
 import thunkMiddleware from 'redux-thunk'
 import { createStore, applyMiddleware, compose, combineReducers } from 'redux'
-import { createWrapper, HYDRATE } from 'next-redux-wrapper'
+import { MakeStore, createWrapper, Context , HYDRATE } from 'next-redux-wrapper'
 import auth from './auth/reducer'
+
 
 // const initStore = (initState = {}) => {
 //   const store = createStore(
@@ -32,7 +33,6 @@ const reducer = (state, action) => {
       ...state, // use previous state
       ...action.payload, // apply delta from hydration
     }
-    if (state.count) nextState.count = state.count // preserve count value on client side navigation
     return nextState
   } else {
     return combinedReducer(state, action)
@@ -44,4 +44,4 @@ const initStore = () => {
 }
 
 
-export const wrapper = createWrapper(initStore, { debug: true })
+export const wrapper = createWrapper(initStore)

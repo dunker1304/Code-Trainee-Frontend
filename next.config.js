@@ -11,18 +11,33 @@ module.exports = {
         analyzerMode: 'server',
         analyzerPort: 8888,
         openAnalyzer: true
-      }))
+      }));
 
-      // config.plugins.push(
-      //   new webpack.ProvidePlugin({
-      //       '$': 'jquery',
-      //       'jQuery': 'jquery',
-      //   })
-      // )
-    }
-
-    config.module.rules.push({
+      // const rule = config.module.rules
+      //   .find(rule => rule.oneOf)
+      //   .oneOf.find(
+      //     r =>
+      //       // Find the global CSS loader
+      //       r.issuer && r.issuer.include && r.issuer.include.includes("_app")
+      //   );
+      // if (rule) {
+      //   rule.issuer.include = [
+      //     rule.issuer.include,
+      //     // Allow `monaco-editor` to import global CSS:
+      //     /[\\/]node_modules[\\/]monaco-editor[\\/]/
+      //   ];
+      // }
       
+      // config.plugins.push(new MonacoWebpackPlugin({
+      //   languages: [
+      //     'json',
+      //     'javascript'
+      //   ]
+      // }))
+    }
+    
+    config.module.rules.push({
+    
     })
 
     return config

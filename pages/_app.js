@@ -5,6 +5,7 @@ import { wrapper } from '../store/store';
 import App, { Container } from 'next/app'
 import { Provider } from 'react-redux'
 import withRedux from 'next-redux-wrapper';
+import { loadUserInfo } from '../store/auth/action'
 
 // function MyApp({ Component, pageProps }) {
 //   return <Component {...pageProps} />
@@ -24,6 +25,9 @@ import withRedux from 'next-redux-wrapper';
 
 class MyApp extends App {
   static async getInitialProps({ Component, ctx }) {
+     //Preload from the server side
+     ctx.store.dispatch(loadUserInfo("1234"));
+
     return {
       pageProps: Component.getInitialProps
         ? await Component.getInitialProps(ctx)
@@ -34,7 +38,9 @@ class MyApp extends App {
   render() {
     const { Component, pageProps } = this.props
     return (
+    //  <Provider>
       <Component {...pageProps} />
+  //    </Provider>
     )
   }
 }

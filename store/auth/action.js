@@ -1,16 +1,47 @@
 import axios from 'axios';
-import CONSTANTS from '../../constant'
 
-export const loadUserInfo = () => {
-  const url = `http://localhost:1337/api/test`;
+export const loadUserInfo = (accessToken) => {
+  const url = `http://localhost:1337/api/current_user`;
   return dispatch => {
     let promise = new Promise((resolve, reject) => {
-      axios
-        .get(url)
-        .then( res => {
+      axios({
+        method: 'get',
+        withCredentials : true,
+        url: url,
+        headers : { Authorization: `Bearer ${accessToken}` }
+      }) .then( res => {
+        dispatch({
+          type: 'LOADED_USER_INFO',
+          payload: res.data.user
+        })
+        resolve(res)
+      })
+      .catch( error => {
+        console.log(error, 'send eorr')
+        reject(error)
+      })
+    })
+    return promise
+  }
+}
+
+
+  export const signIn = (email,password)=> {
+    const url = `http://localhost:1337/signin`;
+    
+    const config = { headers: { 'Content-Type': 'application/json' } };
+    const data = {email : email , password : password}
+    return dispatch => {
+      let promise = new Promise((resolve, reject) => {
+        axios({
+          method: 'post',
+          url: url,
+          data:data,
+          withCredentials : true
+        }) .then( res => {
           dispatch({
-            type: 'LOADED_USER_INFO',
-            payload: res.data.get
+            type: 'SIGN_IN',
+            payload: res.data
           })
           resolve(res)
         })
@@ -18,21 +49,33 @@ export const loadUserInfo = () => {
           console.log(error, 'send eorr')
           reject(error)
         })
-    })
-    return promise
+      })
+      return promise
+    }
   }
-}
 
-export const authGoogle = (accessToken) => {
-  const url = `http://localhost:1337/oauth/google/`;
-  return dispatch => {
+  export const displayLogin = (isShow,type)=> {
+    return dispatch => {
+      dispatch({
+        type: 'DISPLAY_LOGIN',
+        payload: { isShow :isShow , type: type}
+      })
+     }
+ }
+
+ export const signUp = (data) => {
+   const url = `http://localhost:1337/signup`
+   return dispatch => {
     let promise = new Promise((resolve, reject) => {
-      axios
-        .post(url, {'access_token':accessToken}, {headers: {'Content-Type': 'application/json',}})
-        .then( res => {
+        axios({
+          method: 'post',
+          url: url,
+          data :data
+        }) .then( res => {
+          console.log(res)
           dispatch({
-            type: 'GOOGLE_AUTH',
-            payload: res.data.get
+            type: 'SIGN_UP',
+            payload: res.data
           })
           resolve(res)
         })
@@ -40,7 +83,10 @@ export const authGoogle = (accessToken) => {
           console.log(error, 'send eorr')
           reject(error)
         })
-    })
-    return promise
-  }
-}
+      })
+      return promise
+   }
+ }
+
+
+  

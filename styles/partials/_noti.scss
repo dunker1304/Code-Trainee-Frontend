@@ -1,0 +1,13 @@
+.my_notification {
+  border-left: 6px solid #ff674c;
+  .ant-notification-notice-with-icon {
+    display: flex;
+    font-size: 16px;
+    font-weight: bold;
+    color: #555555;
+    .ant-notification-notice-message {
+      margin:0px;
+      padding: 0px;
+    }
+  }
+}
