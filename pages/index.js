@@ -1,12 +1,15 @@
 import React, { Component } from 'react'
 import Head from 'next/head'
-// import { connect } from 'react-redux'
-import { Button, Upload, message } from 'antd'
+ import { connect } from 'react-redux'
+import { Button, Upload, message, Modal } from 'antd'
 import { UpCircleOutlined } from '@ant-design/icons'
 import CodeTrainee from 'hocs';
+import * as action from "../store/auth/action"
+import Login from "../components/Login"
 
-//@CodeTrainee
+@CodeTrainee
 class Index extends Component {
+
   render() {
     return (
       <>
@@ -26,10 +29,23 @@ class Index extends Component {
                   <img src='../static/images/logo.png' alt='logo' width='70px'/>
                   <span className='logo-title'>Code Trainee</span>
                 </div>
+                <Modal
+                  style={{ top: 20 }}
+                  closable = {false}
+                  visible={this.props.isShowLogin.isShow}
+                  footer = {null}
+                  onOk={()=> this.props.displayLogin(false,1)}
+                  onCancel={()=> this.props.displayLogin(false,1)}
+                  wrapClassName = 'login-modal'
+                  className="my-modal-class"
+                >
+      
+                 <Login  type = {this.props.isShowLogin.type ?this.props.isShowLogin.type:1 }></Login>
+                </Modal>
                 <div className="col-sm-6 col-12">
                   <ul className='header-btn'>
-                    <li><a className='fill-btn'>Sign in</a></li>
-                    <li><a className='fill-btn'>Sign up</a></li>
+                    <li><a className='fill-btn'  onClick={()=>this.props.displayLogin(true,1)}>Sign in</a></li>
+                    <li><a className='fill-btn'  onClick={()=>this.props.displayLogin(true,2)}>Sign up</a></li>
                   </ul>
                 </div>
               </div>
@@ -189,4 +205,11 @@ class Index extends Component {
   }
 }
 
-export default Index
+function mapStateToProps(state) {
+  return {
+    errorMessage: state.auth.errorMessage,
+    isShowLogin : state.auth.isShowLogin
+  }
+}
+
+export default connect(mapStateToProps,action)(Index)
