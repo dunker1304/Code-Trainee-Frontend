@@ -2,6 +2,7 @@ import thunkMiddleware from 'redux-thunk'
 import { createStore, applyMiddleware, compose, combineReducers } from 'redux'
 import { createWrapper, HYDRATE } from 'next-redux-wrapper'
 import auth from './auth/reducer'
+import problem from './problem/reducer'
 
 // const initStore = (initState = {}) => {
 //   const store = createStore(
@@ -23,7 +24,8 @@ const bindMiddleware = (middleware) => {
 }
 
 const combinedReducer = combineReducers({
-  auth
+  auth,
+  problem
 })
 
 const reducer = (state, action) => {

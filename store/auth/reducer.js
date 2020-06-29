@@ -1,6 +1,7 @@
 import produce from 'immer';
 import {openNotificationWithIcon} from '../../components/Notification'
 
+
 const initState = {
   userInfo: {},
   authMessage :'',
@@ -8,7 +9,7 @@ const initState = {
     isShow:false,
     type:1
   },
-  isLoginSuccess :false
+  isLoginSuccess :false,
 }
 
 export default (state = initState, action) => {
@@ -42,6 +43,7 @@ export default (state = initState, action) => {
           draft.signUpError = action.payload.message
           openNotificationWithIcon('warning','',action.payload.message)
           break 
+     
     }
   })
 }
