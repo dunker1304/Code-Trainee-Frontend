@@ -7,6 +7,7 @@ import TestCase from '../components/TestCase'
 import SettingModal from '../components/SettingModal'
 import QuestionDescription from '../components/QuestionDescription'
 import { languageMap } from '../utils/constants'
+import Split from 'react-split'
 
 import "ace-builds/src-noconflict/mode-javascript";
 import "ace-builds/src-noconflict/mode-java";
@@ -29,7 +30,7 @@ const { TabPane } = Tabs
 const Playground = props => { 
   const [code, setCode] = useState("")
   const [languageID, setLanguageID] = useState(63)
-  const [testCaseProps, setTestCaseProps] = useState()
+  const [testCaseProps, setTestCaseProps] = useState(props.question.testCases)
   const [consoleEditor, setConsoleEditor] = useState('show')
   const [fontSize, setFontSize] = useState(14)
   const [theme, setTheme] = useState('monokai')
@@ -94,13 +95,34 @@ const Playground = props => {
     }
   }
 
+  const handlePickRandomQuestion = () => {
+    console.log('random question')
+    axios.get('http://localhost:1337/api/question/random')
+      .then((response) => {
+        console.log(response.data, 'random question')
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  }
+
   return (
     <>
-      <Row>
-        <Col className="content-right" span={10}>
+      <Split
+        sizes={[35, 65]}
+        minSize={300}
+        expandToMin={false}
+        gutterSize={10}
+        gutterAlign="center"
+        snapOffset={30}
+        dragInterval={1}
+        direction="horizontal"
+        cursor="col-resize"
+        className="split-wrapper">
+        <div className="content-right">
           <Tabs defaultActiveKey="1" type="card" onChange={handleChangeTab}>
             <TabPane tab="Description" key="1">
-              <QuestionDescription question={props.question}/>
+              <QuestionDescription question={props.question.question}/>
             </TabPane>
             <TabPane tab="Solutions" key="2">
               Solution here
@@ -115,7 +137,7 @@ const Playground = props => {
               <svg viewBox="0 0 24 24" width="1em" height="1em" className="icon__3Su4"><path fillRule="evenodd" d="M7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7zM3 5h2v2H3V5zm0 6h2v2H3v-2zm0 6h2v2H3v-2z"></path></svg>
               <span>Problems</span>
             </Button>
-            <Button type='default'>
+            <Button type='default' onClick={handlePickRandomQuestion}>
               <svg viewBox="0 0 24 24" width="1em" height="1em" className="icon__3Su4 shuffle-icon__dV27"><path fillRule="evenodd" d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"></path></svg>
               <span>Pick One</span>
             </Button>
@@ -123,14 +145,14 @@ const Playground = props => {
               <svg viewBox="0 0 24 24" width="1em" height="1em" className="icon__3Su4 handler-icon__26i5"><path fillRule="evenodd" d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"></path></svg>
               <span>Prev</span>
             </Button>
-            <span>1/2</span>
+              <span>1/{props.question.total}</span>
             <Button type='default'>
               <span>Next</span>
               <svg viewBox="0 0 24 24" width="1em" height="1em" className="icon__3Su4 handler-icon__26i5"><path fillRule="evenodd" d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg>
             </Button>
           </div>
-        </Col>
-        <Col className="content-left playground-wrapper" span={14}>
+        </div>
+        <div className="content-left playground-wrapper">
           <div className="playground-action">
             <Select defaultValue="Javascript" style={{ width: 120 }} onChange={handleChangeLanguage}>
               <Option value="53">C</Option>
@@ -157,6 +179,7 @@ const Playground = props => {
             keyboardHandler={keyboardHandler}
             name="playground"
             showGutter={gutter}
+            showPrintMargin={false}
             editorProps={{ $blockScrolling: true }}
             setOptions={{
               enableBasicAutocompletion: true,
@@ -167,18 +190,19 @@ const Playground = props => {
 
           {
             Array.isArray(testCaseProps) ?
-            <Tabs defaultActiveKey="1" type="card" tabPosition="left" onChange={handleChangeTab}>
-              {console.log(testCaseProps, 'test case props')}
+            <Tabs defaultActiveKey="1" tabPosition="left" onChange={handleChangeTab} 
+              style={ (consoleEditor == 'hide') ? {display: 'none'} : null } className="console-status">
               {testCaseProps.map((testCase, key) => (
                 <TabPane tab={`Test Case ` + (key + 1)} key={key}>
-                  <TestCase testCaseProps={testCase.data}/>
+                  <TestCase testCaseProps={testCase.data || testCase}/>
                 </TabPane>
               ))}
             </Tabs>
             :
             <div className="console-status" style={ (consoleEditor == 'hide') ? {display: 'none'} : null }>
               <div>Status: {testCaseProps && testCaseProps.data.status.description}</div>
-              <div style={{ whiteSpace: 'pre-wrap' }} dangerouslySetInnerHTML={{__html: testCaseProps && testCaseProps.data.compile_output.toString()}}></div>
+              <div style={{ whiteSpace: 'pre-wrap' }} 
+                dangerouslySetInnerHTML={{__html: testCaseProps && testCaseProps.data.compile_output ? testCaseProps.data.compile_output.toString() : testCaseProps.data.stderr.toString()}}></div>
             </div>
           }
 
@@ -192,8 +216,8 @@ const Playground = props => {
               <Button className="submit-code">Submit</Button>
             </div>
           </div>
-        </Col>
-      </Row>
+        </div>
+      </Split>
     </>
   );
 }
@@ -202,6 +226,7 @@ Playground.getInitialProps = async (ctx) => {
   let id = ctx.query.questionID
   let url = `http://localhost:1337/api/question?id=${id}`
   const questionResponse = await axios.get(url)
+  console.log(questionResponse.data, 'question response')
   return { question: questionResponse.data }
 }
 
