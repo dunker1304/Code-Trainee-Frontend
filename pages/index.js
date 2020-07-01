@@ -21,7 +21,7 @@ class Index extends Component {
           <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
           <title>Code Trainee</title>
         </Head>
-        <div className='wrapper'>
+        <div className='wrapper-index-page'>
           <div className='header-menu'>
             <div className='container'>
               <div className='row'>

@@ -11,6 +11,11 @@ div#playground {
   }
 }
 
+.playground-action {
+  display: flex;
+  justify-content: space-between;
+}
+
 .content-right, .content-left {
   height: 100vh;
   display: flex;
@@ -40,13 +45,19 @@ div#playground {
   }
 
   .question-info {
-    display: flex;
-    justify-content: space-evenly;
     border-bottom: 1px solid #8080802e;
+    .question-level, .question-point, .question-reaction {
+      display: inline-block;
+    }
   }
   .question-description {
     margin-top: 20px;
   }
+}
+.gutter.gutter-horizontal {
+  background-repeat: no-repeat;
+  background-position: center;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==);
 }
 
 .question-fast-picker {
@@ -78,6 +89,12 @@ div#playground {
   button.ant-btn {
     display: flex;
     align-items: center;
+  }
+}
+
+.test-case-wrapper {
+  .input {
+    white-space: pre-wrap;
   }
 }
 
