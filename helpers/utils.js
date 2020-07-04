@@ -19,3 +19,8 @@ export const translateClassName = (level) => {
       return 'danger';
   }
 }
+
+export const getQuery = (query)=> {
+  //format discuss_id
+  return query.split('_')[1]
+}

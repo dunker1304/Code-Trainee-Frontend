@@ -3,6 +3,7 @@ import { createStore, applyMiddleware, compose, combineReducers } from 'redux'
 import { createWrapper, HYDRATE } from 'next-redux-wrapper'
 import auth from './auth/reducer'
 import problem from './problem/reducer'
+import discuss from './discuss/reducer'
 
 // const initStore = (initState = {}) => {
 //   const store = createStore(
@@ -25,7 +26,8 @@ const bindMiddleware = (middleware) => {
 
 const combinedReducer = combineReducers({
   auth,
-  problem
+  problem,
+  discuss
 })
 
 const reducer = (state, action) => {

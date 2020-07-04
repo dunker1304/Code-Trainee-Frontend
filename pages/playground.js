@@ -22,6 +22,7 @@ import "ace-builds/src-noconflict/theme-solarized_dark";
 import "ace-builds/src-noconflict/theme-solarized_light";
 import "ace-builds/src-noconflict/theme-terminal";
 import "ace-builds/src-noconflict/ext-language_tools"
+import Router , {useRouter} from 'next/router'
 
 const { Option } = Select
 const { TabPane } = Tabs
@@ -98,7 +99,7 @@ const Playground = props => {
     <>
       <Row>
         <Col className="content-right" span={10}>
-          <Tabs defaultActiveKey="1" type="card" onChange={handleChangeTab}>
+          <Tabs defaultActiveKey="1" type="card" onChange={handleChangeTab} onTabClick = {()=> Router.push('/discuss/[discussId]','/discuss/1')}>
             <TabPane tab="Description" key="1">
               <QuestionDescription question={props.question}/>
             </TabPane>

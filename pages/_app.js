@@ -6,6 +6,8 @@ import App, { Container } from 'next/app'
 import { Provider } from 'react-redux'
 import withRedux from 'next-redux-wrapper';
 import Head from 'next/head'
+import "simplemde/dist/simplemde.min.css";
+import 'highlight.js/styles/github.css';
 
 // function MyApp({ Component, pageProps }) {
 //   return <Component {...pageProps} />
