@@ -56,7 +56,10 @@ const StepBasic = ({
         }
       }
     })();
-    return () => {};
+    return () => {
+      dirty.setValue(false);
+      checkDirtyBeforeLeaving.setValue(false);
+    };
   }, []);
 
   useEffect(() => {
@@ -78,7 +81,7 @@ const StepBasic = ({
     }
   };
 
-  const handleCreate = async (onSuccess = () => {}) => {
+  const handleCreate = async () => {
     try {
       setButtonLoading(true);
       await form.validateFields();
@@ -98,8 +101,10 @@ const StepBasic = ({
           message: 'Notification',
           description: <p>Success!</p>,
         });
-
-        onSuccess();
+        exerciseId.setValue(res.data.data.id);
+        dirty.setValue(false);
+        checkDirtyBeforeLeaving.setValue(false);
+        nextStep();
       } else {
         notification.error({
           message: 'Notification',
@@ -235,14 +240,7 @@ forecolor backcolor | alignleft aligncenter alignright alignjustify | \
               type='primary'
               size='large'
               loading={buttonLoading}
-              onClick={() =>
-                handleCreate(() => {
-                  exerciseId.setValue(res.data.data.id);
-                  dirty.setValue(false);
-                  checkDirtyBeforeLeaving.setValue(false);
-                  nextStep();
-                })
-              }>
+              onClick={handleCreate}>
               Save and Next
             </Button>
           ) : (

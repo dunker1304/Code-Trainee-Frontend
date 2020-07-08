@@ -70,5 +70,9 @@ const Exercise = ({ id }) => {
     </React.Fragment>
   );
 };
+Exercise.getInitialProps = async (ctx) => {
+  let id = ctx.query?.id;
+  return { id };
+};
 
 export default Exercise;
