@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import Head from 'next/head'
- import { connect } from 'react-redux'
+import { connect } from 'react-redux'
 import { Button, Upload, message, Modal } from 'antd'
 import { UpCircleOutlined } from '@ant-design/icons'
 import CodeTrainee from 'hocs';
