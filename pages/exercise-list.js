@@ -1,4 +1,13 @@
-import { Table, Row, Col, Button, Space, Popconfirm, Tag } from 'antd';
+import {
+  Table,
+  Row,
+  Col,
+  Button,
+  Space,
+  Popconfirm,
+  Tag,
+  notification,
+} from 'antd';
 import {
   CheckCircleTwoTone,
   EditOutlined,
@@ -7,16 +16,32 @@ import {
 } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 const ExerciseList = ({ ownerId = 0 }) => {
+  // table
   let [tableData, setTableData] = useState([]);
   let [currPageTable, setCurrPageTable] = useState(1);
   let [currPageSize, setCurrPageSize] = useState(10);
+  let [tableLoading, setTablLoading] = useState(false);
+  // naviagte
+  let router = useRouter();
+  // state button loading
+  let [loadingButtonCreate, setLoadingButtonCreate] = useState(false);
+  let [loadingButtonUpdate, setLoadingButtonUpdate] = useState(false);
+
   useEffect(() => {
-    (async () => {
+    loadTable();
+  }, []);
+
+  const loadTable = async () => {
+    try {
+      setTablLoading(true);
       const res = await axios.get(
         `http://localhost:1337/api/exercise/get-by-owner?ownerId=${ownerId}`
       );
+      setTablLoading(false);
       if (res.data.success) {
         let data = [];
         res.data.data.forEach((e) => {
@@ -34,18 +59,47 @@ const ExerciseList = ({ ownerId = 0 }) => {
         });
         setTableData([...data]);
       }
-    })();
-  }, []);
+    } catch (e) {
+      notification.error({
+        title: 'Notification',
+        message: 'Load Data Fail',
+      });
+      setTablLoading(false);
+      console.log(e);
+    }
+  };
 
-  const handleCreateRecord = () => {};
+  const handleCreateExercise = () => {
+    setLoadingButtonCreate(true);
+    router.push({
+      pathname: '/exercise',
+      query: {},
+    });
+  };
 
-  const handleUpdateRecord = (record) => {};
-
-  const handleDeleteRecord = (record) => {};
+  const handleDeleteRecord = async (record) => {
+    const res = await axios.post(`http://localhost:1337/api/exercise/delete`, {
+      id: record.key,
+    });
+    console.log(res.data);
+    if (res.data.success) {
+      notification.info({
+        title: 'Notification',
+        message: 'Success',
+      });
+      loadTable();
+    } else {
+      notification.error({
+        title: 'Notification',
+        message: 'Fail',
+      });
+    }
+  };
 
   return (
     <>
       <Table
+        loading={tableLoading}
         title={() => (
           <Row
             style={{
@@ -54,7 +108,10 @@ const ExerciseList = ({ ownerId = 0 }) => {
             }}>
             <Col>Exercise List</Col>
             <Col>
-              <Button type='primary' onClick={handleCreateRecord}>
+              <Button
+                type='primary'
+                onClick={handleCreateExercise}
+                loading={loadingButtonCreate}>
                 Create Exercise
               </Button>
             </Col>
@@ -120,18 +177,17 @@ const ExerciseList = ({ ownerId = 0 }) => {
             dataIndex: 'approved',
             key: 'approved',
             width: '100px',
+            align: 'center',
             render: (text, record) => {
               return (
                 <>
                   {record.approved ? (
-                    <span>
-                      <CheckCircleTwoTone twoToneColor='#52c41a' /> Approved
-                    </span>
+                    <CheckCircleTwoTone
+                      twoToneColor='#52c41a'
+                      style={{ fontSize: '25px' }}
+                    />
                   ) : (
-                    <span>
-                      <LoadingOutlined style={{ fontSize: '16px' }} />
-                      Waiting...
-                    </span>
+                    <span>Waiting...</span>
                   )}
                 </>
               );
@@ -151,14 +207,11 @@ const ExerciseList = ({ ownerId = 0 }) => {
             width: '150px',
             render: (text, record) => (
               <Space size='middle'>
-                <a
-                  href='#'
-                  onClick={() => {
-                    setCurrRecord(record);
-                    handleUpdateRecord(record);
-                  }}>
-                  <EditOutlined style={{ fontSize: '16px' }} />
-                </a>
+                <Link href={`/exercise?id=${record.key}`} as={`/exercise`}>
+                  <a>
+                    <EditOutlined style={{ fontSize: '16px' }} />
+                  </a>
+                </Link>
                 <Popconfirm
                   title='Are you sure delete this test case?'
                   okText='Yes'
