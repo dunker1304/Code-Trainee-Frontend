@@ -1,0 +1,16 @@
+.tox-notifications-container {
+  display: none !important;
+}
+.tox-statusbar__branding {
+  display: none !important;
+}
+.add-test-case-model {
+  .ant-form-item-label > label {
+    width: 100%;
+  }
+}
+.table-snippets {
+  .ace_content {
+    height: 100% !important;
+  }
+}
