@@ -106,4 +106,14 @@ div#playground {
   }
 }
 
-
+.settings-editor-modal {
+  .setting-description {
+    font-size: 13px;
+    color: darkgray;
+  }
+  .ant-row {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+  }
+}
