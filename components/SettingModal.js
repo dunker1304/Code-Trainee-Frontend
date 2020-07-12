@@ -114,10 +114,10 @@ const SettingModal = props => {
           </Col>
           <Col span={8}>
             <div className="setting-select">
-            <Select defaultValue="14" style={{ width: 120 }} onChange={onChangeKeyboardHandler}>
+            <Select defaultValue="default" style={{ width: 120 }} onChange={onChangeKeyboardHandler}>
               <Option value="default">Default</Option>
               <Option value="vim">Vim</Option>
-              <Option value="Emacs">Emacs</Option>
+              <Option value="emacs">Emacs</Option>
             </Select>
             </div>
           </Col>
