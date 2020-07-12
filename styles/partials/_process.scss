@@ -1,0 +1,30 @@
+.process {
+  .status-submisson {
+    margin-top: 40px;
+    .number {
+      font-size: 20px;
+      margin-bottom: 0;
+      text-align: center;
+      .text-success {
+        color: #449d44 !important;
+      }
+   }
+   h3.number-text {
+    margin-top: -15px;
+    font-size: 24px;
+    text-align: center;
+    }
+    .number-text {
+        margin-top: 0;
+        text-align: center;
+    }
+  }
+  .title-all-sub {
+    margin: 20px 0px;
+    font-size: 24px;
+  }
+}
+.process-container {
+  padding-top: 20px;
+  min-height: 100vh;
+}

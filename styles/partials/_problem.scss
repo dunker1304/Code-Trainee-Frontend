@@ -1,4 +1,56 @@
+.list-question-container {
+  margin-bottom: 40px;
+}
+.assess-bar {
+  height: 52px;
+  margin-top: 22px;
+  display: flex;
+  justify-content: space-between;
+  .question-solved {
+    padding-top: 6px;
+    padding-left: 0;
+    display: flex;
+    .label {
+      display: inline;
+      padding: .2em .6em .3em;
+      font-size: 10px;
+      font-weight: 700;
+      color: #fff;
+      text-align: center;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      height: fit-content;
+    }
+    .round {
+      border-radius: 1020px;
+     }
+     .label-primary {
+      background-color: #337ab7;
+     }
+     .label-success {
+      background-color: #5cb85c;
+     } 
+     .label-warning {
+      background-color: #f0ad4e;
+     }
+     .label-danger {
+      background-color: #d9534f;
+     }
+  }
+
+}
 .question-list-base {
+  .question-filter-base .question-filter-hr {
+    margin-top: -5px;
+    margin-bottom: 28px;
+    .separator-op {
+      border-bottom: 1px solid #e4eaf1;
+      background: linear-gradient(white, #f7f7f7);
+      height: 7px;
+      z-index: -3;
+     }
+   }
   .question-filter-base {
      .search-bar-control input {
          border-radius: 1020px;

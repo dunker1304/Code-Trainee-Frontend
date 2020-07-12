@@ -1,7 +1,7 @@
 .discuss-container {
-  background-color: #f5f5f5;
+  min-height: 520px;
   .topic-container {
-    max-width: 1240px;
+    max-width: 97%;
     margin: 0 auto;
     background: white;
     margin-bottom: 40px;
@@ -17,7 +17,7 @@
       .link_title {
         .title-wrapper {
           font-size: 18px;
-          margin-left: 10px;
+          margin-left: 20px;
           color: #212121;
           font-weight: bolder;
         }
@@ -400,5 +400,26 @@
     }
 
     /*En Comment Detail*/
+  }
+}
+
+/*wrapper content*/
+.container-content {
+  position: relative;
+  margin-top: 50px;
+  z-index: 99;
+  .ant-tabs-bar {
+    margin: 0;
+    position: fixed;
+    top:50px;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    z-index: 99;
+  } 
+  .ant-tabs-content {
+    position: relative;
+    margin-top:40px;
+    z-index: 97px;
   }
 }

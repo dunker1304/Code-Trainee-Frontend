@@ -4,7 +4,7 @@ import CommentInput from "../components/CommentInput"
 
 const CodeHeader = (props) => {
   return (
-    <ListComment/>
+    <Header/>
   )
 }
 

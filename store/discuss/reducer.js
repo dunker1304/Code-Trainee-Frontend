@@ -5,14 +5,16 @@ import Router , {useRouter} from 'next/router'
 
 const initState = {
   discuss : [],
-  discussDetail : {}
+  discussDetail : {},
+  totalDiscuss : 0
 }
 
 export default (state = initState, action) => {
   return produce(state, draft => {
     switch (action.type) {
       case 'GET_COMMENT_QUESTION_ID':
-        draft.discuss = action.payload
+        draft.discuss = action.payload.comments
+        draft.totalDiscuss = action.payload.total
         break
       case 'GET_COMMENT_COMMENT_ID' :
         draft.discussDetail = action.payload
@@ -70,7 +72,7 @@ export default (state = initState, action) => {
 
           draft.discuss = [...tmpArray]
           openNotificationWithIcon('success','','Delete Successfully!')
-          Router.push('/exercise/[exerciseId]/discuss',`/exercise/${tmpCommentForDelete['questionId']}/discuss`)
+          Router.push('/exercise/[exerciseId]/discuss',`/exercise/${tmpCommentForDelete['exerciseId']}/discuss`)
           break;
         }
 

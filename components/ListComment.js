@@ -1,5 +1,4 @@
-import { Button } from "antd";
-const list = [1,2,3,4,5]
+import { Button ,Pagination} from "antd";
 import CommentListItem from "../components/CommentListItem"
 import CommentInput from "../components/CommentInput"
 import React, { useState } from 'react';
@@ -8,6 +7,7 @@ import { getDiscussByQuestionId } from "../store/discuss/action";
 const ListComment = (props) => {
   const [isShow, setIsShow] = useState(false);
   const [filterBy , setFilterBy ] = useState(0) /* 0 : DESC - 1 : ASC */
+  const [currentPage , setCurrentPage ] = useState(1)
 
   const handelClickShow = ()=> {
         setIsShow(!isShow)
@@ -17,9 +17,16 @@ const ListComment = (props) => {
        setFilterBy(value)
        console.log(props)
        let exerciseId = props.questionId;
-       let page = 1;
+       let page = currentPage;
        let sortBy = value
        props.getDiscussByQuestionId(exerciseId,page,sortBy)
+  }
+
+  const pagingQuestion = (currentPage,pageSize)=> {
+      let exerciseId = props.questionId;
+      setCurrentPage(currentPage);
+      props.getDiscussByQuestionId(exerciseId,currentPage,filterBy)
+
   }
   
   return (
@@ -28,7 +35,7 @@ const ListComment = (props) => {
         <div className = "header-wrapper">
           <a className = "link_title">
             <div className = "title-wrapper">
-                1480. Running Sum of 1d Array
+                {props.question.title}
             </div>
           </a>
         </div>
@@ -50,7 +57,21 @@ const ListComment = (props) => {
               <CommentListItem key= {value['id']} comment={value}/>
             ))
           }
+          <div className="topic-item-wrap" style={{textAlign:"center"}}>
+              <Pagination
+              defaultCurrent={currentPage}
+              current= {currentPage}
+              total={props.totalDiscuss}
+              showSizeChanger={false}
+              pageSize={2}
+              defaultPageSize={2}
+              onChange= {(pageNumber,pageSize)=> {pagingQuestion(pageNumber,pageSize)}}
+           />
 
+
+          </div>
+
+        
         </div>
       </div>
 

@@ -8,6 +8,7 @@ import { searchQuestion, chooseTags, dropdownFilter, getCategory,addToWishList,r
 import QuestionItem from "../components/QuestionItem"
 import YourProcess from "../components/YourProcess"
 import Header from "../components/Header"
+import Footer from "../components/Footer"
 
 
 const Level = [{ id: 1, name: 'Easy' }, { id: 2, name: 'Medium' }, { id: 3, name: 'Hard' }]
@@ -228,13 +229,36 @@ const Problems = (props) => {
 
   return (
     <div>
-      <Header/>
-    <div className="container">
+    <Header/>
+    <div className="container container-content list-question-container">
 
       <div className="row" >
         <div className="col-md-9">
+          <div className="assess-bar">
+          <div id="welcome" className="col-md-4 col-sm-12 question-solved">
+          
+              <span className="label label-primary round">
+                <span>0/1505 Solved</span>
+             </span>&nbsp;-&nbsp;
+            <span className="label label-success round">Easy 0</span>&nbsp;
+            <span className="label label-warning round">Medium 0</span>&nbsp;
+            <span className="label label-danger round">Hard 0</span>
+            
+          </div>
+          <div className="pull-right">
+            <Button type='default'>
+              <svg viewBox="0 0 24 24" width="1em" height="1em" className="icon__3Su4 shuffle-icon__dV27"><path fillRule="evenodd" d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"></path></svg>
+              <span>Pick One</span>
+            </Button>
+          </div>
+
+
+          </div>
           <div className="question-list-base">
             <div className="question-filter-base">
+              <div className="separator-line question-filter-hr">
+                <div className="separator-op"></div>
+              </div>
               <div className="row search-bar-control">
                 <div className="col-sm-6 col-lg-7">
                   <Input placeholder="Search question title, discription" value={termSearch} onChange={textChange} onKeyUp={submitTermSearch}></Input>
@@ -297,7 +321,7 @@ const Problems = (props) => {
                     <th className="text-center">Title</th>
                     <th className="text-center">Difficulty</th>
                     <th className="text-center">Author</th>
-                    <th className="text-center">Acceptance</th>
+                   
                   </tr>
                 </thead>
                 <tbody>
@@ -316,19 +340,7 @@ const Problems = (props) => {
                           </span>
                           {value.author.displayName}
                         </td>
-                        <td class="text-center" >
-                          <div class="widget-content p-0">
-                            <div class="widget-content-outer">
-                              <div class="widget-content-wrapper">
-                                <div class="widget-content-left pr-2">
-                                  <div class="widget-numbers fsize-1 text-danger">
-                                    71%
-                                </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </td>
+                        
 
                       </tr>
                     ))
@@ -386,6 +398,7 @@ const Problems = (props) => {
       </div>
 
       </div>
+      <Footer/>
     </div>
   )
 

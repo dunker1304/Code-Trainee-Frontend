@@ -1,6 +1,6 @@
 import axios from 'axios';
 export const searchQuestion = (data)=> {
-  const url = `http://localhost:1337/api/search-question`;
+  const url = `http://localhost:1337/api/search-exercise`;
   return dispatch => {
     let promise = new Promise((resolve, reject) => {
       axios({
@@ -45,7 +45,7 @@ export const dropdownFilter = (value) => {
 
 export const getCategory = ()=> {
   ///api/get-category
-  const url = `http://localhost:1337/api/get-category`;
+  const url = `http://localhost:1337/api/get-tag`;
   return dispatch => {
     let promise = new Promise((resolve, reject) => {
       axios({
@@ -94,14 +94,14 @@ export const addToWishList = (questionId) => {
   }
 }
 
-export const removeToWishList = (questionId) => {
+export const removeToWishList = (questionId ,typeWishList) => {
   const url = `http://localhost:1337/api/remove-wishList`;
   return dispatch => {
     let promise = new Promise((resolve, reject) => {
       axios({
         method: 'post',
         url: url,
-        data: {questionId : questionId}
+        data: {exerciseId : questionId , typeWishList :typeWishList }
         //headers : { Authorization: `Bearer ${accessToken}` }
       }) .then( res => {
         dispatch({
@@ -119,3 +119,76 @@ export const removeToWishList = (questionId) => {
   }
 }
 
+export const getTypeWishList = (userId) => {
+  const url = `http://localhost:1337/api/type-wish-list`;
+  return dispatch => {
+    let promise = new Promise((resolve, reject) => {
+      axios({
+        method: 'get',
+        url: url,
+        //headers : { Authorization: `Bearer ${accessToken}` }
+      }) .then( res => {
+        dispatch({
+          type: 'GET_TYPE_WISHLIST',
+          payload: res.data.data
+        })
+        resolve(res)
+      })
+      .catch( error => {
+        console.log(error, 'send eorr')
+        reject(error)
+      })
+    })
+    return promise
+  }
+}
+
+export const addTypeWishList = (name)=> {
+  const url = `http://localhost:1337/api/add-type-wish-list`;
+  return dispatch => {
+    let promise = new Promise((resolve, reject) => {
+      axios({
+        method: 'post',
+        data : { name : name},
+        url: url,
+        //headers : { Authorization: `Bearer ${accessToken}` }
+      }) .then( res => {
+        dispatch({
+          type: 'ADD_TYPE_WISHLIST',
+          payload: res.data
+        })
+        resolve(res)
+      })
+      .catch( error => {
+        console.log(error, 'send eorr')
+        reject(error)
+      })
+    })
+    return promise
+}
+}
+
+
+export const getWishListByType = (type) => {
+  const url = `http://localhost:1337/api/wish-list/${type}`;
+  return dispatch => {
+    let promise = new Promise((resolve, reject) => {
+      axios({
+        method: 'get',
+        url: url,
+        //headers : { Authorization: `Bearer ${accessToken}` }
+      }) .then( res => {
+        dispatch({
+          type: 'GET_WISHLIST_BY_TYPE',
+          payload: res.data
+        })
+        resolve(res)
+      })
+      .catch( error => {
+        console.log(error, 'send eorr')
+        reject(error)
+      })
+    })
+    return promise
+  }
+}

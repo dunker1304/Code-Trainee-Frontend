@@ -11,7 +11,7 @@ const CommentListItem = (props)=> {
       </div>
       <div className = "title-wrapper">
          <div className = "item-header">
-            <Link href="/exercise/[exerciseId]/[discussId]" as={`/exercise/${props.comment.questionId}/discuss_${props.comment.id}`}>
+            <Link href="/exercise/[exerciseId]/[discussId]" as={`/exercise/${props.comment.exerciseId}/discuss_${props.comment.id}`}>
              <a className = "title-link"> 
                {props.comment.title}
              </a>

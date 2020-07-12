@@ -7,7 +7,6 @@ import Router , {useRouter} from 'next/router'
 import axios from 'axios'
 import { openNotificationWithIcon } from "../components/Notification"
 import  { ERROR_MESSAGE_FROM_SERVER} from "../utils/constants"
-import { responsiveArray } from "antd/lib/_util/responsiveObserve";
 const SimpleMDE = dynamic(() => import('react-simplemde-editor'), {
   ssr: false
 });
@@ -39,14 +38,14 @@ const CommentInput = (props) => {
 
     if(res.data.success) {
         let createdCmt = res.data.data
-        Router.push('/exercise/[exerciseId]/[discuss_Id]',`/exercise/${props.questionId}/${`discuss_${createdCmt['id']}`}`)
+        Router.push('/exercise/[exerciseId]/[discussId]',`/exercise/${props.questionId}/${`discuss_${createdCmt['id']}`}`)
     }
     else {
       openNotificationWithIcon('error','',ERROR_MESSAGE_FROM_SERVER[res.data.error])
     }
   }
    return (
-     <div className = {classnames('page-drawer-base', !props.isShow ? 'cancel-class':'show-class')} style={{height :"65%"}}>
+     <div className = {classnames('page-drawer-base', !props.isShow ? 'cancel-class':'show-class')} style={{height :"72%"}}>
        <div className = "content-container">
          <form className = "topic-editor-base" onSubmit= {(e)=>submitComment(e)}>
            <div className = "editor-header">

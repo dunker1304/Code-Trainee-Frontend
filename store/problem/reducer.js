@@ -14,7 +14,9 @@ const tags = [
 const initState = {
   question : [],
   category : [],
-  totalQuestion : 0
+  totalQuestion : 0,
+  typeWishList : [],
+  wishList : []
 }
 
 export default (state = initState, action) => {
@@ -69,14 +71,18 @@ export default (state = initState, action) => {
       case 'REMOVE_TO_WISHLIST':
         if(action.payload.success) {
           let tmpQuestionRemove = JSON.parse(JSON.stringify(state.question))
+          let wishList =  JSON.parse(JSON.stringify(state.wishList))
           let tmpWishListRemove = action.payload.data
-          console.log(tmpWishListRemove)
           for(let i =0 ;i<tmpQuestionRemove.length ; i++) {
             if(tmpQuestionRemove[i].id == tmpWishListRemove['questionId']) {
               tmpQuestionRemove[i]['isWishList'] = false
               }
           }
-          draft.question = tmpQuestionRemove  
+          wishList = wishList.filter((value,index)=>{
+            return value['id'] != tmpWishListRemove['id']
+          })
+          draft.question = tmpQuestionRemove  ;
+          draft.wishList = wishList;
           openNotificationWithIcon('success','Success','Remove Successfully')
         }  
         else {
@@ -84,6 +90,27 @@ export default (state = initState, action) => {
         }
         break;
 
+      case 'GET_TYPE_WISHLIST': 
+        draft.typeWishList = action.payload
+        break;  
+
+      case 'ADD_TYPE_WISHLIST':
+        let tmpTypeWishList = [...draft.typeWishList]
+        if(action.payload.success  ) {
+            tmpTypeWishList.push(action.payload.data)
+            draft.typeWishList = tmpTypeWishList;
+            openNotificationWithIcon('success','','Add Successfully!')
+            break;
+        }  
+        else {
+            openNotificationWithIcon('error','', 'Add Failed!')
+            break;
+        }
+      
+      case 'GET_WISHLIST_BY_TYPE':
+           draft.wishList = action.payload.data
+           break;
+       
     }
   })
 }

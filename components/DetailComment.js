@@ -1,12 +1,12 @@
 import {LeftOutlined , DislikeFilled , LikeFilled ,MessageOutlined ,DeleteFilled, LikeOutlined, DislikeOutlined   } from "@ant-design/icons"
 import hljs from 'highlight.js';
 import dynamic from 'next/dynamic';
-import { Button } from "antd";
+import { Button , Pagination} from "antd";
 import React, { useState ,useEffect } from 'react';  
 import {voteAComment , createACommentChildren , deleteAComment} from "../store/discuss/action"
 import { connect } from 'react-redux'
 import CommentDetailItem from "../components/CommentDetailItem"
-import Router , {useRouter} from 'next/router'
+import Router , {useRouter } from 'next/router'
 const SimpleMDE = dynamic(() => import('react-simplemde-editor'), {
    ssr: false
  });
@@ -17,28 +17,39 @@ const DetailComment = (props) => {
        props.voteAComment(commentId , statusVote)
     }
     const [contentCmt , setContentCmt ] = useState('')
+    const [isSummit , setIsSummit ] = useState(false)
 
     const handleChangeCmt = (value)=> {
       setContentCmt(value)
+      
     }
 
-    const submitChildrenCmt = async (e)=>{
+    const submitChildrenCmt =  (e)=>{
       e.preventDefault();
       let data = {
          parentId : props.discussDetail['id'],
          content : contentCmt,
-         questionId : props.discussDetail['questionId']
+         questionId : props.discussDetail['exerciseId']
       }
       props.createACommentChildren(data)
-      setContentCmt('')
+      setIsSummit(true)
       
     }
+   
+   
+    useEffect(() => {
+      if(isSummit ) {
+         setIsSummit(false)
+         setContentCmt('')
+      }
+   },[isSummit]);
+ 
 
   return (
     <div className ="discuss-container">
        <div className="topic-container">
          <div className="title-comment">
-            <div className = "button-back right-border" onClick = {()=> {Router.push('/exercise/[exerciseId]/discuss',`/exercise/${props.discussDetail['questionId']}/discuss`)}}>
+            <div className = "button-back right-border" onClick = {()=> {Router.push('/exercise/[exerciseId]/discuss',`/exercise/${props.discussDetail['exerciseId']}/discuss`)}}>
                <LeftOutlined className="back_icon" /> Back
             </div>
             <div className = "___title">
@@ -77,7 +88,6 @@ const DetailComment = (props) => {
                  </div>
                  <div className="input_action">
                      <Button className="post-btn" htmlType="submit" >Post</Button>
-
                  </div>
               </form>
             </div>

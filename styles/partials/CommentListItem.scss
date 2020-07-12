@@ -50,4 +50,27 @@
        margin-left: 40px;
     }
   }
+  .ant-pagination-prev a , .ant-pagination-next a{
+    border-radius: 1020px;
+    border :none;
+    box-shadow: 0 5px 15px 0 rgba(0, 0, 0, 0.08);
+  } 
+  .ant-pagination-item {
+    border-radius: 10px;
+    border :none;
+    box-shadow: 0 5px 15px 0 rgba(0, 0, 0, 0.08);
+  }
+  .ant-pagination {
+     margin: 0 auto;
+     a {
+       color :#212121;
+     }
+     .ant-pagination-item-active {
+        a {
+         color: #fff !important;
+        }
+       background-color: #546e7a;
+       cursor: default;
+     }
+  }
 }
