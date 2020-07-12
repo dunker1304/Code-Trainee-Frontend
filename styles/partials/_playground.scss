@@ -28,6 +28,10 @@ div#playground {
 .console-status {
   height: 250px;
   overflow: scroll;
+
+  .ant-tabs-content {
+    margin-top: 20px !important;
+  }
 }
 
 .question-desc-wrapper {
@@ -55,6 +59,10 @@ div#playground {
   }
   .question-description {
     margin-top: 20px;
+  }
+
+  .question-level, .question-point, .question-reaction {
+    margin: 10px;
   }
 }
 .gutter.gutter-horizontal {
@@ -101,4 +109,14 @@ div#playground {
   }
 }
 
-
+.settings-editor-modal {
+  .setting-description {
+    font-size: 13px;
+    color: darkgray;
+  }
+  .ant-row {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+  }
+}

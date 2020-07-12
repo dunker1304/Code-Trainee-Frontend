@@ -1,7 +1,8 @@
-
-
+import React, { useEffect, useState } from 'react'
 const QuestionDescription = props => {
-  console.log(props, 'question description')
+  useEffect(() => {
+    document.getElementsByClassName('question-description')[0].innerHTML = props.question.content
+  })
   return (
     <div className="question-desc-wrapper">
       <h4 className='question-title'>Title: {props.question.title}</h4>
