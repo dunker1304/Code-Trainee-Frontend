@@ -7,6 +7,9 @@ import TestCase from '../components/TestCase'
 import SettingModal from '../components/SettingModal'
 import QuestionDescription from '../components/QuestionDescription'
 import { languageMap } from '../utils/constants'
+import Split from 'react-split'
+import CodeTrainee from '../hocs/index';
+import { connect } from 'react-redux'
 
 import "ace-builds/src-noconflict/mode-javascript";
 import "ace-builds/src-noconflict/mode-java";
@@ -27,22 +30,22 @@ const { Option } = Select
 const { TabPane } = Tabs
 
 const Playground = props => { 
-  const [code, setCode] = useState("")
-  const [languageID, setLanguageID] = useState(63)
-  const [testCaseProps, setTestCaseProps] = useState()
+  const [code, setCode] = useState(props.language[0].codeSnippets[0]?.sampleCode || '')
+  const [languageID, setLanguageID] = useState(props.language[0].code)
+  const [testCaseProps, setTestCaseProps] = useState(props.question.testCases)
   const [consoleEditor, setConsoleEditor] = useState('show')
   const [fontSize, setFontSize] = useState(14)
   const [theme, setTheme] = useState('monokai')
   const [tabSize, setTabSize] = useState(2)
   const [keyboardHandler, setKeyboardHandler] = useState("")
   const [gutter, setGutter] = useState(true)
+  const [runCode, setRunCode] = useState(false)
 
   const onChange = (newValue) => {
     setCode(newValue)
   }
 
   const handleRunCode = () => {
-    console.log(code, 'run code thoi')
     let data = {
       language_id: languageID,
       source_code: code,
@@ -50,16 +53,45 @@ const Playground = props => {
     }
     axios.post('http://localhost:1337/api/submissions', data)
       .then(res => {
-        console.log(res, 'dunker alo')
         setTestCaseProps(res.data)
       })
       .catch(error => {
         console.log(error)
       })
+    setRunCode(true)
   }
 
-  const handleChangeLanguage = (value) => {
+  const handleSubmitCode = () => {
+    console.log(testCaseProps, 'submit code')
+    if (!runCode) {
+      console.log('da run code d dau')
+      handleRunCode();
+    }
+    let data = {
+      question: props.question.question,
+      testcases: testCaseProps
+    }
+    axios.post('http://localhost:1337/api/solution', data)
+      .then(res => {
+
+      })
+      .catch(error => {
+        console.log(error)
+      })
+
+  }
+
+  const handleChangeLanguage = (value, option) => {
+    // get code snippet
+    // axios.get(`http://localhost:1337/api/snippet-code?userID=3&exerciseID=${props.question.question.id}&languageID=${languageID}`)
+    //   .then(res => {
+    //     console.log(res)
+    //   })
+    //   .catch(error => {
+    //     console.log(error)
+    //   })
     setLanguageID(value)
+    setCode(props.language[option.key].codeSnippets[0]?.sampleCode || "")
   }
 
   const handleChangeSettingFontSize = (fontSize) => {
@@ -94,13 +126,34 @@ const Playground = props => {
     }
   }
 
+  const handlePickRandomQuestion = () => {
+    console.log('random question')
+    axios.get('http://localhost:1337/api/exercise/random')
+      .then((response) => {
+        console.log(response.data, 'random question')
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+  }
+
   return (
     <>
-      <Row>
-        <Col className="content-right" span={10}>
+      <Split
+        sizes={[35, 65]}
+        minSize={300}
+        expandToMin={false}
+        gutterSize={10}
+        gutterAlign="center"
+        snapOffset={30}
+        dragInterval={1}
+        direction="horizontal"
+        cursor="col-resize"
+        className="split-wrapper">
+        <div className="content-right">
           <Tabs defaultActiveKey="1" type="card" onChange={handleChangeTab}>
             <TabPane tab="Description" key="1">
-              <QuestionDescription question={props.question}/>
+              <QuestionDescription question={props.question.question}/>
             </TabPane>
             <TabPane tab="Solutions" key="2">
               Solution here
@@ -115,27 +168,27 @@ const Playground = props => {
               <svg viewBox="0 0 24 24" width="1em" height="1em" className="icon__3Su4"><path fillRule="evenodd" d="M7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7zM3 5h2v2H3V5zm0 6h2v2H3v-2zm0 6h2v2H3v-2z"></path></svg>
               <span>Problems</span>
             </Button>
-            <Button type='default'>
+            <Button type='default' onClick={handlePickRandomQuestion}>
               <svg viewBox="0 0 24 24" width="1em" height="1em" className="icon__3Su4 shuffle-icon__dV27"><path fillRule="evenodd" d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"></path></svg>
               <span>Pick One</span>
             </Button>
-            <Button type='default'>
+            {/* <Button type='default'>
               <svg viewBox="0 0 24 24" width="1em" height="1em" className="icon__3Su4 handler-icon__26i5"><path fillRule="evenodd" d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"></path></svg>
               <span>Prev</span>
             </Button>
-            <span>1/2</span>
+              <span>1/{props.question.total}</span>
             <Button type='default'>
               <span>Next</span>
               <svg viewBox="0 0 24 24" width="1em" height="1em" className="icon__3Su4 handler-icon__26i5"><path fillRule="evenodd" d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg>
-            </Button>
+            </Button> */}
           </div>
-        </Col>
-        <Col className="content-left playground-wrapper" span={14}>
+        </div>
+        <div className="content-left playground-wrapper">
           <div className="playground-action">
-            <Select defaultValue="Javascript" style={{ width: 120 }} onChange={handleChangeLanguage}>
-              <Option value="53">C</Option>
-              <Option value="62">Java</Option>
-              <Option value="63">Javascript</Option>
+            <Select defaultValue={props.language[0].code} style={{ width: 120 }} onSelect={handleChangeLanguage}>
+              {props.language && props.language.map((lang, key) => (
+                <Option key={key} value={lang.code}>{lang.name}</Option>
+              ))}
             </Select>
 
             <SettingModal
@@ -157,6 +210,7 @@ const Playground = props => {
             keyboardHandler={keyboardHandler}
             name="playground"
             showGutter={gutter}
+            showPrintMargin={false}
             editorProps={{ $blockScrolling: true }}
             setOptions={{
               enableBasicAutocompletion: true,
@@ -167,18 +221,19 @@ const Playground = props => {
 
           {
             Array.isArray(testCaseProps) ?
-            <Tabs defaultActiveKey="1" type="card" tabPosition="left" onChange={handleChangeTab}>
-              {console.log(testCaseProps, 'test case props')}
+            <Tabs defaultActiveKey="1" tabPosition="left" onChange={handleChangeTab} 
+              style={ (consoleEditor == 'hide') ? {display: 'none'} : null } className="console-status">
               {testCaseProps.map((testCase, key) => (
                 <TabPane tab={`Test Case ` + (key + 1)} key={key}>
-                  <TestCase testCaseProps={testCase.data}/>
+                  <TestCase testCaseProps={testCase.data || testCase}/>
                 </TabPane>
               ))}
             </Tabs>
             :
             <div className="console-status" style={ (consoleEditor == 'hide') ? {display: 'none'} : null }>
               <div>Status: {testCaseProps && testCaseProps.data.status.description}</div>
-              <div style={{ whiteSpace: 'pre-wrap' }} dangerouslySetInnerHTML={{__html: testCaseProps && testCaseProps.data.compile_output.toString()}}></div>
+              <div style={{ whiteSpace: 'pre-wrap' }} 
+                dangerouslySetInnerHTML={{__html: testCaseProps && testCaseProps.data.compile_output ? testCaseProps.data.compile_output.toString() : testCaseProps.data.stderr.toString()}}></div>
             </div>
           }
 
@@ -189,20 +244,30 @@ const Playground = props => {
             </Button>
             <div className="action">
               <Button type='primary' onClick={handleRunCode}>Run Code</Button>
-              <Button className="submit-code">Submit</Button>
+              <Button className="submit-code" onClick={handleSubmitCode}>Submit</Button>
             </div>
           </div>
-        </Col>
-      </Row>
+        </div>
+      </Split>
     </>
   );
 }
 
-Playground.getInitialProps = async (ctx) => {
+Playground.getInitialProps = async function(ctx) {
   let id = ctx.query.questionID
-  let url = `http://localhost:1337/api/question?id=${id}`
-  const questionResponse = await axios.get(url)
-  return { question: questionResponse.data }
+  let urlExercise = `http://localhost:1337/api/exercise?id=${id}`
+  let urlLanguage = `http://localhost:1337/api/get-all-languages?exerciseId=${id}`
+  const questionResponse = await axios.get(urlExercise)
+  const languageResponse = await axios.get(urlLanguage)
+  console.log(questionResponse.data, 'questionResponse')
+  return { question: questionResponse.data, language: languageResponse.data.data.result }
+}
+
+function mapStateToProps(state) {
+  return {
+    errorMessage: state.auth.errorMessage,
+    isShowLogin : state.auth.isShowLogin
+  }
 }
 
 export default Playground
