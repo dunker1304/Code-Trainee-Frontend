@@ -9,7 +9,7 @@ import QuestionDescription from '../components/QuestionDescription'
 import { languageMap } from '../utils/constants'
 import Split from 'react-split'
 import CodeTrainee from '../hocs/index';
-import { connect } from 'react-redux'
+import { connect } from 'react-redux';
 
 import "ace-builds/src-noconflict/mode-javascript";
 import "ace-builds/src-noconflict/mode-java";
@@ -41,6 +41,7 @@ const Playground = props => {
   const [gutter, setGutter] = useState(true)
   const [runCode, setRunCode] = useState(false)
 
+  console.log(JSON.stringify(process.env.API), 'env config')
   const onChange = (newValue) => {
     setCode(newValue)
     setRunCode(false)
