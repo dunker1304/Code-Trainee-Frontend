@@ -154,7 +154,7 @@ const StepTestCases = ({ exerciseId }) => {
               if (hidden) {
                 return <CheckOutlined style={{ fontSize: '16px' }} />;
               } else {
-                return <CloseOutlined style={{ fontSize: '16px' }} />;
+                // return <CloseOutlined style={{ fontSize: '16px' }} />;
               }
             },
           },
