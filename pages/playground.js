@@ -41,7 +41,6 @@ const Playground = props => {
   const [gutter, setGutter] = useState(true)
   const [runCode, setRunCode] = useState(false)
 
-  console.log(JSON.stringify(process.env.API), 'env config')
   const onChange = (newValue) => {
     setCode(newValue)
     setRunCode(false)
@@ -267,6 +266,8 @@ const Playground = props => {
 }
 
 Playground.getInitialProps = async function(ctx) {
+  console.log(JSON.stringify(process.env.API), 'env config')
+
   let id = ctx.query.questionID
   let urlExercise = `http://localhost:1337/api/exercise?id=${id}`
   let urlLanguage = `http://localhost:1337/api/program-language/all?exerciseId=${id}`
