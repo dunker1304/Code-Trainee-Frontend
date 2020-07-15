@@ -9,7 +9,7 @@ import QuestionDescription from '../components/QuestionDescription'
 import { languageMap } from '../utils/constants'
 import Split from 'react-split'
 import CodeTrainee from '../hocs/index';
-import { connect } from 'react-redux'
+import { connect } from 'react-redux';
 
 import "ace-builds/src-noconflict/mode-javascript";
 import "ace-builds/src-noconflict/mode-java";
@@ -43,9 +43,10 @@ const Playground = props => {
 
   const onChange = (newValue) => {
     setCode(newValue)
+    setRunCode(false)
   }
 
-  const handleRunCode = () => {
+  const handleRunCode = (callback) => {
     let data = {
       language_id: languageID,
       source_code: code,
@@ -54,31 +55,43 @@ const Playground = props => {
     axios.post('http://localhost:1337/api/submissions', data)
       .then(res => {
         setTestCaseProps(res.data)
+        if (callback) callback(res.data)
       })
       .catch(error => {
         console.log(error)
       })
-    setRunCode(true)
+      setRunCode(true)
   }
 
-  const handleSubmitCode = () => {
-    console.log(testCaseProps, 'submit code')
-    if (!runCode) {
-      console.log('da run code d dau')
-      handleRunCode();
-    }
+  const addSolution = testCaseProps => {
+    let langDB
+    props.language.forEach(language => {
+      if (language.code == languageID) {
+        langDB = language.id
+      }
+    })
     let data = {
       question: props.question.question,
-      testcases: testCaseProps
+      testcases: testCaseProps,
+      answer: code,
+      language: langDB
     }
     axios.post('http://localhost:1337/api/solution', data)
       .then(res => {
-
+        console.log(res, 'add solution')
       })
       .catch(error => {
         console.log(error)
       })
+  }
 
+  const handleSubmitCode = () => {
+    console.log(runCode, 'submit code')
+    if (!runCode) {
+      handleRunCode(addSolution)
+    } else {
+      addSolution()
+    }
   }
 
   const handleChangeLanguage = (value, option) => {
@@ -127,7 +140,6 @@ const Playground = props => {
   }
 
   const handlePickRandomQuestion = () => {
-    console.log('random question')
     axios.get('http://localhost:1337/api/exercise/random')
       .then((response) => {
         console.log(response.data, 'random question')
@@ -254,9 +266,11 @@ const Playground = props => {
 }
 
 Playground.getInitialProps = async function(ctx) {
+  console.log(JSON.stringify(process.env.API), 'env config')
+
   let id = ctx.query.questionID
   let urlExercise = `http://localhost:1337/api/exercise?id=${id}`
-  let urlLanguage = `http://localhost:1337/api/get-all-languages?exerciseId=${id}`
+  let urlLanguage = `http://localhost:1337/api/program-language/all?exerciseId=${id}`
   const questionResponse = await axios.get(urlExercise)
   const languageResponse = await axios.get(urlLanguage)
   console.log(questionResponse.data, 'questionResponse')
