@@ -80,7 +80,7 @@ class Login extends Component {
               <span className="login100-form-title p-b-20">
                 Login your account
               </span>
-              <a href={`http://localhost:1337/oauth/google`} className="btn-google m-b-20">
+              <a href={`${process.env.API}/oauth/google`} className="btn-google m-b-20">
                 <img src="../static/images/icon-google.png" alt="GOOGLE" />
                 Google
               </a>
@@ -131,7 +131,7 @@ class Login extends Component {
               <span className="login100-form-title p-b-20">
                 Register new account
               </span>
-              <a href={`http://localhost:1337/oauth/google?role=1`} onClick = {(e)=>this.onClickATag(e)}className="btn-google m-b-20">
+              <a href={`${process.env.API}/oauth/google?role=1`} onClick = {(e)=>this.onClickATag(e)}className="btn-google m-b-20">
                 <img src="../static/images/icon-google.png" alt="GOOGLE" />
                 Google
               </a>

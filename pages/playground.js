@@ -52,7 +52,7 @@ const Playground = props => {
       source_code: code,
       question_id: '1'
     }
-    axios.post('http://localhost:1337/api/submissions', data)
+    axios.post(`${process.env.API}/api/submissions`, data)
       .then(res => {
         setTestCaseProps(res.data)
         if (callback) callback(res.data)
@@ -76,7 +76,7 @@ const Playground = props => {
       answer: code,
       language: langDB
     }
-    axios.post('http://localhost:1337/api/solution', data)
+    axios.post(`${process.env.API}/api/solution`, data)
       .then(res => {
         console.log(res, 'add solution')
       })
@@ -140,7 +140,7 @@ const Playground = props => {
   }
 
   const handlePickRandomQuestion = () => {
-    axios.get('http://localhost:1337/api/exercise/random')
+    axios.get(`${process.env.API}/api/exercise/random`)
       .then((response) => {
         console.log(response.data, 'random question')
       })
@@ -269,8 +269,8 @@ Playground.getInitialProps = async function(ctx) {
   console.log(JSON.stringify(process.env.API), 'env config')
 
   let id = ctx.query.questionID
-  let urlExercise = `http://localhost:1337/api/exercise?id=${id}`
-  let urlLanguage = `http://localhost:1337/api/program-language/all?exerciseId=${id}`
+  let urlExercise = `${process.env.API}/api/exercise?id=${id}`
+  let urlLanguage = `${process.env.API}/api/program-language/all?exerciseId=${id}`
   const questionResponse = await axios.get(urlExercise)
   const languageResponse = await axios.get(urlLanguage)
   console.log(questionResponse.data, 'questionResponse')

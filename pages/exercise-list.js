@@ -39,7 +39,7 @@ const ExerciseList = ({ ownerId = 0 }) => {
     try {
       setTablLoading(true);
       const res = await axios.get(
-        `http://localhost:1337/api/exercise/get-by-owner?ownerId=${ownerId}`
+        `${process.env.API}/api/exercise/get-by-owner?ownerId=${ownerId}`
       );
       setTablLoading(false);
       if (res.data.success) {
@@ -78,7 +78,7 @@ const ExerciseList = ({ ownerId = 0 }) => {
   };
 
   const handleDeleteRecord = async (record) => {
-    const res = await axios.post(`http://localhost:1337/api/exercise/delete`, {
+    const res = await axios.post(`${process.env.API}/api/exercise/delete`, {
       id: record.key,
     });
     console.log(res.data);
