@@ -1,7 +1,12 @@
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 const { ANALYZE } = process.env
+const { HOST, API_URL } = require('./env-config.js') 
 
 module.exports = {
+  env: {
+    HOST: HOST,
+    API: API_URL
+  },
   generateBuildId: async () => {
     return require('child_process').execSync('git rev-parse HEAD').toString().replace('\n', '')
   },
