@@ -52,6 +52,7 @@ const Playground = props => {
       source_code: code,
       question_id: '1'
     }
+    console.log(process.env.API, 'handle run code')
     axios.post(`${process.env.API}/api/submissions`, data)
       .then(res => {
         setTestCaseProps(res.data)
