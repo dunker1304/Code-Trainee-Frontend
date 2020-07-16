@@ -56,7 +56,7 @@ const Playground = props => {
     axios.post(`${process.env.API}/api/submissions`, data)
       .then(res => {
         setTestCaseProps(res.data)
-        if (callback) callback(res.data)
+        if (typeof callback === 'function') callback(res.data)
       })
       .catch(error => {
         console.log(error)
