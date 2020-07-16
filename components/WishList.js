@@ -2,8 +2,8 @@ import { Menu ,Modal ,Input ,Empty} from "antd"
 import { PlusCircleOutlined ,DeleteOutlined } from "@ant-design/icons"
 import { useState , useEffect } from "react"
 import {connect } from "react-redux"
-import { getTypeWishList , addTypeWishList , getWishListByType ,removeToWishList} from "../store/problem/action"
-import ConfirmModal from "../components/ConfirmModal"
+import { getWishList , addTypeWishList , getWishListByType ,removeToWishList} from "../store/problem/action"
+import ConfirmModal from "../components/MyConfirm"
 
 const WishList = (props)=> {
 
@@ -21,18 +21,18 @@ const WishList = (props)=> {
   }
 
   useEffect(()=> {
-    props.getTypeWishList();
+    props.getWishList();
   },[])
 
-  useEffect(()=>{
-    if(props.typeWishList.length > 0 ){
-      props.getWishListByType(props.typeWishList[0]['id'])
-    }
-  },[props.typeWishList])
+  // useEffect(()=>{
+  //   if(props.typeWishList.length > 0 ){
+  //     props.getWishListByType(props.typeWishList[0]['id'])
+  //   }
+  // },[props.typeWishList])
 
   const hanleOke = (questionId)=> {
-    let type = props.typeWishList[activeIndex]['id']
-    props.removeToWishList(questionId,type)
+  
+    props.removeToWishList(questionId)
   
   }
 
@@ -48,7 +48,7 @@ const WishList = (props)=> {
       <div className="container panel_main">
 
      
-       <div className="left_wish_list">
+       {/* <div className="left_wish_list">
           <div className="panel-heading all-lists-header">
             <h3 class="panel-title">My List</h3>
             <button type="button" class="add-list-btn">
@@ -72,14 +72,14 @@ const WishList = (props)=> {
           </div> 
           <div className = "all_item_wish_list">
               <Menu  mode="vertical" selectedKeys= {[`${activeIndex}`]} onClick={({key})=> { handleClickMenu(key)}}>
-                {props.typeWishList.lenth > 0 ? props.typeWishList.lenth.map((value,index)=> (
+                {props.typeWishList.length > 0 ? props.typeWishList.map((value,index)=> (
                    <Menu.Item key= {index}  >
                       {value.name}
                   </Menu.Item> 
                 )) : <Empty/>}
               </Menu>
           </div> 
-       </div>
+       </div> */}
 
        <div className="right_wish_list">
          <div className="favorite-panel">
@@ -121,4 +121,4 @@ function mapStateToProps(state,ownProps) {
   }
 }
 
-export default connect(mapStateToProps,{ getTypeWishList ,addTypeWishList,getWishListByType, removeToWishList})(WishList);
+export default connect(mapStateToProps,{ getWishList ,addTypeWishList,getWishListByType, removeToWishList})(WishList);

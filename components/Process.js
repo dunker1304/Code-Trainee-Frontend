@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react"
 import { PieChart } from 'react-minimal-pie-chart';
 import  {Table} from "antd"
+import axios from "axios"
+import { getExerciseOfUser} from "../store/problem/action"
+import {connect} from "react-redux"
 
 const columns = [
   {
@@ -37,6 +40,7 @@ const Process = (props) => {
   const [lamda, setLamda] = useState(182)
   const [fontSize, setFontSize] = useState(20)
   const [fontSize2, setFontSize2] = useState(20)
+  const [dataSource, setDataSource] = useState([])
 
   useEffect(() => {
     if (fontSize < 80) {
@@ -55,6 +59,13 @@ const Process = (props) => {
 
     }
   }, [fontSize2])
+
+  useEffect( async () => {
+    let url = `http://localhost:1337/api/all-submission`
+    let result =await  axios.get(url)
+    await props.getExerciseOfUser()
+    setDataSource(result.data.data)
+  }, [])
   return (
     <div className="process">
       <div className="container">
@@ -62,9 +73,10 @@ const Process = (props) => {
           <div className="col-md-4 col-sm-12">
             <PieChart
               data={[
-                { title: 'One', value: 10, color: '#337ab7' },
-                { title: 'Two', value: 15, color: '#449d44' },
-                { title: 'Three', value: 20, color: '#fea116' },
+                { title: 'Wrong Answer', value: 10, color: 'rgb(175,216,248)' },
+                { title: 'Accepted', value: 15, color: 'rgb(237,194,64)' },
+                { title: 'Runtime Error', value: 20, color: 'rgb(203,75,75)' },
+                { title: 'Other', value: 20, color: 'rgb(148,64,237)' },
               ]}
               animate = {true}
               animationDuration = {5000}
@@ -76,7 +88,7 @@ const Process = (props) => {
               <div className="col-md-12">
                 <p className="number">
                   <span className="text-success" style={{ color: "rgb(60, 118, 61)", fontSize: fontSize }}>0</span>
-                  <span>/ 1505</span>
+                   <span>/ {props.exerciseOfUser.total}</span>
                 </p>
                 <h3 className="number-text"> questions solved</h3>
               </div>
@@ -84,7 +96,7 @@ const Process = (props) => {
             </div>
             <div className="row inner-row">
               <div className="col-md-4 col-sm-4 col-xs-12">
-                <p className="number text-primary" id="total_submissions" style={{color: "rgb(60, 118, 61)", fontSize: fontSize2 }}>6</p>
+            <p className="number text-primary" id="total_submissions" style={{color: "rgb(60, 118, 61)", fontSize: fontSize2 }}>{dataSource.total}</p>
                 <h4 className="number-text"> total submissions</h4>
               </div>
               <div className="col-md-4 col-sm-4 col-xs-12">
@@ -105,7 +117,7 @@ const Process = (props) => {
         <div className = "row"> 
           <div className= " col-md-12">
               <h3 className="title-all-sub">All Submissions</h3>
-              <Table columns={columns} dataSource={[]} />
+              <Table columns={columns} dataSource={dataSource.submission} />
           </div>
         </div>
       </div>
@@ -114,4 +126,11 @@ const Process = (props) => {
   )
 }
 
-export default Process
+
+function mapStateToProps(state, ownProps) {
+  return {
+    exerciseOfUser : state.problem.exerciseOfUser
+  }
+}
+
+export default connect(mapStateToProps, {getExerciseOfUser})(Process)

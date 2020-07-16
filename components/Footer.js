@@ -3,7 +3,9 @@ const Footer = (props)=> {
  return (
    <div className = "site-footer">
      <div className = "row">
+     
        <div className = "right-reserved">
+       <hr className="footer-hr"/>
          <span className ="powerby">
            <img src={Logo} className="logo"/>
             Powered by Code Trainee

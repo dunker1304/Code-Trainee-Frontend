@@ -119,8 +119,8 @@ export const removeToWishList = (questionId ,typeWishList) => {
   }
 }
 
-export const getTypeWishList = (userId) => {
-  const url = `http://localhost:1337/api/type-wish-list`;
+export const getWishList = () => {
+  const url = `http://localhost:1337/api/wish-list`;
   return dispatch => {
     let promise = new Promise((resolve, reject) => {
       axios({
@@ -180,6 +180,30 @@ export const getWishListByType = (type) => {
       }) .then( res => {
         dispatch({
           type: 'GET_WISHLIST_BY_TYPE',
+          payload: res.data
+        })
+        resolve(res)
+      })
+      .catch( error => {
+        console.log(error, 'send eorr')
+        reject(error)
+      })
+    })
+    return promise
+  }
+}
+
+export const getExerciseOfUser = ()=> {
+  const url = `http://localhost:1337/api/user/exercise`;
+  return dispatch => {
+    let promise = new Promise((resolve, reject) => {
+      axios({
+        method: 'get',
+        url: url,
+        //headers : { Authorization: `Bearer ${accessToken}` }
+      }) .then( res => {
+        dispatch({
+          type: 'GET_EXERCISE_OF_USER',
           payload: res.data
         })
         resolve(res)

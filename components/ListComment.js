@@ -1,4 +1,4 @@
-import { Button ,Pagination} from "antd";
+import { Button ,Pagination, Empty} from "antd";
 import CommentListItem from "../components/CommentListItem"
 import CommentInput from "../components/CommentInput"
 import React, { useState } from 'react';
@@ -52,26 +52,27 @@ const ListComment = (props) => {
         </div>
         <div className = "list-container">
 
-          {
+          { props.discuss.length > 0 ?
             props.discuss.map((value,key) => (
               <CommentListItem key= {value['id']} comment={value}/>
-            ))
+            )) : <Empty/>
           }
-          <div className="topic-item-wrap" style={{textAlign:"center"}}>
-              <Pagination
-              defaultCurrent={currentPage}
-              current= {currentPage}
-              total={props.totalDiscuss}
-              showSizeChanger={false}
-              pageSize={2}
-              defaultPageSize={2}
-              onChange= {(pageNumber,pageSize)=> {pagingQuestion(pageNumber,pageSize)}}
-           />
+           {
+             props.discuss.length > 0 ? 
+             <div className="topic-item-wrap" style={{textAlign:"center"}}>
+                <Pagination
+                defaultCurrent={currentPage}
+                current= {currentPage}
+                total={props.totalDiscuss}
+                showSizeChanger={false}
+                pageSize={2}
+                defaultPageSize={2}
+                onChange= {(pageNumber,pageSize)=> {pagingQuestion(pageNumber,pageSize)}}
+                />
+            </div>
+               :''
+           }
 
-
-          </div>
-
-        
         </div>
       </div>
 

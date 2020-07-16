@@ -9,9 +9,9 @@ const YourProcess = (props) => {
        <div className="process-chart">
           <PieChart
             data={[
-              { title: 'One', value: 10, color: '#337ab7' },
-              { title: 'Two', value: 15, color: '#449d44' },
-              { title: 'Three', value: 20, color: '#fea116' },
+              { title: 'To Do', value: props.exerciseOfUser.todo, color: '#337ab7' },
+              { title: 'Solved', value: props.exerciseOfUser.solved, color: '#449d44' },
+              { title: 'Attempted', value: props.exerciseOfUser.attempted, color: '#fea116' },
             ]}
             animate = {true}
             animationDuration = {1000}
@@ -24,7 +24,7 @@ const YourProcess = (props) => {
       <div className="progress-status row">
         <div className="to-do col-md-4">
           <div className="static">
-            1487
+            {props.exerciseOfUser.todo}
            </div>
           <div className="type">
             To do
@@ -33,7 +33,7 @@ const YourProcess = (props) => {
         </div>
         <div className="solved col-md-4">
           <div className="static">
-            0/1489
+            {props.exerciseOfUser.solved}/{props.exerciseOfUser.total}
            </div>
           <div className="type">
             Solved
@@ -42,10 +42,10 @@ const YourProcess = (props) => {
         </div>
         <div className="processing col-md-4">
           <div className="static">
-            2
+            {props.exerciseOfUser.attempted}
            </div>
           <div className="type">
-            InComplete
+            Attempted
            </div>
         </div>
       </div>

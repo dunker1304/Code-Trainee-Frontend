@@ -18,7 +18,7 @@ const QuestionLayout = (props)=> {
     width: router.asPath.includes('/discuss') ? '100%' : 'auto',
   }
   const handleChangeTab = (key) => {
-     Router.push(`/playground?questionId=${props.questionId}&tab=${key}`)
+     Router.push(`/playground?questionID=${props.questionId}&tab=${key}`)
   }
 
   useEffect(() => {

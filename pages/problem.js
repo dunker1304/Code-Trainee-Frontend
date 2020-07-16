@@ -1,14 +1,18 @@
 
-import { Input } from 'antd';
-import { Menu, Dropdown, Button, Select, Tag, Pagination } from 'antd';
+import { Input, Empty } from 'antd';
+import { Menu, Dropdown, Button, Select, Tag, Pagination ,Popover} from 'antd';
 import { DownOutlined, CheckOutlined, SwitcherOutlined } from '@ant-design/icons';
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux'
-import { searchQuestion, chooseTags, dropdownFilter, getCategory,addToWishList,removeToWishList } from "../store/problem/action"
+import { searchQuestion, chooseTags, dropdownFilter, getCategory,addToWishList,removeToWishList,getExerciseOfUser } from "../store/problem/action"
 import QuestionItem from "../components/QuestionItem"
 import YourProcess from "../components/YourProcess"
 import Header from "../components/Header"
 import Footer from "../components/Footer"
+import Link from 'next/link'
+import axios from "axios"
+import  Router  from "next/router"
+import { openNotificationWithIcon } from "../components/Notification"
 
 
 const Level = [{ id: 1, name: 'Easy' }, { id: 2, name: 'Medium' }, { id: 3, name: 'Hard' }]
@@ -19,7 +23,7 @@ const Problems = (props) => {
   const [termSearch, setTermSearch] = useState('')
   const [tagSearch, setTagSearch] = useState({})
   const [isTable, setIsTable] = useState(true)
-  const [pageSize, setPageSize] = useState(1)
+  const [pageSize, setPageSize] = useState(10)
   const [pageNumber, setPageNumber] = useState(1)
   const onSearchDropDown = (e) => {
     props.dropdownFilter(e.target.value)
@@ -69,18 +73,22 @@ const Problems = (props) => {
 
   }
 
-  const select = (array) => {
+
+  const text = ()=> {
     return (
-      <div>
-        <Input className="filterSearch" placeholder="Filter topics.." onChange={(e) => onSearchDropDown(e)} />
+      <Input className="filterSearch" placeholder="Filter topics.." onChange={(e) => onSearchDropDown(e)} />
+    )
+  }
+
+  const content = (array)=> {
+    return (
+      <div style={{maxHeight:"300px"}}>
         {
-          array.map((value, index) => (
-            <li onClick={() => handleIsClicked(value)} key={index}>
-              {value.isClicked ? <CheckOutlined /> : ''}<span >{value.name}</span></li>
-          ))
-        }
-
-
+        array.map((value, index) => (
+          <li onClick={() => handleIsClicked(value)} key={index}>
+            {value.isClicked ? <CheckOutlined /> : ''}<span >{value.name}</span></li>
+        ))
+      }
       </div>
     )
   }
@@ -225,11 +233,24 @@ const Problems = (props) => {
     props.searchQuestion(condition)
   }
 
+  const handlePickRandomQuestion = async () => {
+   let random = await axios.get('http://localhost:1337/api/exercise/random')
+   if(random.data.success) {
+     let exercise  = random.data.data
+     Router.push(`/playground?questionID=${exercise['id']}`,`/playground?questionID=${exercise['id']}`)
+   }
+   else {
+    openNotificationWithIcon('error','','Something Wrong!')
+   }
+    
+  }
+
 
 
   return (
     <div>
     <Header/>
+    <div className="wrapper_problem">
     <div className="container container-content list-question-container">
 
       <div className="row" >
@@ -238,15 +259,15 @@ const Problems = (props) => {
           <div id="welcome" className="col-md-4 col-sm-12 question-solved">
           
               <span className="label label-primary round">
-                <span>0/1505 Solved</span>
+              <span>{props.exerciseOfUser['solved']}/{props.exerciseOfUser['total']} solved</span>
              </span>&nbsp;-&nbsp;
-            <span className="label label-success round">Easy 0</span>&nbsp;
-            <span className="label label-warning round">Medium 0</span>&nbsp;
-            <span className="label label-danger round">Hard 0</span>
+            <span className="label label-success round">Easy {props.exerciseOfUser['easy']}</span>&nbsp;
+            <span className="label label-warning round">Medium {props.exerciseOfUser['medium']}</span>&nbsp;
+            <span className="label label-danger round">Hard {props.exerciseOfUser['hard']}</span>
             
           </div>
           <div className="pull-right">
-            <Button type='default'>
+            <Button type='default' onClick= {()=>handlePickRandomQuestion()}>
               <svg viewBox="0 0 24 24" width="1em" height="1em" className="icon__3Su4 shuffle-icon__dV27"><path fillRule="evenodd" d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"></path></svg>
               <span>Pick One</span>
             </Button>
@@ -272,7 +293,7 @@ const Problems = (props) => {
                     <Button>Status <DownOutlined /></Button>
                   </Dropdown>
 
-                  <Dropdown overlay={select(props.tags)}
+                  {/* <Dropdown overlay={select(props.tags)}
                     placement="bottomRight"
                     overlayClassName="my_dropdown"
                     trigger="['click']"
@@ -280,7 +301,10 @@ const Problems = (props) => {
                     onVisibleChange={onChange}
                   >
                     <Button>Tags <DownOutlined /></Button>
-                  </Dropdown>
+                  </Dropdown> */}
+                   <Popover placement="bottomRight" title={text} content={content(props.dropdownCategorySearch)} trigger="click">
+                     <Button>Tags <DownOutlined /></Button>
+                  </Popover>
                   <SwitcherOutlined onClick = {()=> setIsTable(!isTable)} title = {`${isTable ? 'Grid Layout':'Table Layout'}`}style={{ fontSize: '16px', color: '#08c' }}/>
 
 
@@ -314,7 +338,7 @@ const Problems = (props) => {
             </div>
             {/* Table */}
             <div className="table-responsive question-list-table" style={{ display: isTable ? 'block' : 'none' }}>
-              <table className="align-middle text-truncate mb-0 table table-borderless table-hover">
+              <table className="align-middle text-truncate mb-0 table table-borderless ">
                 <thead>
                   <tr>
                     <th className="text-center">#</th>
@@ -324,33 +348,44 @@ const Problems = (props) => {
                    
                   </tr>
                 </thead>
+              
                 <tbody>
                   {
-                    props.question.map((value, index) => (
+                     props.question && props.question.length > 0 ? props.question.map((value, index) => (
                       <tr key={value.id}>
-                        <td class="text-center text-muted" >#{index + 1}</td>
-                        <td class="text-center"><a>{value.title}</a></td>
-                        <td class="text-center">
-                          <div class={`badge badge-pill badge-${translateClassName(value.level)}`}>{value.level}</div>
+                        <td className="text-center text-muted" >#{index + 1}</td>
+                        <td className="text-center title-question">
+                          <Link href={{pathname : '/playground', query : { questionID : value['id']}}} as={`/playground?questionID=${value['id']}`}>
+                          <a>{value.title}</a>
+                          </Link>
+                        </td>
+                        <td className="text-center">
+                          <div className={`badge badge-pill badge-${translateClassName(value.level)}`}>{value.level}</div>
                         </td>
 
-                        <td class="text-center created_by">
-                          <span class="pr-2 opacity-6">
-                            <i class="fa fa-business-time"></i>
-                          </span>
-                          {value.author.displayName}
+                        <td className="text-center created_by">
+                          <Link href={{pathname : '/profile/[profileId]'}} as={`/profile/${value.author['id']}`}>
+                          <a>{value.author.displayName}</a>
+                          </Link>
+                          
                         </td>
                         
 
                       </tr>
-                    ))
+                    )): 
+                    <tr style={{boxShadow:"none"}}>
+                      <td colSpan="4" style={{backgroundColor:"#fff"}}>
+                        <Empty/>
+                      </td>
+                    </tr>
+                     
                   }
 
                 </tbody>
-                <tbody class="reactable-pagination">
+                <tbody className="reactable-pagination">
                   <tr>
-                    <td colspan="7">
-                      <span class="row-selector">
+                    <td colSpan="7">
+                      <span className="row-selector">
                         <Select defaultValue="1" className="selectPaging" onSelect= {(value)=>{changePageSize(value)}}>
                           <Option value="1">20</Option>
                           <Option value="2">50</Option>
@@ -393,12 +428,15 @@ const Problems = (props) => {
 
         </div>
         <div className="col-md-3">
-          <YourProcess/>
+          <YourProcess exerciseOfUser = {props.exerciseOfUser}/>
         </div>
       </div>
 
       </div>
+     
       <Footer/>
+      </div>
+   
     </div>
   )
 
@@ -409,6 +447,7 @@ Problems.getInitialProps = async (ctx) => {
   const { store: { dispatch }, pathname, req, res } = ctx
   await dispatch(searchQuestion())
   await dispatch(getCategory())
+  await dispatch(getExerciseOfUser())
 
 }
 
@@ -416,11 +455,13 @@ function mapStateToProps(state, ownProps) {
   return {
     tags: state.problem.category,
     question: state.problem.question,
-    totalQuestion : state.problem.totalQuestion
+    totalQuestion : state.problem.totalQuestion,
+    dropdownCategorySearch : state.problem.dropdownCategorySearch,
+    exerciseOfUser : state.problem.exerciseOfUser
 
   }
 }
 
 
 export default connect(mapStateToProps, { searchQuestion, chooseTags,
-   dropdownFilter, getCategory ,addToWishList ,removeToWishList })(Problems);
+   dropdownFilter, getCategory ,addToWishList ,removeToWishList, })(Problems);

@@ -16,7 +16,9 @@ const initState = {
   category : [],
   totalQuestion : 0,
   typeWishList : [],
-  wishList : []
+  wishList : [],
+  dropdownCategorySearch : [],
+  exerciseOfUser : {}
 }
 
 export default (state = initState, action) => {
@@ -29,17 +31,18 @@ export default (state = initState, action) => {
 
       case 'GET_ALL_CATEGORY' : 
         draft.category = action.payload   
+        draft.dropdownCategorySearch = action.payload
         break;
 
       case 'UPDATE_CATEGORY' : 
-        let tmpArray = JSON.parse(JSON.stringify(state.category))
+        let tmpArray = JSON.parse(JSON.stringify(state.dropdownCategorySearch))
 
         for(let i =0 ;i<tmpArray.length ; i++) {
           if(tmpArray[i].id == action.payload) {
             tmpArray[i]['isClicked'] = !tmpArray[i].isClicked
             }
         }
-        draft.category = tmpArray  
+        draft.dropdownCategorySearch = tmpArray  
         break;
       
       case 'DROP_DOWN_FILTER':
@@ -48,7 +51,7 @@ export default (state = initState, action) => {
           return value.name.toLowerCase().indexOf(action.payload.toLowerCase()) > -1
         })
 
-        draft.category = result;
+        draft.dropdownCategorySearch = result;
         break;  
       
       case 'ADD_TO_WISHLIST':
@@ -56,7 +59,7 @@ export default (state = initState, action) => {
           let tmpQuestion = JSON.parse(JSON.stringify(state.question))
           let tmpWishList = action.payload.data
           for(let i =0 ;i<tmpQuestion.length ; i++) {
-            if(tmpQuestion[i].id == tmpWishList['questionId']) {
+            if(tmpQuestion[i].id == tmpWishList['exerciseId']) {
                 tmpQuestion[i]['isWishList'] = true
               }
           }
@@ -74,7 +77,7 @@ export default (state = initState, action) => {
           let wishList =  JSON.parse(JSON.stringify(state.wishList))
           let tmpWishListRemove = action.payload.data
           for(let i =0 ;i<tmpQuestionRemove.length ; i++) {
-            if(tmpQuestionRemove[i].id == tmpWishListRemove['questionId']) {
+            if(tmpQuestionRemove[i].id == tmpWishListRemove['exerciseId']) {
               tmpQuestionRemove[i]['isWishList'] = false
               }
           }
@@ -91,7 +94,7 @@ export default (state = initState, action) => {
         break;
 
       case 'GET_TYPE_WISHLIST': 
-        draft.typeWishList = action.payload
+        draft.wishList = action.payload
         break;  
 
       case 'ADD_TYPE_WISHLIST':
@@ -111,6 +114,9 @@ export default (state = initState, action) => {
            draft.wishList = action.payload.data
            break;
        
+      case 'GET_EXERCISE_OF_USER':
+          draft.exerciseOfUser = action.payload.data
+          break;     
     }
   })
 }

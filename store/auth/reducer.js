@@ -1,5 +1,6 @@
 import produce from 'immer';
 import {openNotificationWithIcon} from '../../components/Notification'
+import Router , {useRouter} from 'next/router'
 
 
 const initState = {
@@ -32,6 +33,7 @@ export default (state = initState, action) => {
             type: 1
           }
           openNotificationWithIcon('success','SUCCESS',action.payload.message)
+          Router.push('/problem')
          }   
         break
 

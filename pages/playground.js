@@ -46,7 +46,7 @@ const Playground = props => {
   useEffect(() => {
    let activeTab = router.query.tab ? router.query.tab : "1"
    if(activeTab == 4) {
-    let questionId = router.query.questionId
+    let questionId = router.query.questionID
     Router.push(`/exercise/[exerciseId]/discuss`,`/exercise/${questionId}/discuss`)
    }
    else
@@ -141,12 +141,12 @@ const Playground = props => {
   }
 
   const handleChangeTab = (key) => {
-    let questionId = router.query.questionId
+    let questionId = router.query.questionID
     if(key == 4) {
       Router.push(`/exercise/[exerciseId]/discuss`,`/exercise/${questionId}/discuss`)
     }
     else {
-      Router.push(`/playground?questionId=${questionId}&tab=${key}`)
+      Router.push(`/playground?questionID=${questionId}&tab=${key}`)
       setIndexActive(key)
     }
    
@@ -291,14 +291,14 @@ const Playground = props => {
 }
 
 Playground.getInitialProps = async function(ctx) {
-  let id = ctx.query.questionID
-  let urlExercise = `http://localhost:1337/api/exercise?id=${id}`
-  let urlLanguage = `http://localhost:1337/api/program-language/all?exerciseId=${id}`
-  const questionResponse = await axios.get(urlExercise)
-  const languageResponse = await axios.get(urlLanguage)
-  console.log(questionResponse.data, 'questionResponse')
-  return { question: questionResponse.data, language: languageResponse.data.data.result }
-}
+    let id = ctx.query.questionID
+    let urlExercise = `http://localhost:1337/api/exercise?id=${id}`
+    let urlLanguage = `http://localhost:1337/api/program-language/all?exerciseId=${id}`
+    const questionResponse = await axios.get(urlExercise)
+    const languageResponse = await axios.get(urlLanguage)
+    console.log(ctx)
+    return { question: questionResponse.data, language: languageResponse.data.data.result }
+  }
 
 function mapStateToProps(state) {
   return {
@@ -307,4 +307,4 @@ function mapStateToProps(state) {
   }
 }
 
-export default Playground
+export default Playground 

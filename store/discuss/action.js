@@ -10,6 +10,7 @@ export const getDiscussByQuestionId = (questionId,page,sortBy)=> {
         data: {questionId : questionId, page : page , sortBy : sortBy}
         //headers : { Authorization: `Bearer ${accessToken}` }
       }) .then( res => {
+        console.log(res)
         dispatch({
           type: 'GET_COMMENT_QUESTION_ID',
           payload: res.data.data

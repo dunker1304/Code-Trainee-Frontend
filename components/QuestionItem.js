@@ -7,8 +7,8 @@ const QuestionItem = (props)=> {
         <Card
           style={{  marginTop: 16 }}
           actions={[
-             <div style={{color: '#08c'}}><MessageOutlined  style={{color: '#08c'}}/>120</div>,
-           <div onClick = {()=> props.question.isWishList ? props.removeToWishList(props.question.id):props.addToWishList(props.question.id)}style={{color: '#eb2f96'}}> {props.question.isWishList ? <HeartFilled  title ="remove to wishlist"style={{color: '#eb2f96'}}/>: <HeartOutlined  title = "add to wishlist" style={{color: '#eb2f96'}}/>}83</div>,
+          <div style={{color: '#08c'}}><MessageOutlined  style={{color: '#08c'}}/>{props.question.countComment}</div>,
+           <div onClick = {()=> props.question.isWishList ? props.removeToWishList(props.question.id):props.addToWishList(props.question.id)}style={{color: '#eb2f96'}}> {props.question.isWishList ? <HeartFilled  title ="remove to wishlist"style={{color: '#eb2f96'}}/>: <HeartOutlined  title = "add to wishlist" style={{color: '#eb2f96'}}/>}</div>,
            
           ]}
         >
