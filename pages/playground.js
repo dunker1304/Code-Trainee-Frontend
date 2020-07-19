@@ -1,11 +1,12 @@
 import React, { Component, useState, useEffect } from 'react'
 import { render } from 'react-dom'
 import AceEditor from 'react-ace'
-import { Row, Col, Button, Select, Tabs } from 'antd'
+import { Row, Col, Button, Select, Tabs, Spin, message, notification } from 'antd'
 import axios from 'axios'
 import TestCase from '../components/TestCase'
 import SettingModal from '../components/SettingModal'
-import QuestionDescription from '../components/QuestionDescription'
+import QuestionDescription from '../components/exercise/ExerciseDescription'
+import ExerciseSubmissions from '../components/exercise/ExerciseSubmissions'
 import { languageMap } from '../utils/constants'
 import Split from 'react-split'
 import CodeTrainee from '../hocs/index';
@@ -40,6 +41,7 @@ const Playground = props => {
   const [keyboardHandler, setKeyboardHandler] = useState("")
   const [gutter, setGutter] = useState(true)
   const [runCode, setRunCode] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const onChange = (newValue) => {
     setCode(newValue)
@@ -47,18 +49,20 @@ const Playground = props => {
   }
 
   const handleRunCode = (callback) => {
+    setLoading(true);
     let data = {
       language_id: languageID,
       source_code: code,
       question_id: '1'
     }
-    console.log(process.env.API, 'handle run code')
     axios.post(`${process.env.API}/api/submissions`, data)
       .then(res => {
         setTestCaseProps(res.data)
+        setLoading(false)
         if (typeof callback === 'function') callback(res.data)
       })
       .catch(error => {
+        setLoading(false)
         console.log(error)
       })
       setRunCode(true)
@@ -80,6 +84,10 @@ const Playground = props => {
     axios.post(`${process.env.API}/api/solution`, data)
       .then(res => {
         console.log(res, 'add solution')
+        setLoading(false)
+        notification.success({
+          message: "Sucessfully added solution"
+        })
       })
       .catch(error => {
         console.log(error)
@@ -88,6 +96,7 @@ const Playground = props => {
 
   const handleSubmitCode = () => {
     console.log(runCode, 'submit code')
+    setLoading(true)
     if (!runCode) {
       handleRunCode(addSolution)
     } else {
@@ -172,7 +181,7 @@ const Playground = props => {
               Solution here
             </TabPane>
             <TabPane tab="Submissions" key="3">
-              Submissions here
+              <ExerciseSubmissions handleChangeCodeAce={onChange} exerciseID={props.question.question.id}></ExerciseSubmissions>
             </TabPane>
           </Tabs>
 
@@ -234,20 +243,24 @@ const Playground = props => {
 
           {
             Array.isArray(testCaseProps) ?
-            <Tabs defaultActiveKey="1" tabPosition="left" onChange={handleChangeTab} 
-              style={ (consoleEditor == 'hide') ? {display: 'none'} : null } className="console-status">
-              {testCaseProps.map((testCase, key) => (
-                <TabPane tab={`Test Case ` + (key + 1)} key={key}>
-                  <TestCase testCaseProps={testCase.data || testCase}/>
-                </TabPane>
-              ))}
-            </Tabs>
+            <Spin spinning={loading}>
+              <Tabs defaultActiveKey="1" tabPosition="left" onChange={handleChangeTab} 
+                style={ (consoleEditor == 'hide') ? {display: 'none'} : null } className="console-status">
+                {testCaseProps.map((testCase, key) => (
+                  <TabPane tab={`Test Case ` + (key + 1)} key={key}>
+                    <TestCase testCaseProps={testCase.data || testCase}/>
+                  </TabPane>
+                ))}
+              </Tabs>
+            </Spin> 
             :
-            <div className="console-status" style={ (consoleEditor == 'hide') ? {display: 'none'} : null }>
-              <div>Status: {testCaseProps && testCaseProps.data.status.description}</div>
-              <div style={{ whiteSpace: 'pre-wrap' }} 
-                dangerouslySetInnerHTML={{__html: testCaseProps && testCaseProps.data.compile_output ? testCaseProps.data.compile_output.toString() : testCaseProps.data.stderr.toString()}}></div>
-            </div>
+            <Spin spinning={loading}>
+              <div className="console-status" style={ (consoleEditor == 'hide') ? {display: 'none'} : null }>
+                <div>Status: {testCaseProps && testCaseProps.data.status.description}</div>
+                <div style={{ whiteSpace: 'pre-wrap' }} 
+                  dangerouslySetInnerHTML={{__html: testCaseProps && testCaseProps.data.compile_output ? testCaseProps.data.compile_output.toString() : testCaseProps.data.stderr.toString()}}></div>
+              </div>
+            </Spin>
           }
 
           <div className="action-code-editor">

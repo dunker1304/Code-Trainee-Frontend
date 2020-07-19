@@ -5,7 +5,7 @@ div#playground {
 .split-wrapper {
   display: flex;
   .gutter.gutter-horizontal:hover {
-    background: #8080807d;
+    //background: #8080807d;
     cursor: ew-resize;
     transition: 0.5s;
   }
@@ -22,8 +22,17 @@ div#playground {
   flex-direction: column;
 }
 
+.content-right {
+  border-right: 1px solid #f0f0f0;
+}
+
+.content-left.playground-wrapper {
+  margin-left: 2px;
+  border-left: 1px solid #f0f0f0;
+}
+
 .console-status {
-  height: 250px;
+  height: 200px;
   overflow: scroll;
 
   .ant-tabs-content {
