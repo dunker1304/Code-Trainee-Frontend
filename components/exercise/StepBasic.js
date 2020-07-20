@@ -1,61 +1,94 @@
-import { Form, Input, Button, Select, notification } from 'antd';
+import {
+  Form,
+  Input,
+  Button,
+  Select,
+  notification,
+  AutoComplete,
+  Tag,
+  Tooltip,
+} from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
 import { Editor } from '@tinymce/tinymce-react';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import ConfirmModal from '../ConfirmModal';
+import ExerciseTags from './ExerciseTags';
 
 const StepBasic = ({
   exerciseId = {
     value,
-    setValue: (value) => {},
+    setValue: () => {},
   },
   checkDirtyBeforeLeaving = {
     value,
-    setValue: (value) => {},
+    setValue: () => {},
   },
   dirty = {
     value,
-    setValue: (value) => {},
+    setValue: () => {},
   },
   nextStep = () => {},
 }) => {
   let [visibleConfirm, setVisibleConfirm] = useState(false);
   let [buttonLoading, setButtonLoading] = useState(false);
-  let [form] = Form.useForm();
-  let [initialValues, setInitialValues] = useState({
+  let [formRef] = Form.useForm();
+  let [initFormValues, setInitFormValues] = useState({
     title: '',
     content: '',
     points: 0,
     level: 'easy',
+    tags: ['#'],
   });
+  let [allTags, setAllTags] = useState([]);
 
   // run only one when component mounted
   useEffect(() => {
     (async () => {
+      // get old information
       if (exerciseId.value) {
         try {
           const res = await axios.get(
-            `${process.env.API}/api/exercise/basic-info?id=${exerciseId.value}`
+            `${process.env.API}/api/exercise/basic-info/${exerciseId.value}`
           );
           if (res.data.success) {
-            form.setFieldsValue({
+            let tags = res.data.data.tags.map((e) => e.name);
+            formRef.setFieldsValue({
               title: res.data.data.title,
               content: res.data.data.content,
               points: res.data.data.points,
               level: res.data.data.level,
+              tags: tags,
             });
-            setInitialValues({
+            setInitFormValues({
               title: res.data.data.title,
               content: res.data.data.content,
               points: res.data.data.points,
               level: res.data.data.level,
+              tags: tags,
             });
+          } else {
+            console.log('get basic-info data fail');
           }
         } catch (e) {
           console.log(e);
         }
       }
     })();
+    (async () => {
+      // get all tags
+      try {
+        const res = await axios.get(`${process.env.API}/api/tags/all`);
+        if (res.data.success) {
+          setAllTags([...res.data.data.map((e) => e.name)]);
+        } else {
+          console.log('get tags data fail');
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    })();
+
     return () => {
       dirty.setValue(false);
       checkDirtyBeforeLeaving.setValue(false);
@@ -84,22 +117,20 @@ const StepBasic = ({
   const handleCreate = async () => {
     try {
       setButtonLoading(true);
-      await form.validateFields();
-      let { content, title, points, level } = form.getFieldsValue();
-      const res = await axios.post(
-        `${process.env.API}/api/exercise/create`,
-        {
-          content: content,
-          title: title,
-          points: Number(points),
-          level: level,
-        }
-      );
+      await formRef.validateFields();
+      let { content, title, points, level, tags } = formRef.getFieldsValue();
+      const res = await axios.post(`${process.env.API}/api/exercise/create`, {
+        content: content,
+        title: title,
+        points: Number(points),
+        level: level,
+        tags: tags,
+      });
       setButtonLoading(false);
       if (res.data.success) {
         notification.info({
           message: 'Notification',
-          description: <p>Success!</p>,
+          description: 'Success!',
         });
         exerciseId.setValue(res.data.data.id);
         dirty.setValue(false);
@@ -108,14 +139,14 @@ const StepBasic = ({
       } else {
         notification.error({
           message: 'Notification',
-          description: <p>Failed!</p>,
+          description: 'Failed!',
         });
       }
     } catch (e) {
       setButtonLoading(false);
       notification.warning({
         message: 'Notification',
-        description: <p>Check your input again!</p>,
+        description: 'Check your input again!',
       });
     }
   };
@@ -123,36 +154,34 @@ const StepBasic = ({
   const handleUpdate = async (onSuccess = () => {}) => {
     try {
       setButtonLoading(true);
-      await form.validateFields();
-      let { content, title, points, level } = form.getFieldsValue();
-      const res = await axios.post(
-        `${process.env.API}/api/exercise/update`,
-        {
-          id: exerciseId.value,
-          content: content,
-          title: title,
-          points: Number(points),
-          level: level,
-        }
-      );
+      await formRef.validateFields();
+      let { content, title, points, level, tags } = formRef.getFieldsValue();
+      const res = await axios.post(`${process.env.API}/api/exercise/update`, {
+        id: exerciseId.value,
+        content: content,
+        title: title,
+        points: Number(points),
+        level: level,
+        tags: tags,
+      });
       setButtonLoading(false);
       if (res.data.success) {
         notification.info({
           message: 'Notification',
-          description: <p>Success!</p>,
+          description: 'Success!',
         });
         onSuccess();
       } else {
         notification.error({
           message: 'Notification',
-          description: <p>Failed!</p>,
+          description: 'Fail!',
         });
       }
     } catch (e) {
       setButtonLoading(false);
       notification.warning({
         message: 'Notification',
-        description: <p>Check your input again!</p>,
+        description: 'Check your input again!',
       });
     }
   };
@@ -181,16 +210,16 @@ const StepBasic = ({
   return (
     <>
       <Form
-        form={form}
+        form={formRef}
         labelCol={{ span: 4 }}
         wrapperCol={{ span: 16 }}
         validateMessages={{
           required: "'${label}' is required!",
         }}
         scrollToFirstError={true}
-        initialValues={initialValues}
+        initialValues={initFormValues}
         onValuesChange={(changedValue, allValues) =>
-          checkDirty(initialValues, allValues)
+          checkDirty(initFormValues, allValues)
         }>
         <Form.Item name='title' label='Title' rules={[{ required: true }]}>
           <Input />
@@ -209,7 +238,7 @@ const StepBasic = ({
               plugins: [
                 'advlist autolink lists link preview',
                 'searchreplace visualblocks fullscreen codesample',
-                'table paste code wordcount',
+                'table paste code',
               ],
               toolbar:
                 'undo redo | fontselect fontsizeselect formatselect | bold italic underline strikethrough | \
@@ -233,6 +262,13 @@ forecolor backcolor | alignleft aligncenter alignright alignjustify | \
             <Select.Option value='medium'>Medium</Select.Option>
             <Select.Option value='hard'>Hard</Select.Option>
           </Select>
+        </Form.Item>
+        <Form.Item
+          name='tags'
+          label='Tags'
+          valuePropName='tags'
+          trigger='setTags'>
+          <ExerciseTags allTags={allTags} />
         </Form.Item>
         <Form.Item>
           {!exerciseId.value ? (
