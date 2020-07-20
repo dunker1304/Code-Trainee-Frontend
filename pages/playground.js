@@ -1,11 +1,12 @@
 import React, { Component, useState, useEffect } from 'react'
 import { render } from 'react-dom'
 import AceEditor from 'react-ace'
-import { Row, Col, Button, Select, Tabs } from 'antd'
+import { Row, Col, Button, Select, Tabs, Spin, message, notification } from 'antd'
 import axios from 'axios'
 import TestCase from '../components/TestCase'
 import SettingModal from '../components/SettingModal'
-import QuestionDescription from '../components/QuestionDescription'
+import QuestionDescription from '../components/exercise/ExerciseDescription'
+import ExerciseSubmissions from '../components/exercise/ExerciseSubmissions'
 import { languageMap } from '../utils/constants'
 import Split from 'react-split'
 import CodeTrainee from '../hocs/index';
@@ -25,6 +26,7 @@ import "ace-builds/src-noconflict/theme-solarized_dark";
 import "ace-builds/src-noconflict/theme-solarized_light";
 import "ace-builds/src-noconflict/theme-terminal";
 import "ace-builds/src-noconflict/ext-language_tools"
+import Router , {useRouter} from 'next/router'
 
 const { Option } = Select
 const { TabPane } = Tabs
@@ -39,7 +41,20 @@ const Playground = props => {
   const [tabSize, setTabSize] = useState(2)
   const [keyboardHandler, setKeyboardHandler] = useState("")
   const [gutter, setGutter] = useState(true)
+  const [indexActive , setIndexActive] = useState("1")
+  const router = useRouter()
+
+  useEffect(() => {
+   let activeTab = router.query.tab ? router.query.tab : "1"
+   if(activeTab == 4) {
+    let questionId = router.query.questionID
+    Router.push(`/exercise/[exerciseId]/discuss`,`/exercise/${questionId}/discuss`)
+   }
+   else
+    setIndexActive(activeTab)
+ },[]);
   const [runCode, setRunCode] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const onChange = (newValue) => {
     setCode(newValue)
@@ -47,18 +62,20 @@ const Playground = props => {
   }
 
   const handleRunCode = (callback) => {
+    setLoading(true);
     let data = {
       language_id: languageID,
       source_code: code,
       question_id: '1'
     }
-    console.log(process.env.API, 'handle run code')
     axios.post(`${process.env.API}/api/submissions`, data)
       .then(res => {
         setTestCaseProps(res.data)
+        setLoading(false)
         if (typeof callback === 'function') callback(res.data)
       })
       .catch(error => {
+        setLoading(false)
         console.log(error)
       })
       setRunCode(true)
@@ -80,6 +97,10 @@ const Playground = props => {
     axios.post(`${process.env.API}/api/solution`, data)
       .then(res => {
         console.log(res, 'add solution')
+        setLoading(false)
+        notification.success({
+          message: "Sucessfully added solution"
+        })
       })
       .catch(error => {
         console.log(error)
@@ -88,6 +109,7 @@ const Playground = props => {
 
   const handleSubmitCode = () => {
     console.log(runCode, 'submit code')
+    setLoading(true)
     if (!runCode) {
       handleRunCode(addSolution)
     } else {
@@ -129,7 +151,16 @@ const Playground = props => {
   }
 
   const handleChangeTab = (key) => {
-
+    let questionId = router.query.questionID
+    if(key == 4) {
+      Router.push(`/exercise/[exerciseId]/discuss`,`/exercise/${questionId}/discuss`)
+    }
+    else {
+      Router.push(`/playground?questionID=${questionId}&tab=${key}`)
+      setIndexActive(key)
+    }
+   
+   
   }
 
   const handleShowConsole = () => {
@@ -163,8 +194,8 @@ const Playground = props => {
         direction="horizontal"
         cursor="col-resize"
         className="split-wrapper">
-        <div className="content-right">
-          <Tabs defaultActiveKey="1" type="card" onChange={handleChangeTab}>
+        <div className="content-right" >
+          <Tabs defaultActiveKey= {indexActive} activeKey = {indexActive} type="card" onChange={handleChangeTab}>
             <TabPane tab="Description" key="1">
               <QuestionDescription question={props.question.question}/>
             </TabPane>
@@ -172,11 +203,14 @@ const Playground = props => {
               Solution here
             </TabPane>
             <TabPane tab="Submissions" key="3">
-              Submissions here
+              <ExerciseSubmissions handleChangeCodeAce={onChange} exerciseID={props.question.question.id}></ExerciseSubmissions>
+            </TabPane>
+            <TabPane tab="Discussions" key="4">
+              Discussion Here
             </TabPane>
           </Tabs>
 
-          <div className="question-fast-picker">
+          <div className="question-fast-picker" >
             <Button type='default'>
               <svg viewBox="0 0 24 24" width="1em" height="1em" className="icon__3Su4"><path fillRule="evenodd" d="M7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7zM3 5h2v2H3V5zm0 6h2v2H3v-2zm0 6h2v2H3v-2z"></path></svg>
               <span>Problems</span>
@@ -196,7 +230,7 @@ const Playground = props => {
             </Button> */}
           </div>
         </div>
-        <div className="content-left playground-wrapper">
+        <div className="content-left playground-wrapper" >
           <div className="playground-action">
             <Select defaultValue={props.language[0].code} style={{ width: 120 }} onSelect={handleChangeLanguage}>
               {props.language && props.language.map((lang, key) => (
@@ -234,20 +268,24 @@ const Playground = props => {
 
           {
             Array.isArray(testCaseProps) ?
-            <Tabs defaultActiveKey="1" tabPosition="left" onChange={handleChangeTab} 
-              style={ (consoleEditor == 'hide') ? {display: 'none'} : null } className="console-status">
-              {testCaseProps.map((testCase, key) => (
-                <TabPane tab={`Test Case ` + (key + 1)} key={key}>
-                  <TestCase testCaseProps={testCase.data || testCase}/>
-                </TabPane>
-              ))}
-            </Tabs>
+            <Spin spinning={loading}>
+              <Tabs defaultActiveKey="1" tabPosition="left" onChange={handleChangeTab} 
+                style={ (consoleEditor == 'hide') ? {display: 'none'} : null } className="console-status">
+                {testCaseProps.map((testCase, key) => (
+                  <TabPane tab={`Test Case ` + (key + 1)} key={key}>
+                    <TestCase testCaseProps={testCase.data || testCase}/>
+                  </TabPane>
+                ))}
+              </Tabs>
+            </Spin> 
             :
-            <div className="console-status" style={ (consoleEditor == 'hide') ? {display: 'none'} : null }>
-              <div>Status: {testCaseProps && testCaseProps.data.status.description}</div>
-              <div style={{ whiteSpace: 'pre-wrap' }} 
-                dangerouslySetInnerHTML={{__html: testCaseProps && testCaseProps.data.compile_output ? testCaseProps.data.compile_output.toString() : testCaseProps.data.stderr.toString()}}></div>
-            </div>
+            <Spin spinning={loading}>
+              <div className="console-status" style={ (consoleEditor == 'hide') ? {display: 'none'} : null }>
+                <div>Status: {testCaseProps && testCaseProps.data.status.description}</div>
+                <div style={{ whiteSpace: 'pre-wrap' }} 
+                  dangerouslySetInnerHTML={{__html: testCaseProps && testCaseProps.data.compile_output ? testCaseProps.data.compile_output.toString() : testCaseProps.data.stderr.toString()}}></div>
+              </div>
+            </Spin>
           }
 
           <div className="action-code-editor">
@@ -285,4 +323,4 @@ function mapStateToProps(state) {
   }
 }
 
-export default Playground
+export default Playground 

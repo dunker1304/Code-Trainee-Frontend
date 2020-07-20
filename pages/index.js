@@ -7,7 +7,7 @@ import CodeTrainee from 'hocs';
 import * as action from "../store/auth/action"
 import Login from "../components/Login"
 
-@CodeTrainee
+
 class Index extends Component {
 
   render() {

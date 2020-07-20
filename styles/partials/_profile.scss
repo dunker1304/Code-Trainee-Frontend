@@ -1,0 +1,136 @@
+// body {
+//   background-color: #f5f5f5 !important;
+// }
+.main-content-profile {
+  .customer-icon {
+    position: relative;
+    top:-3px;
+  }
+  .break-line {
+    height: 2px;
+    background-color: #d8d8d8;
+    margin: 0px 0 20px 0px;
+    clear: both;
+    float: left;
+    width: 100%;
+    .separator-op {
+      border-bottom: 1px solid #e4eaf1;
+      background: linear-gradient(white, #f7f7f7);
+      height: 5px;
+      z-index: -3;
+     }
+  }
+  .information {
+    h3 {
+      height: 21px;
+      color: #333;
+      font-size: 18px;
+      font-weight: bold;
+      line-height: 21px;
+      text-transform: uppercase;
+    }
+    .anticon {
+      position: relative;
+      top : -3px;
+    }
+  }
+  .cv-left {
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding-bottom: 20px;
+    box-shadow: 0 5px 15px 0 #dedede;
+    border-radius: 7px;
+    .user-point {
+      height: 12px;
+      color: #8291a3;
+      font-size: 12px;
+      font-weight: bold;
+      .anticon {
+        top: -2px;
+        color: rgb(237,194,64);
+        font-weight: bold;
+      }
+    }
+    .user-info {
+      text-align: center;
+      margin: 20px 0px 20px 0px;
+
+      .user-avatar {
+        img {
+          width: 128px;
+          height: 128px;
+          min-width: 128px;
+          max-width: 128px;
+          border-radius: 50%;
+          border: 3px solid #e5e5e5;
+        }
+      }
+  
+      .user-display-name {
+        height: 30px;
+        color: #8291a3;
+        font-size: 20px;
+        font-weight: bold;
+        line-height: 30px;
+        text-align: center;
+        margin: 15px 0 5px 0px;
+        display: block;
+      }
+    }
+
+   
+  }
+
+  .cv-right {
+    .heap-map-activity {
+      background-color: #fff;
+      padding-bottom: 20px;
+      box-shadow: 0 5px 15px 0 #dedede;
+      border-radius: 7px;
+      .cus-heap-map {
+         display: flex;
+         justify-content: center;
+         flex-direction: row;
+         padding-top: 30px;
+        .react-calendar-heatmap {
+          width: 90%;
+        }
+        
+      }
+    }
+
+    .last-submmition{
+      background-color: #fff;
+      padding-bottom: 20px;
+      box-shadow: 0 5px 15px 0 #dedede;
+      border-radius: 7px;
+      margin-top: 30px;
+      font-weight: bolder;
+      .title {
+        padding: 15px 0px 0px 10px;
+      }
+      .status-submission{
+        background-color: #d9534f;
+        padding: 3px 7px;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1;
+        color: #fff;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        /* background-color: #777; */
+        border-radius: 10px;
+      }
+    }
+  }
+}
+
+.profile-container {
+  padding: 30px;
+  min-height: 100vh;
+}

@@ -12,7 +12,7 @@ export const loadUserInfo = (accessToken) => {
       }) .then( res => {
         dispatch({
           type: 'LOADED_USER_INFO',
-          payload: res.data.user
+          payload: res.data
         })
         resolve(res)
       })
@@ -87,6 +87,8 @@ export const loadUserInfo = (accessToken) => {
       return promise
    }
  }
+
+
 
 
   
