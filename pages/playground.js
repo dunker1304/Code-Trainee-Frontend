@@ -1,11 +1,12 @@
 import React, { Component, useState, useEffect } from 'react'
 import { render } from 'react-dom'
 import AceEditor from 'react-ace'
-import { Row, Col, Button, Select, Tabs } from 'antd'
+import { Row, Col, Button, Select, Tabs, Spin, message, notification } from 'antd'
 import axios from 'axios'
 import TestCase from '../components/TestCase'
 import SettingModal from '../components/SettingModal'
-import QuestionDescription from '../components/QuestionDescription'
+import QuestionDescription from '../components/exercise/ExerciseDescription'
+import ExerciseSubmissions from '../components/exercise/ExerciseSubmissions'
 import { languageMap } from '../utils/constants'
 import Split from 'react-split'
 import CodeTrainee from '../hocs/index';
@@ -53,6 +54,7 @@ const Playground = props => {
     setIndexActive(activeTab)
  },[]);
   const [runCode, setRunCode] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const onChange = (newValue) => {
     setCode(newValue)
@@ -60,18 +62,20 @@ const Playground = props => {
   }
 
   const handleRunCode = (callback) => {
+    setLoading(true);
     let data = {
       language_id: languageID,
       source_code: code,
       question_id: '1'
     }
-    console.log(process.env.API, 'handle run code')
     axios.post(`${process.env.API}/api/submissions`, data)
       .then(res => {
         setTestCaseProps(res.data)
+        setLoading(false)
         if (typeof callback === 'function') callback(res.data)
       })
       .catch(error => {
+        setLoading(false)
         console.log(error)
       })
       setRunCode(true)
@@ -93,6 +97,10 @@ const Playground = props => {
     axios.post(`${process.env.API}/api/solution`, data)
       .then(res => {
         console.log(res, 'add solution')
+        setLoading(false)
+        notification.success({
+          message: "Sucessfully added solution"
+        })
       })
       .catch(error => {
         console.log(error)
@@ -101,6 +109,7 @@ const Playground = props => {
 
   const handleSubmitCode = () => {
     console.log(runCode, 'submit code')
+    setLoading(true)
     if (!runCode) {
       handleRunCode(addSolution)
     } else {
@@ -194,7 +203,7 @@ const Playground = props => {
               Solution here
             </TabPane>
             <TabPane tab="Submissions" key="3">
-              Submissions here
+              <ExerciseSubmissions handleChangeCodeAce={onChange} exerciseID={props.question.question.id}></ExerciseSubmissions>
             </TabPane>
             <TabPane tab="Discussions" key="4">
               Discussion Here
@@ -258,21 +267,27 @@ const Playground = props => {
           />
 
           {
-            Array.isArray(testCaseProps) ?
-            <Tabs defaultActiveKey="1" tabPosition="left" onChange={handleChangeTab} 
-              style={ (consoleEditor == 'hide') ? {display: 'none'} : null } className="console-status">
-              {testCaseProps.map((testCase, key) => (
-                <TabPane tab={`Test Case ` + (key + 1)} key={key}>
-                  <TestCase testCaseProps={testCase.data || testCase}/>
-                </TabPane>
-              ))}
-            </Tabs>
+            (testCaseProps.length == 1 && testCaseProps[0].success == false) ?
+            <Spin spinning={loading}>
+              <div className="console-status" style={ (consoleEditor == 'hide') ? {display: 'none'} : null }>
+                <div>Status: {testCaseProps[0].data ? testCaseProps[0].data.status.description : "Something Wrong"}</div>
+                <div style={{ whiteSpace: 'pre-wrap' }} 
+                  dangerouslySetInnerHTML={{ __html: testCaseProps[0].data ? testCaseProps[0].data.compile_output ? testCaseProps[0].data.compile_output.toString() : testCaseProps[0].data.stderr.toString() 
+                                          : ("Source code: " + testCaseProps[0]?.message.source_code[0] || "Something Wrong") }}>                            
+              </div>
+              </div>
+            </Spin>
             :
-            <div className="console-status" style={ (consoleEditor == 'hide') ? {display: 'none'} : null }>
-              <div>Status: {testCaseProps && testCaseProps.data.status.description}</div>
-              <div style={{ whiteSpace: 'pre-wrap' }} 
-                dangerouslySetInnerHTML={{__html: testCaseProps && testCaseProps.data.compile_output ? testCaseProps.data.compile_output.toString() : testCaseProps.data.stderr.toString()}}></div>
-            </div>
+            <Spin spinning={loading}>
+              <Tabs defaultActiveKey="1" tabPosition="left" 
+                style={ (consoleEditor == 'hide') ? {display: 'none'} : null } className="console-status">
+                {testCaseProps.map((testCase, key) => (
+                  <TabPane tab={`Test Case ` + (key + 1)} key={key}>
+                    <TestCase testCaseProps={testCase.data || testCase}/>
+                  </TabPane>
+                ))}
+              </Tabs>
+            </Spin> 
           }
 
           <div className="action-code-editor">
@@ -292,22 +307,18 @@ const Playground = props => {
 }
 
 Playground.getInitialProps = async function(ctx) {
-  console.log(JSON.stringify(process.env.API), 'env config')
-
   let id = ctx.query.questionID
   let urlExercise = `${process.env.API}/api/exercise?id=${id}`
   let urlLanguage = `${process.env.API}/api/program-language/all?exerciseId=${id}`
   const questionResponse = await axios.get(urlExercise)
   const languageResponse = await axios.get(urlLanguage)
-  console.log(questionResponse.data, 'questionResponse')
   return { question: questionResponse.data, language: languageResponse.data.data.result }
 }
 
-function mapStateToProps(state) {
+function mapStateToProps(state, ownProps) {
   return {
-    errorMessage: state.auth.errorMessage,
-    isShowLogin : state.auth.isShowLogin
+    auth: state.auth
   }
 }
 
-export default Playground 
+export default connect(mapStateToProps)(Playground)
