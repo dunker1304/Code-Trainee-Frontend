@@ -33,7 +33,7 @@ const CommentInput = (props) => {
       content : contentCmt,
       questionId : props.questionId
     }
-    let url = `http://localhost:1337/api/create-comment`
+    let url = `${process.env.API}/api/create-comment`
     let res = await axios.post(url,data)
 
     if(res.data.success) {

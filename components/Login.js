@@ -4,6 +4,7 @@ import {connect} from 'react-redux'
 import * as action from "../store/auth/action"
 import { Radio } from 'antd'
 import {openNotificationWithIcon} from '../components/Notification'
+import axios from 'axios';
 class Login extends Component {
 
   constructor(props, context) {
@@ -13,9 +14,22 @@ class Login extends Component {
       password:'',
       role:'',
       username:'',
+      listRole : []
      // isLogin : props.type == 1
     }
     
+  }
+
+  componentDidMount(){
+    this.fetchRole()
+  }
+
+  fetchRole = async function(){
+    let url = `${process.env.API}/api/user/role`
+    let data = { ignoreAdmin : true}
+    let listRole = await axios.post(url, data)
+    this.setState({listRole : listRole.data.data})
+
   }
 
   //state = { isLogin: true, email:'',password:'',role:'',username:'' };
@@ -164,8 +178,13 @@ class Login extends Component {
                 <span className="focus-input100" />
               </div>
               <Radio.Group name="role"  className ="role_radio"  onChange= {(e)=>this.changeRole(e.target.value)} >
-                <Radio value={1} required>Teacher</Radio>
-                <Radio value={2}>Student</Radio>
+                {
+                   this.state.listRole && this.state.listRole.length > 0 ? this.state.listRole.map((value,index)=> (
+                    <Radio key = {index}value={value['id']} required>{value['name']}</Radio>
+                  )) : ''
+                }
+            
+
               </Radio.Group>
               {/* <div className='login_error'>
                 {this.props.signUpError}

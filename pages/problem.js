@@ -236,7 +236,7 @@ const Problems = (props) => {
   }
 
   const handlePickRandomQuestion = async () => {
-   let random = await axios.get('http://localhost:1337/api/exercise/random')
+   let random = await axios.get(`${process.env.API}/api/exercise/random`)
    if(random.data.success) {
      let exercise  = random.data.data
      Router.push(`/playground?questionID=${exercise['id']}`,`/playground?questionID=${exercise['id']}`)
