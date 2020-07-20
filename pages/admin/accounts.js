@@ -1,10 +1,10 @@
-import Header from "../components/Header"
+import Header from "../../components/Header"
 import { useState , useEffect ,useRef} from "react"
-import Footer from "../components/Footer"
+import Footer from "../../components/Footer"
 import { Menu, Dropdown, Button, Input, Table, DatePicker, Space, Drawer, Form, Col, Row, Select, Switch,Pagination } from 'antd';
 import { DownOutlined, PlusOutlined, DeleteOutlined, EditOutlined, UsergroupDeleteOutlined,CheckOutlined } from "@ant-design/icons"
 import axios from "axios"
-import { openNotificationWithIcon} from "../components/Notification"
+import { openNotificationWithIcon} from "../../components/Notification"
 import moment from "moment"
 import _ from 'lodash'
 
