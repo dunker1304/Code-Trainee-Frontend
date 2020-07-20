@@ -104,6 +104,7 @@ const ExerciseTags = ({ tags = [], setTags = (arr) => {}, allTags = [] }) => {
           );
         }
         const isLongTag = tag.length > 15;
+        const handleLongTag = (tag) => tag.slice(0, 15) + '...';
         const tagElem = (
           <Tag
             color='green'
@@ -122,7 +123,7 @@ const ExerciseTags = ({ tags = [], setTags = (arr) => {}, allTags = [] }) => {
                   event.preventDefault();
                 }
               }}>
-              {isLongTag ? `{tag.slice(0, 15)}...` : tag}
+              {isLongTag ? handleLongTag(tag) : tag}
             </span>
           </Tag>
         );
