@@ -14,6 +14,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import ConfirmModal from '../ConfirmModal';
 import ExerciseTags from './ExerciseTags';
+import ExerciseLOC from './ExerciseLOC';
 
 const StepBasic = ({
   exerciseId = {
@@ -41,6 +42,8 @@ const StepBasic = ({
     tags: ['#'],
   });
   let [allTags, setAllTags] = useState([]);
+  let [minSliderValue, setMinSliderValue] = useState(0);
+  let [maxSliderValue, setMaxSliderValue] = useState(100);
 
   // run only one when component mounted
   useEffect(() => {
@@ -52,6 +55,7 @@ const StepBasic = ({
             `${process.env.API}/api/exercise/basic-info/${exerciseId.value}`
           );
           if (res.data.success) {
+            setRangeSlider(res.data.data.level); // must on top of this scope
             let tags = res.data.data.tags.map((e) => e.name);
             formRef.setFieldsValue({
               title: res.data.data.title,
@@ -207,6 +211,29 @@ const StepBasic = ({
     setVisibleConfirm(false);
   };
 
+  const setRangeSlider = (value) => {
+    if (value === 'easy') {
+      setMinSliderValue(0);
+      setMaxSliderValue(100);
+      formRef.setFieldsValue({
+        points: '100',
+      });
+    } else if (value === 'medium') {
+      setMinSliderValue(101);
+      setMaxSliderValue(200);
+      formRef.setFieldsValue({
+        points: '200',
+      });
+    } else {
+      // hard
+      setMinSliderValue(201);
+      setMaxSliderValue(300);
+      formRef.setFieldsValue({
+        points: '300',
+      });
+    }
+  };
+
   return (
     <>
       <Form
@@ -253,15 +280,15 @@ forecolor backcolor | alignleft aligncenter alignright alignjustify | \
             }}
           />
         </Form.Item>
-        <Form.Item name='points' label='LOC' rules={[{ required: true }]}>
-          <Input type='number' />
-        </Form.Item>
         <Form.Item name='level' label='Level' rules={[{ required: true }]}>
-          <Select>
+          <Select onChange={setRangeSlider}>
             <Select.Option value='easy'>Easy</Select.Option>
             <Select.Option value='medium'>Medium</Select.Option>
             <Select.Option value='hard'>Hard</Select.Option>
           </Select>
+        </Form.Item>
+        <Form.Item name='points' label='LOC' rules={[{ required: true }]}>
+          <ExerciseLOC minValue={minSliderValue} maxValue={maxSliderValue} />
         </Form.Item>
         <Form.Item
           name='tags'
