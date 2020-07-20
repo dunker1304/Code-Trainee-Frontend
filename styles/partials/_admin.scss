@@ -59,20 +59,23 @@
       }
     }
     .data-list-container {
-      ._deactive , ._active{
+      ._deactive , ._active , ._unconfirmed{
         padding: 3px 10px;
         background: red;
         border-radius: 15px;
         font-size: 12px;
         color: #fff;
         font-weight: bold;
-        width: 70px;
+        max-width: 100px;
         display: block;
         text-align: center;
         margin: 0 auto;
       }
       ._active {
         background-color: #28c76f
+      }
+      ._unconfirmed {
+        background-color: #fbc02d
       }
 
       tr th {
@@ -82,6 +85,11 @@
       }
       tr td {
         text-align: center;
+      }
+      .data-pagging {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 30px;
       }
     }
   }

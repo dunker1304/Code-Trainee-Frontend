@@ -45,8 +45,8 @@ const Process = (props) => {
   useEffect(() => {
     if (fontSize < 80) {
       setTimeout(() => {
-        setFontSize(fontSize + 0.1)
-      }, 1);
+        setFontSize(fontSize + 0.5)
+      }, 0.1);
 
     }
   }, [fontSize])
@@ -54,18 +54,28 @@ const Process = (props) => {
   useEffect(() => {
     if (fontSize2 < 40) {
       setTimeout(() => {
-        setFontSize2(fontSize2 + 0.1)
-      }, 1);
+        setFontSize2(fontSize2 + 0.5)
+      }, 0.1);
 
     }
   }, [fontSize2])
 
-  useEffect( async () => {
+  const fetchData = async ()=> {
     let url = `http://localhost:1337/api/all-submission`
     let result =await  axios.get(url)
     await props.getExerciseOfUser()
     setDataSource(result.data.data)
+  }
+
+  useEffect(  () => {
+    fetchData()
   }, [])
+
+  const defaultLabelStyle = {
+    fontSize: '5px',
+    fontFamily: 'sans-serif',
+    color : '#fff'
+  };
   return (
     <div className="process">
       <div className="container">
@@ -73,21 +83,59 @@ const Process = (props) => {
           <div className="col-md-4 col-sm-12">
             <PieChart
               data={[
-                { title: 'Wrong Answer', value: 10, color: 'rgb(175,216,248)' },
-                { title: 'Accepted', value: 15, color: 'rgb(237,194,64)' },
-                { title: 'Runtime Error', value: 20, color: 'rgb(203,75,75)' },
-                { title: 'Other', value: 20, color: 'rgb(148,64,237)' },
+                { title: 'Wrong Answer', value: props.exerciseOfUser.wrongAnswer, color: 'rgb(175,216,248)' },
+                { title: 'Accepted', value: props.exerciseOfUser.acceptedSubmissions, color: 'rgb(237,194,64)' },
+                { title: 'Runtime Error', value: props.exerciseOfUser.runtimeError, color: 'rgb(203,75,75)' },
+                { title: 'Other', value: props.exerciseOfUser.other, color: 'rgb(148,64,237)' },
               ]}
               animate = {true}
-              animationDuration = {5000}
+              animationDuration = {3000}
               style={{width:"300px"}}
-            />
+              label={({ dataEntry }) => dataEntry.percentage > 0 ? Math.round(dataEntry.percentage) + '%' : ''}
+              labelStyle={defaultLabelStyle}
+       />
+           <table style={{position: 'absolute', top: '0px', right: '-20px', fontSize: 'smaller', color: '#545454'}}>
+             <tbody>
+               <tr>
+                 <td className="legendColorBox">
+                   <div style={{border: '1px solid #ccc', padding: '1px'}}>
+                     <div style={{width: '4px', height: 0, border: '5px solid rgb(237,194,64)', overflow: 'hidden'}} />
+                     </div>
+                </td>
+                <td className="legendLabel">Accepted</td>
+              </tr>
+              <tr>
+                <td className="legendColorBox">
+                  <div style={{border: '1px solid #ccc', padding: '1px'}}>
+                    <div style={{width: '4px', height: 0, border: '5px solid rgb(175,216,248)', overflow: 'hidden'}} />
+                    </div>
+                </td>
+                <td className="legendLabel">Wrong Answer</td>
+              </tr>
+              <tr>
+                <td className="legendColorBox">
+                  <div style={{border: '1px solid #ccc', padding: '1px'}}>
+                    <div style={{width: '4px', height: 0, border: '5px solid rgb(203,75,75)', overflow: 'hidden'}} />
+                    </div>
+                </td>
+                <td className="legendLabel">Runtime Error</td>
+              </tr>
+              <tr>
+                <td className="legendColorBox">
+                  <div style={{border: '1px solid #ccc', padding: '1px'}}>
+                  <div style={{width: '4px', height: 0, border: '5px solid rgb(148,64,237)', overflow: 'hidden'}} />
+                  </div>
+                </td>
+                <td className="legendLabel">Others</td>
+              </tr>
+            </tbody>
+          </table>
           </div>
           <div className="col-md-8 col-sm-12">
             <div className="row">
               <div className="col-md-12">
                 <p className="number">
-                  <span className="text-success" style={{ color: "rgb(60, 118, 61)", fontSize: fontSize }}>0</span>
+            <span className="text-success" style={{ color: "rgb(60, 118, 61)", fontSize: fontSize }}>{props.exerciseOfUser.solved}</span>
                    <span>/ {props.exerciseOfUser.total}</span>
                 </p>
                 <h3 className="number-text"> questions solved</h3>
@@ -100,12 +148,12 @@ const Process = (props) => {
                 <h4 className="number-text"> total submissions</h4>
               </div>
               <div className="col-md-4 col-sm-4 col-xs-12">
-                <p className="number text-success" id="ac_submissions"  style={{color: "rgb(60, 118, 61)", fontSize: fontSize2}}>0</p>
+            <p className="number text-success" id="ac_submissions"  style={{color: "rgb(60, 118, 61)", fontSize: fontSize2}}>{props.exerciseOfUser.acceptedSubmissions}</p>
                 <h4 className="number-text"> accepted submissions</h4>
               </div>
               <div className="col-md-4 col-sm-4 col-xs-12">
                 <p className="number">
-                  <span className="text-success" id="ac_rate"  style={{color: "rgb(60, 118, 61)", fontSize: fontSize2}}>0.0</span>
+            <span className="text-success" id="ac_rate"  style={{color: "rgb(60, 118, 61)", fontSize: fontSize2}}>{props.exerciseOfUser.rateAcceptedSubmissions}</span>
                   <span>%</span>
                 </p>
                 <h4 className="number-text"> acceptance rate</h4>
@@ -117,7 +165,7 @@ const Process = (props) => {
         <div className = "row"> 
           <div className= " col-md-12">
               <h3 className="title-all-sub">All Submissions</h3>
-              <Table columns={columns} dataSource={dataSource.submission} />
+              <Table columns={columns} dataSource={dataSource.submission} pagination={true}/>
           </div>
         </div>
       </div>

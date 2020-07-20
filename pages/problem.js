@@ -13,6 +13,8 @@ import Link from 'next/link'
 import axios from "axios"
 import  Router  from "next/router"
 import { openNotificationWithIcon } from "../components/Notification"
+import composedAuthHOC from 'hocs';
+import {compose} from "redux";
 
 
 const Level = [{ id: 1, name: 'Easy' }, { id: 2, name: 'Medium' }, { id: 3, name: 'Hard' }]
@@ -443,7 +445,7 @@ const Problems = (props) => {
 }
 
 Problems.getInitialProps = async (ctx) => {
-  // console.log(action)
+  console.log('action')
   const { store: { dispatch }, pathname, req, res } = ctx
   await dispatch(searchQuestion())
   await dispatch(getCategory())
@@ -462,6 +464,10 @@ function mapStateToProps(state, ownProps) {
   }
 }
 
+const Proms = compose (
+  connect(mapStateToProps, { searchQuestion, chooseTags,
+    dropdownFilter, getCategory ,addToWishList ,removeToWishList }),
+    composedAuthHOC
+)
 
-export default connect(mapStateToProps, { searchQuestion, chooseTags,
-   dropdownFilter, getCategory ,addToWishList ,removeToWishList, })(Problems);
+export default Proms(Problems);

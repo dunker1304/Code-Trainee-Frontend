@@ -23,7 +23,7 @@ const StepTestCases = ({ exerciseId }) => {
   let [currPageSize, setCurrPageSize] = useState(10);
   const loadTable = async () => {
     const res = await axios.get(
-      `http://localhost:1337/api/testcase/get-by-exercise?exerciseId=${exerciseId}`
+      `${process.env.API}/api/testcase/get-by-exercise?exerciseId=${exerciseId}`
     );
     console.log(res.data);
     if (res.data.success) {
@@ -45,7 +45,7 @@ const StepTestCases = ({ exerciseId }) => {
     loadTable();
   }, []);
   const handleEditRecord = async (data) => {
-    const res = await axios.post(`http://localhost:1337/api/testcase/update`, {
+    const res = await axios.post(`${process.env.API}/api/testcase/update`, {
       isHidden: data.isHidden,
       input: data.input,
       output: data.output,
@@ -71,7 +71,7 @@ const StepTestCases = ({ exerciseId }) => {
     }
   };
   const handleDeleteRecord = async (record) => {
-    const res = await axios.post(`http://localhost:1337/api/testcase/delete`, {
+    const res = await axios.post(`${process.env.API}/api/testcase/delete`, {
       id: record.key,
     });
     if (res.data.success) {
@@ -88,7 +88,7 @@ const StepTestCases = ({ exerciseId }) => {
     }
   };
   const handleAddRecord = async (data) => {
-    const res = await axios.post(`http://localhost:1337/api/testcase/create`, {
+    const res = await axios.post(`${process.env.API}/api/testcase/create`, {
       isHidden: data.isHidden,
       dataInput: data.input,
       expectedOutput: data.output,
@@ -154,7 +154,7 @@ const StepTestCases = ({ exerciseId }) => {
               if (hidden) {
                 return <CheckOutlined style={{ fontSize: '16px' }} />;
               } else {
-                return <CloseOutlined style={{ fontSize: '16px' }} />;
+                // return <CloseOutlined style={{ fontSize: '16px' }} />;
               }
             },
           },

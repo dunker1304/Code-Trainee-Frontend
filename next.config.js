@@ -1,5 +1,6 @@
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
 const { ANALYZE } = process.env
+const { HOST, API_URL } = require('./env-config.js') 
 const withSass = require('@zeit/next-sass')
 const withImages = require('next-images')
 const withCss = require('@zeit/next-css')
@@ -9,6 +10,10 @@ module.exports = withCss(
     withSass({
       cssLoaderOptions: {
          url : false
+      },
+      env: {
+        HOST: HOST,
+        API: API_URL
       },
       generateBuildId: async () => {
         return require('child_process').execSync('git rev-parse HEAD').toString().replace('\n', '')

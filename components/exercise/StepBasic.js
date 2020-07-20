@@ -35,7 +35,7 @@ const StepBasic = ({
       if (exerciseId.value) {
         try {
           const res = await axios.get(
-            `http://localhost:1337/api/exercise/basic-info?id=${exerciseId.value}`
+            `${process.env.API}/api/exercise/basic-info?id=${exerciseId.value}`
           );
           if (res.data.success) {
             form.setFieldsValue({
@@ -87,7 +87,7 @@ const StepBasic = ({
       await form.validateFields();
       let { content, title, points, level } = form.getFieldsValue();
       const res = await axios.post(
-        `http://localhost:1337/api/exercise/create`,
+        `${process.env.API}/api/exercise/create`,
         {
           content: content,
           title: title,
@@ -126,7 +126,7 @@ const StepBasic = ({
       await form.validateFields();
       let { content, title, points, level } = form.getFieldsValue();
       const res = await axios.post(
-        `http://localhost:1337/api/exercise/update`,
+        `${process.env.API}/api/exercise/update`,
         {
           id: exerciseId.value,
           content: content,

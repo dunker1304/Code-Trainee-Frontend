@@ -1,33 +1,16 @@
 import Header from "../components/Header"
-import { useState } from "react"
+import { useState , useEffect ,useRef} from "react"
 import Footer from "../components/Footer"
-import { Menu, Dropdown, Button, Input, Table, Tag, Space, Drawer, Form, Col, Row, Select, Switch } from 'antd';
+import { Menu, Dropdown, Button, Input, Table, DatePicker, Space, Drawer, Form, Col, Row, Select, Switch,Pagination } from 'antd';
 import { DownOutlined, PlusOutlined, DeleteOutlined, EditOutlined, UsergroupDeleteOutlined,CheckOutlined } from "@ant-design/icons"
+import axios from "axios"
+import { openNotificationWithIcon} from "../components/Notification"
+import moment from "moment"
+import _ from 'lodash'
 
-
-
-const data = [
-  {
-    index: '1',
-    name: 'John Brown',
-    role: 'Student',
-    status: 'Deactive',
-  },
-  {
-    index: '2',
-    name: 'Jim Green',
-    role: 'Student',
-    status: 'Deactive',
-  },
-  {
-    index: '3',
-    name: 'Joe Black',
-    role: 'Student',
-    status: 'Active',
-  },
-];
 
 const role = [
+  
   {
     id : 3 ,
     name : 'admin'
@@ -39,7 +22,11 @@ const role = [
   {
     id : 5 ,
     name : 'student'
-  }
+  },
+  {
+    id : -1 ,
+    name : 'all'
+  },
 
 ]
 
@@ -48,16 +35,33 @@ const Admin = (props) => {
 
   const [visible, setVisible] = useState(false)
   const [visibleEdit, setVisibleEdit] = useState(false)
-  const [roleActive , setRoleActive ] = useState(0)
+  const [roleActive , setRoleActive ] = useState(3)
   const [dropDownVisible , setDropDownVisible] = useState(0)
-  const handleRoleActive = (key)=>{
+  const [listAccount , setListAccount] = useState([])
+
+
+  const [editUsername , setEditUsername] = useState('')
+  const [editEmail , setEditEmail] = useState('')
+  const [editDisplayName , setEditDisplayName] = useState('')
+  const [editPhone , setEditPhone] = useState('')
+  const [editRole ,setEditRole] = useState('')
+  const [editDeactive , setEditDeactive] = useState(false)
+  const [editDOB , setEditDOB] = useState('')
+  const [editUserId , setEditUserId] = useState('')
+  const [currentPage , setCurrentPage] = useState(1)
+  const [pageSize , setPageSize] = useState(1)
+  const [pageTotal , setPageTotal] = useState(1)
+  const formatDate = 'DD/MM/YYYY'
+
+  const handleRoleActive = async (key)=>{
     setRoleActive(key)
+    fetchData(1,key)
   }
   const menu = (
     <Menu onClick = { ({key}) => handleRoleActive(key)}>
        {role.map((value,index) => (
-         <Menu.Item key = {index}>
-            {index == roleActive ?  <CheckOutlined/>  : ''}
+         <Menu.Item key = {value['id']}>
+            {value['id'] == roleActive ?  <CheckOutlined/>  : ''}
             <span >
                {value.name}
             </span>
@@ -76,8 +80,31 @@ const Admin = (props) => {
     setVisible(false)
   };
 
-  const showDrawerEdit = () => {
+  const showDrawerEdit = async(record) => {
     setVisibleEdit(true)
+
+    //load edit account
+    let urlUser = `${process.env.API}/api/admin/get-user-by-id`
+    let data = { userId : record['id']}
+    const resUser = await axios.post(urlUser,data)
+    if(resUser.data.success) {
+      // setEditAccount(resUser.data.data)
+      // console.log(resUser.data)
+      let data = resUser.data.data;
+      setEditUserId(data['id'])
+      setEditUsername(data['username'])
+      setEditEmail(data['email'])
+      setEditDisplayName(data['displayName'])
+      setEditPhone(data['phone'])
+      setEditRole(data['roles'] ? data['roles'][0]['id'] : '')
+      setEditDeactive(data['isDeleted'])
+      setEditDOB( data['dateOfBirth'] ? moment(data['dateOfBirth']).format(formatDate) : null)
+    }
+    else {
+      openNotificationWithIcon('error','','Load data fail!')
+    }
+   
+    
   };
 
   const onCloseEdit = () => {
@@ -91,10 +118,15 @@ const Admin = (props) => {
       key: 'index',
     },
     {
-      title: 'NAME',
-      dataIndex: 'name',
-      key: 'name',
+      title: 'EMAIL',
+      dataIndex: 'email',
+      key: 'email',
       render: text => <a>{text}</a>,
+    },
+    {
+      title: 'USERNAME',
+      dataIndex: 'username',
+      key: 'username',
     },
     {
       title: 'ROLE',
@@ -105,14 +137,14 @@ const Admin = (props) => {
       title: 'STATUS',
       key: 'status',
       dataIndex: 'status',
-      render: (text) => (<span className={text == 'Deactive' ? '_deactive' : '_active'}>{text}</span>)
+      render: (text) => (<span className={text == 'Deactive' ? '_deactive' : text == 'Active' ? '_active':'_unconfirmed'}>{text}</span>)
     },
     {
       title: 'ACTION',
       key: 'action',
       render: (text, record) => (
         <Space size="middle">
-          <EditOutlined onClick={showDrawerEdit} />
+          <EditOutlined onClick={()=>showDrawerEdit(record)} />
           {/* <DeleteOutlined /> */}
         </Space>
       ),
@@ -122,12 +154,110 @@ const Admin = (props) => {
     setDropDownVisible(newValue)
   }
 
+  const submitEditAccount = async ()=> {
+    let data = {
+      userId : editUserId,
+      username : editUsername ,
+      email : editEmail ,
+      phone : editPhone ,
+      dateOfBirth : editDOB,
+      deActive : editDeactive,
+      displayName : editDisplayName,
+      role : editRole,
+      key : 'admin-edit'
+    }
+   
+    let urlUser = `${process.env.API}/api/admin/edit-an-account`
+    const resUser = await axios.post(urlUser,data)
+    if(resUser.data.success) {
+      openNotificationWithIcon('success', '', 'Edit Account Successfully!')
+      fetchData(currentPage,roleActive)
+      onCloseEdit()
+    }
+    else {
+      openNotificationWithIcon('error', '', 'Edit Account Fail!')
+    }
+
+  }
+
+  const submitCreateAccount = async ()=>{
+    let data = {
+      username : editUsername ,
+      email : editEmail ,
+      phone : editPhone ,
+      dateOfBirth : editDOB,
+      displayName : editDisplayName,
+      role : editRole,
+    }
+
+    let urlUser = `${process.env.API}/api/admin/create-an-account`
+    const resUser = await axios.post(urlUser,data)
+    if(resUser.data.success) {
+      openNotificationWithIcon('success', '', 'Create Account Successfully!')
+      fetchData(currentPage,roleActive)
+      onClose()
+    }
+    else {
+      openNotificationWithIcon('error', '', resUser.data.message ? resUser.data.message :'Edit Account Fail!')
+    }
+
+  }
+
+  const handleClickPagging = (pageNumber)=>{
+        fetchData(pageNumber,roleActive)
+        setCurrentPage(pageNumber)
+  }
+
+  useEffect( ()=>{
+    fetchData(1,roleActive);
+  },[])
+
+  const fetchData = async (page,role)=>{
+    let urlUser = `${process.env.API}/api/admin/get-user-by-role`
+    let data = { role : role , page : page}
+    const resUser = await axios.post(urlUser,data)
+    if(resUser.data.success) {
+      setListAccount(resUser.data.data.users)
+      setPageTotal(resUser.data.data.total)
+    }
+    else {
+      openNotificationWithIcon('error','','Load data fail!')
+    }
+  }
+
+  const searchHandleChange = async (e)=> {
+     delayedQuery(e.target.value,roleActive);
+  }
+
+  const fetchKeySearchDate = async (keySearch,role)=> {
+    if(keySearch) {
+      let urlUser = `${process.env.API}/api/admin/search-fuzzy-account`
+      let data = { role : role , keySearch : keySearch}
+      const resUser = await axios.post(urlUser,data)
+      if(resUser.data.success) {
+        setListAccount(resUser.data.data.users)
+        setPageTotal(resUser.data.data.total)
+      }
+      else {
+        openNotificationWithIcon('error','','Load data fail!')
+      }
+    }
+    else {
+      fetchData(1)
+    }
+   
+  }
+ 
+
+  const delayedQuery = useRef(_.debounce((e,role) => fetchKeySearchDate(e,role), 500)).current;
+  
+
   return (
     <div>
       <Header />
       <div className="container-content admin-content">
         <div className="admin-wrap-content container">
-          <div style={{ display: "flex" }}>
+          <div style={{ display: "flex",paddingTop:"30px" }}>
             <h2 className="title_manage_acc">List Account  </h2>
             <UsergroupDeleteOutlined style={{ fontSize: "25px", marginLeft: "10px" }} />
           </div>
@@ -155,7 +285,7 @@ const Admin = (props) => {
                       <Button onClick={onClose} style={{ marginRight: 8 }}>
                         Cancel
                       </Button>
-                      <Button onClick={onClose} type="primary">
+                      <Button onClick={submitCreateAccount} type="primary">
                         Submit
                       </Button>
                     </div>
@@ -169,7 +299,7 @@ const Admin = (props) => {
                           label="Username"
                           rules={[{ required: true, message: 'Please enter user name' }]}
                         >
-                          <Input placeholder="Please enter user name" />
+                          <Input placeholder="Please enter user name" value={editUsername} onChange={(e)=>setEditUsername(e.target.value)} />
                         </Form.Item>
                       </Col>
                     </Row>
@@ -181,7 +311,18 @@ const Admin = (props) => {
                           label="Email"
                           rules={[{ required: true, message: 'Please enter email' }]}
                         >
-                          <Input placeholder="Please enter email" />
+                          <Input placeholder="Please enter email" value={editEmail} onChange={(e)=>setEditEmail(e.target.value)}/>
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                    <Row gutter={16}>
+                      <Col span={16}>
+                        <Form.Item
+                          name="displayName"
+                          label="Display Name"
+                          rules={[{ required: false, message: 'Please enter your display name' }]}
+                        >
+                          <Input placeholder='Please enter your display name' value={editDisplayName} onChange={(e)=>setEditDisplayName(e.target.value)}/>
                         </Form.Item>
                       </Col>
                     </Row>
@@ -190,12 +331,23 @@ const Admin = (props) => {
                         <Form.Item
                           name="phone"
                           label="Phone"
-                          rules={[{ required: false, message: 'Please enter phone' }]}
                         >
-                          <Input placeholder="Please enter phone" />
+                          <Input placeholder="Please enter phone" value={editPhone} onChange={(e)=>setEditPhone(e.target.value)}/>
                         </Form.Item>
                       </Col>
                     </Row>
+                    <Row gutter={16}>
+                      <Col span={16}>
+                        <Form.Item
+                          name="dob"
+                          label="DOB"
+                         
+                        >
+                           <DatePicker value = {moment(editDOB, formatDate) } format={formatDate} allowClear = {false}onChange={(date,dateString)=> setEditDOB(dateString)} /> 
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                   
                     <Row gutter={16}>
                       <Col span={16}>
                         <Form.Item
@@ -203,7 +355,7 @@ const Admin = (props) => {
                           label="Role"
                           rules={[{ required: true, message: 'Please enter your role' }]}
                         >
-                          <Select placeholder="Please select your role">
+                          <Select placeholder="Please select your role" onSelect = {(value)=> setEditRole(value)}>
                             <Option value="3">Admin</Option>
                             <Option value="4">Teacher</Option>
                             <Option value="5">Student</Option>
@@ -216,19 +368,32 @@ const Admin = (props) => {
                 </Drawer>
               </div>
               <div className="filter_action">
-                <Input placeholder="Search..." />
+                <Input placeholder="Search..." onChange= {(e) => searchHandleChange(e)}/>
               </div>
 
             </header>
             <div className="data-list-container">
-              <Table columns={columns} dataSource={data} pagination={false} />
-
+              <Table columns={columns} dataSource={listAccount} pagination={false} />
+              <div className="data-pagging" style={ { display : pageTotal != 0 ?'flex' : 'none'} }>
+                  <Pagination
+                    defaultCurrent={1}
+                    current= {currentPage}
+                    total={pageTotal}
+                    showSizeChanger={false}
+                    pageSize={pageSize}
+                    defaultPageSize={2} 
+                    onChange= {(pageNumber)=> {handleClickPagging(pageNumber)}}
+                    />
+              </div>
+              
+              
             </div>
           </div>
 
         </div>
-
+        <Footer/>
       </div>
+     
 
       <Drawer
         title="Edit An account"
@@ -245,7 +410,7 @@ const Admin = (props) => {
             <Button onClick={onCloseEdit} style={{ marginRight: 8 }}>
               Cancel
                       </Button>
-            <Button onClick={onCloseEdit} type="primary">
+            <Button onClick={submitEditAccount} type="primary">
               Submit
                       </Button>
           </div>
@@ -258,8 +423,7 @@ const Admin = (props) => {
                 name="username"
                 label="Username"
                 rules={[{ required: true, message: 'Please enter user name' }]}
-              >
-                <Input placeholder="Please enter user name" />
+              > <Input   value={editUsername}  disabled/>              
               </Form.Item>
             </Col>
           </Row>
@@ -270,8 +434,34 @@ const Admin = (props) => {
                 name="email"
                 label="Email"
                 rules={[{ required: true, message: 'Please enter email' }]}
-              >
-                <Input placeholder="Please enter email" />
+              > <Input   value={editEmail} disabled />
+                
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={16}>
+              <Form.Item
+                name="displayName"
+                label="Display Name"
+                rules={[{ required: true, message: 'Please enter your display name' }]}
+              > <Input placeholder="Please enter your display name" value={editDisplayName} onChange= {(e)=> {setEditDisplayName(e.target.value)}}/>
+
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={16}>
+              <Form.Item
+                name="dob"
+                label="DOB"
+              > {
+                editDOB ?   <DatePicker value = {moment(editDOB, formatDate) } format={formatDate} allowClear = {false}onChange={(date,dateString)=> setEditDOB(dateString)} /> :
+                <DatePicker  format={formatDate} allowClear = {false}onChange={(date,dateString)=> setEditDOB(dateString)} /> 
+              }
+            
+            
+
               </Form.Item>
             </Col>
           </Row>
@@ -280,9 +470,7 @@ const Admin = (props) => {
               <Form.Item
                 name="phone"
                 label="Phone"
-                rules={[{ required: false, message: 'Please enter phone' }]}
-              >
-                <Input placeholder="Please enter phone" />
+              > <Input placeholder="Please enter phone" value={editPhone}  onChange= {(e)=> {setEditPhone(e.target.value)}}/>
               </Form.Item>
             </Col>
           </Row>
@@ -292,8 +480,7 @@ const Admin = (props) => {
                 name="role"
                 label="Role"
                 rules={[{ required: true, message: 'Please enter your role' }]}
-              >
-                <Select placeholder="Please select your role">
+              >  <Select onSelect = {(value)=> setEditRole(value)} placeholder="Please select your role" value= {editRole == 3 ?'Admin' : editRole == 4 ? 'Teacher' : 'Student'} >
                   <Option value="3">Admin</Option>
                   <Option value="4">Teacher</Option>
                   <Option value="5">Student</Option>
@@ -306,9 +493,9 @@ const Admin = (props) => {
             <Col span={10}>
               <Form.Item
                 name="status"
-                label="Active Account"
+                label="DeActive Account"
               >
-                <Switch checked={true} />
+                <Switch checked={editDeactive} onChange ={()=>setEditDeactive(!editDeactive)}/>
 
               </Form.Item>
             </Col>
@@ -318,5 +505,17 @@ const Admin = (props) => {
     </div>
   )
 }
+
+// Admin.getInitialProps = async function(ctx) {
+//   console.log(JSON.stringify(process.env.API), 'env config')
+
+//   let id = ctx.query.questionID
+//   let urlExercise = `${process.env.API}/api/exercise?id=${id}`
+//   let urlLanguage = `${process.env.API}/api/program-language/all?exerciseId=${id}`
+//   const questionResponse = await axios.get(urlExercise)
+//   const languageResponse = await axios.get(urlLanguage)
+//   console.log(questionResponse.data, 'questionResponse')
+//   return { question: questionResponse.data, language: languageResponse.data.data.result }
+// }
 
 export default Admin;

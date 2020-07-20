@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export const loadUserInfo = (accessToken) => {
-  const url = `http://localhost:1337/api/current_user`;
+  const url = `${process.env.API}/api/current_user`;
   return dispatch => {
     let promise = new Promise((resolve, reject) => {
       axios({
@@ -12,7 +12,7 @@ export const loadUserInfo = (accessToken) => {
       }) .then( res => {
         dispatch({
           type: 'LOADED_USER_INFO',
-          payload: res.data.user
+          payload: res.data
         })
         resolve(res)
       })
@@ -27,7 +27,7 @@ export const loadUserInfo = (accessToken) => {
 
 
   export const signIn = (email,password)=> {
-    const url = `http://localhost:1337/signin`;
+    const url = `${process.env.API}/signin`;
     
     const config = { headers: { 'Content-Type': 'application/json' } };
     const data = {email : email , password : password}
@@ -64,7 +64,7 @@ export const loadUserInfo = (accessToken) => {
  }
 
  export const signUp = (data) => {
-   const url = `http://localhost:1337/signup`
+   const url = `${process.env.API}/signup`
    return dispatch => {
     let promise = new Promise((resolve, reject) => {
         axios({

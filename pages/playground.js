@@ -9,7 +9,7 @@ import QuestionDescription from '../components/QuestionDescription'
 import { languageMap } from '../utils/constants'
 import Split from 'react-split'
 import CodeTrainee from '../hocs/index';
-import { connect } from 'react-redux'
+import { connect } from 'react-redux';
 
 import "ace-builds/src-noconflict/mode-javascript";
 import "ace-builds/src-noconflict/mode-java";
@@ -65,10 +65,11 @@ const Playground = props => {
       source_code: code,
       question_id: '1'
     }
-    axios.post('http://localhost:1337/api/submissions', data)
+    console.log(process.env.API, 'handle run code')
+    axios.post(`${process.env.API}/api/submissions`, data)
       .then(res => {
         setTestCaseProps(res.data)
-        if (callback) callback(res.data)
+        if (typeof callback === 'function') callback(res.data)
       })
       .catch(error => {
         console.log(error)
@@ -89,7 +90,7 @@ const Playground = props => {
       answer: code,
       language: langDB
     }
-    axios.post('http://localhost:1337/api/solution', data)
+    axios.post(`${process.env.API}/api/solution`, data)
       .then(res => {
         console.log(res, 'add solution')
       })
@@ -162,7 +163,7 @@ const Playground = props => {
   }
 
   const handlePickRandomQuestion = () => {
-    axios.get('http://localhost:1337/api/exercise/random')
+    axios.get(`${process.env.API}/api/exercise/random`)
       .then((response) => {
         console.log(response.data, 'random question')
       })
@@ -291,14 +292,16 @@ const Playground = props => {
 }
 
 Playground.getInitialProps = async function(ctx) {
-    let id = ctx.query.questionID
-    let urlExercise = `http://localhost:1337/api/exercise?id=${id}`
-    let urlLanguage = `http://localhost:1337/api/program-language/all?exerciseId=${id}`
-    const questionResponse = await axios.get(urlExercise)
-    const languageResponse = await axios.get(urlLanguage)
-    console.log(ctx)
-    return { question: questionResponse.data, language: languageResponse.data.data.result }
-  }
+  console.log(JSON.stringify(process.env.API), 'env config')
+
+  let id = ctx.query.questionID
+  let urlExercise = `${process.env.API}/api/exercise?id=${id}`
+  let urlLanguage = `${process.env.API}/api/program-language/all?exerciseId=${id}`
+  const questionResponse = await axios.get(urlExercise)
+  const languageResponse = await axios.get(urlLanguage)
+  console.log(questionResponse.data, 'questionResponse')
+  return { question: questionResponse.data, language: languageResponse.data.data.result }
+}
 
 function mapStateToProps(state) {
   return {

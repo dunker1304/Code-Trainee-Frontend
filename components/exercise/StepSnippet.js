@@ -54,7 +54,7 @@ const StepSnippet = ({ exerciseId = { value }, nexStep = () => {} }) => {
     });
     try {
       const res = await axios.post(
-        `http://localhost:1337/api/snippet/sample/update`,
+        `${process.env.API}/api/snippet/sample/update`,
         {
           exerciseId: exerciseId.value,
           languageId: languageId,
@@ -103,7 +103,7 @@ const StepSnippet = ({ exerciseId = { value }, nexStep = () => {} }) => {
         .map((e) => e.key)
         .filter((e) => !activeIds.includes(e));
       const res = await axios.post(
-        `http://localhost:1337/api/snippet/supported-language/update`,
+        `${process.env.API}/api/snippet/supported-language/update`,
         {
           exerciseId: exerciseId.value,
           activeLangIds: activeIds,
@@ -139,7 +139,7 @@ const StepSnippet = ({ exerciseId = { value }, nexStep = () => {} }) => {
   const loadTable = async () => {
     setLoading(true);
     const res = await axios.get(
-      `http://localhost:1337/api/program-language/all?exerciseId=${exerciseId.value}`
+      `${process.env.API}/api/program-language/all?exerciseId=${exerciseId.value}`
     );
     if (res.data.success) {
       let tableData = [];
