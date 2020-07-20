@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export const getDiscussByQuestionId = (questionId,page,sortBy)=> {
-  const url = `http://localhost:1337/api/get-comment-question-id`;
+  const url = `${process.env.API}/api/get-comment-question-id`;
   return dispatch => {
     let promise = new Promise((resolve, reject) => {
       axios({
@@ -27,7 +27,7 @@ export const getDiscussByQuestionId = (questionId,page,sortBy)=> {
 }
 
 export const getDiscussByCommentId = (commentId)=> {
-  const url = `http://localhost:1337/api/get-comment-comment-id`;
+  const url = `${process.env.API}/api/get-comment-comment-id`;
   return dispatch => {
     let promise = new Promise((resolve, reject) => {
       axios({
@@ -52,7 +52,7 @@ export const getDiscussByCommentId = (commentId)=> {
 }
 
 export const voteAComment = (commentId , statusVote ) => {
-  const url = `http://localhost:1337/api/create-vote-comment`;
+  const url = `${process.env.API}/api/create-vote-comment`;
   return dispatch => {
     let promise = new Promise((resolve, reject) => {
       axios({
@@ -80,7 +80,7 @@ export const voteAComment = (commentId , statusVote ) => {
 }
 
 export const createACommentChildren = (data) => {
-  const url = `http://localhost:1337/api/create-comment`;
+  const url = `${process.env.API}/api/create-comment`;
   return dispatch => {
     let promise = new Promise((resolve, reject) => {
       axios({
@@ -105,7 +105,7 @@ export const createACommentChildren = (data) => {
 }
 
 export const deleteAComment = (data)=> {
-  const url = `http://localhost:1337/api/delete-a-comment`;
+  const url = `${process.env.API}/api/delete-a-comment`;
   return dispatch => {
     let promise = new Promise((resolve, reject) => {
       axios({
