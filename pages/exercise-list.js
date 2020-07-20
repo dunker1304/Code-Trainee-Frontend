@@ -19,7 +19,7 @@ import axios from 'axios';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
-const ExerciseList = ({ ownerId = 0 }) => {
+const ExerciseList = ({ ownerId = 5 }) => {
   // table
   let [tableData, setTableData] = useState([]);
   let [currPageTable, setCurrPageTable] = useState(1);

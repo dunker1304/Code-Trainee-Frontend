@@ -25,6 +25,7 @@ import "ace-builds/src-noconflict/theme-solarized_dark";
 import "ace-builds/src-noconflict/theme-solarized_light";
 import "ace-builds/src-noconflict/theme-terminal";
 import "ace-builds/src-noconflict/ext-language_tools"
+import Router , {useRouter} from 'next/router'
 
 const { Option } = Select
 const { TabPane } = Tabs
@@ -39,6 +40,18 @@ const Playground = props => {
   const [tabSize, setTabSize] = useState(2)
   const [keyboardHandler, setKeyboardHandler] = useState("")
   const [gutter, setGutter] = useState(true)
+  const [indexActive , setIndexActive] = useState("1")
+  const router = useRouter()
+
+  useEffect(() => {
+   let activeTab = router.query.tab ? router.query.tab : "1"
+   if(activeTab == 4) {
+    let questionId = router.query.questionID
+    Router.push(`/exercise/[exerciseId]/discuss`,`/exercise/${questionId}/discuss`)
+   }
+   else
+    setIndexActive(activeTab)
+ },[]);
   const [runCode, setRunCode] = useState(false)
 
   const onChange = (newValue) => {
@@ -129,7 +142,16 @@ const Playground = props => {
   }
 
   const handleChangeTab = (key) => {
-
+    let questionId = router.query.questionID
+    if(key == 4) {
+      Router.push(`/exercise/[exerciseId]/discuss`,`/exercise/${questionId}/discuss`)
+    }
+    else {
+      Router.push(`/playground?questionID=${questionId}&tab=${key}`)
+      setIndexActive(key)
+    }
+   
+   
   }
 
   const handleShowConsole = () => {
@@ -163,8 +185,8 @@ const Playground = props => {
         direction="horizontal"
         cursor="col-resize"
         className="split-wrapper">
-        <div className="content-right">
-          <Tabs defaultActiveKey="1" type="card" onChange={handleChangeTab}>
+        <div className="content-right" >
+          <Tabs defaultActiveKey= {indexActive} activeKey = {indexActive} type="card" onChange={handleChangeTab}>
             <TabPane tab="Description" key="1">
               <QuestionDescription question={props.question.question}/>
             </TabPane>
@@ -174,9 +196,12 @@ const Playground = props => {
             <TabPane tab="Submissions" key="3">
               Submissions here
             </TabPane>
+            <TabPane tab="Discussions" key="4">
+              Discussion Here
+            </TabPane>
           </Tabs>
 
-          <div className="question-fast-picker">
+          <div className="question-fast-picker" >
             <Button type='default'>
               <svg viewBox="0 0 24 24" width="1em" height="1em" className="icon__3Su4"><path fillRule="evenodd" d="M7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7zM3 5h2v2H3V5zm0 6h2v2H3v-2zm0 6h2v2H3v-2z"></path></svg>
               <span>Problems</span>
@@ -196,7 +221,7 @@ const Playground = props => {
             </Button> */}
           </div>
         </div>
-        <div className="content-left playground-wrapper">
+        <div className="content-left playground-wrapper" >
           <div className="playground-action">
             <Select defaultValue={props.language[0].code} style={{ width: 120 }} onSelect={handleChangeLanguage}>
               {props.language && props.language.map((lang, key) => (
@@ -285,4 +310,4 @@ function mapStateToProps(state) {
   }
 }
 
-export default Playground
+export default Playground 

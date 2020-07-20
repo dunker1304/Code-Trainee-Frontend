@@ -9,6 +9,9 @@ div#playground {
     cursor: ew-resize;
     transition: 0.5s;
   }
+  .ant-tabs-bar {
+    margin: 0;
+  }
 }
 
 .playground-action {

@@ -1,5 +1,7 @@
 import produce from 'immer';
 import {openNotificationWithIcon} from '../../components/Notification'
+import Router , {useRouter} from 'next/router'
+
 
 const initState = {
   userInfo: {},
@@ -8,14 +10,23 @@ const initState = {
     isShow:false,
     type:1
   },
-  isLoginSuccess :false
+  isLoginSuccess :false,
+  isAuthenticated : false
 }
 
 export default (state = initState, action) => {
   return produce(state, draft => {
     switch (action.type) {
       case 'LOADED_USER_INFO':
-        draft.userInfo = action.payload
+        if(action.payload.success) {
+          draft.userInfo = action.payload.user;
+          draft.isAuthenticated = true
+        }
+        else {
+          draft.userInfo = action.payload.user
+          draft.isAuthenticated = false
+        }
+     
         break
       case 'SIGN_IN': 
          if(!action.payload.success){
@@ -31,6 +42,7 @@ export default (state = initState, action) => {
             type: 1
           }
           openNotificationWithIcon('success','SUCCESS',action.payload.message)
+          Router.push('/problem')
          }   
         break
 
@@ -42,6 +54,7 @@ export default (state = initState, action) => {
           draft.signUpError = action.payload.message
           openNotificationWithIcon('warning','',action.payload.message)
           break 
+     
     }
   })
 }
