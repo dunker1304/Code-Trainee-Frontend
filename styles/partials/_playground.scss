@@ -45,6 +45,10 @@ div#playground {
 .exercise-submission {
   margin: 20px;
   border: 1px solid #f0f0f0;
+
+  tr.ant-table-row.ant-table-row-level-0 {
+    cursor: pointer;
+  }
 }
 
 .question-desc-wrapper {
