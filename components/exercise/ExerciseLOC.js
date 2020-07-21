@@ -1,13 +1,17 @@
-import { Space, Slider, Row, Col, Input } from 'antd';
-import { useState } from 'react';
+import { Space, Slider, Row, Col, InputNumber } from 'antd';
+import { useState, useEffect } from 'react';
 
 const ExerciseLOC = ({
   value = 0,
-  onChange = () => {},
-  minValue = 0,
-  maxValue = 100,
-  defaultValue = 0,
+  onChange = (value) => {},
+  min = 0,
+  max = 100,
 }) => {
+  let [sliderValue, setSliderValue] = useState(value);
+  useEffect(() => {
+    console.log('init', value);
+    setSliderValue(value);
+  }, [value]);
   return (
     <div
       style={{
@@ -16,20 +20,21 @@ const ExerciseLOC = ({
         justifyContent: 'space-between',
       }}>
       <Slider
-        min={minValue}
-        max={maxValue}
-        value={value}
-        defaultValue={defaultValue}
-        onChange={onChange}
+        min={min}
+        max={max}
+        value={sliderValue}
+        onAfterChange={onChange}
+        onChange={setSliderValue}
         style={{
           width: '80%',
           display: 'inline-block',
         }}
       />
-      <Input
-        disabled
-        value={value}
-        defaultValue={defaultValue}
+      <InputNumber
+        value={sliderValue}
+        min={min}
+        max={max}
+        onChange={onChange}
         style={{
           width: '15%',
           display: 'inline-block',

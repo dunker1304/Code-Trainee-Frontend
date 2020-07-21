@@ -48,21 +48,13 @@ const Exercise = ({ id }) => {
         <Divider />
         {currStep === 0 && (
           <StepBasic
-            exerciseId={{
-              value: exerciseId,
-              setValue: setExerciseId,
-            }}
-            checkDirtyBeforeLeaving={{
-              value: checkDirtyBeforeLeaving,
-              setValue: setCheckDirtyBeforeLeaving,
-            }}
-            dirty={{
-              value: dirty,
-              setValue: setDirty,
-            }}
-            nextStep={() => {
-              setCurrStep(wishStep);
-            }}
+            exerciseId={exerciseId}
+            setExerciseId={setExerciseId}
+            checkDirtyBeforeLeaving={checkDirtyBeforeLeaving}
+            setCheckDirtyBeforeLeaving={setCheckDirtyBeforeLeaving}
+            dirty={dirty}
+            setDirty={setDirty}
+            nextStep={() => setCurrStep(wishStep)}
           />
         )}
         {currStep === 1 && (

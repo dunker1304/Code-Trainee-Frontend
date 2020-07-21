@@ -1,13 +1,4 @@
-import {
-  Form,
-  Input,
-  Button,
-  Select,
-  notification,
-  AutoComplete,
-  Tag,
-  Tooltip,
-} from 'antd';
+import { Form, Input, Button, Select, notification } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { Editor } from '@tinymce/tinymce-react';
 import { useState, useEffect } from 'react';
@@ -17,23 +8,21 @@ import ExerciseTags from './ExerciseTags';
 import ExerciseLOC from './ExerciseLOC';
 
 const StepBasic = ({
-  exerciseId = {
-    value,
-    setValue: () => {},
-  },
-  checkDirtyBeforeLeaving = {
-    value,
-    setValue: () => {},
-  },
-  dirty = {
-    value,
-    setValue: () => {},
-  },
+  exerciseId,
+  setExerciseId = () => {},
+  checkDirtyBeforeLeaving = false,
+  setCheckDirtyBeforeLeaving = () => {},
+  dirty = false,
+  setDirty = () => {},
   nextStep = () => {},
 }) => {
+  // visible of comfirm modal
   let [visibleConfirm, setVisibleConfirm] = useState(false);
+  // loading state
   let [buttonLoading, setButtonLoading] = useState(false);
+  // form instance
   let [formRef] = Form.useForm();
+  // init data of form
   let [initFormValues, setInitFormValues] = useState({
     title: '',
     content: '',
@@ -41,7 +30,9 @@ const StepBasic = ({
     level: 'easy',
     tags: ['#'],
   });
+  // all tags from DB
   let [allTags, setAllTags] = useState([]);
+  // min max slider LOC
   let [minSliderValue, setMinSliderValue] = useState(0);
   let [maxSliderValue, setMaxSliderValue] = useState(100);
 
@@ -49,10 +40,10 @@ const StepBasic = ({
   useEffect(() => {
     (async () => {
       // get old information to update
-      if (exerciseId.value) {
+      if (exerciseId) {
         try {
           const res = await axios.get(
-            `${process.env.API}/api/exercise/basic-info/${exerciseId.value}`
+            `${process.env.API}/api/exercise/basic-info/${exerciseId}`
           );
           if (res.data.success) {
             let tags = res.data.data.tags.map((e) => e.name);
@@ -87,22 +78,21 @@ const StepBasic = ({
 
     return () => {
       // run when component dis-mounted
-      dirty.setValue(false);
-      checkDirtyBeforeLeaving.setValue(false);
+      setDirty(false);
+      setCheckDirtyBeforeLeaving(false);
     };
   }, []);
 
   useEffect(() => {
-    // init value for form
-    setRangeSlider(initFormValues.level);
-    formRef.setFieldsValue(initFormValues);
+    // setRangeSlider(initFormValues.level);
+    formRef.setFieldsValue({
+      ...initFormValues,
+    });
   }, [initFormValues]);
 
   useEffect(() => {
-    if (dirty.value && checkDirtyBeforeLeaving.value) {
-      setVisibleConfirm(true);
-    }
-  }, [checkDirtyBeforeLeaving.value]);
+    dirty && checkDirtyBeforeLeaving && setVisibleConfirm(true);
+  }, [checkDirtyBeforeLeaving]);
 
   const arraysEqual = (a, b) => {
     if (a === b) return true;
@@ -113,18 +103,14 @@ const StepBasic = ({
     }
     return true;
   };
-  const checkDirty = (oldValue, currValue) => {
-    console.log('checkDirty', { oldValue, currValue });
-    if (
-      oldValue.title !== currValue.title ||
-      oldValue.content !== currValue.content ||
-      oldValue.points !== currValue.points ||
-      oldValue.level !== currValue.level ||
-      !arraysEqual(oldValue.tags, currValue.tags)
-    ) {
-      dirty.setValue(true);
+
+  const checkChangedValue = (changedValue) => {
+    console.log('changed value', changedValue);
+    const prop = Object.getOwnPropertyNames(changedValue)[0];
+    if (prop === 'tags') {
+      setDirty(!arraysEqual(changedValue[prop], initFormValues[prop]));
     } else {
-      dirty.setValue(false);
+      setDirty(changedValue[prop] !== initFormValues[prop]);
     }
   };
 
@@ -146,9 +132,9 @@ const StepBasic = ({
           message: 'Notification',
           description: 'Success!',
         });
-        exerciseId.setValue(res.data.data.id);
-        dirty.setValue(false);
-        checkDirtyBeforeLeaving.setValue(false);
+        setExerciseId(res.data.data.id);
+        setDirty(false);
+        setCheckDirtyBeforeLeaving(false);
         nextStep();
       } else {
         notification.error({
@@ -166,44 +152,45 @@ const StepBasic = ({
   };
 
   const handleUpdate = async (onSuccess = () => {}) => {
-    try {
-      setButtonLoading(true);
-      await formRef.validateFields();
-      let { content, title, points, level, tags } = formRef.getFieldsValue();
-      const res = await axios.post(`${process.env.API}/api/exercise/update`, {
-        id: exerciseId.value,
-        content: content,
-        title: title,
-        points: Number(points),
-        level: level,
-        tags: tags,
-      });
-      setButtonLoading(false);
-      if (res.data.success) {
-        notification.info({
-          message: 'Notification',
-          description: 'Success!',
-        });
-        onSuccess();
-      } else {
-        notification.error({
-          message: 'Notification',
-          description: 'Fail!',
-        });
-      }
-    } catch (e) {
-      setButtonLoading(false);
-      notification.warning({
-        message: 'Notification',
-        description: 'Check your input again!',
-      });
-    }
+    // try {
+    //   setButtonLoading(true);
+    //   await formRef.validateFields();
+    //   let { content, title, points, level, tags } = formRef.getFieldsValue();
+    //   const res = await axios.post(`${process.env.API}/api/exercise/update`, {
+    //     id: exerciseId,
+    //     content: content,
+    //     title: title,
+    //     points: Number(points),
+    //     level: level,
+    //     tags: tags,
+    //   });
+    //   setButtonLoading(false);
+    //   if (res.data.success) {
+    //     notification.info({
+    //       message: 'Notification',
+    //       description: 'Success!',
+    //     });
+    //     onSuccess();
+    //   } else {
+    //     notification.error({
+    //       message: 'Notification',
+    //       description: 'Fail!',
+    //     });
+    //   }
+    // } catch (e) {
+    //   setButtonLoading(false);
+    //   notification.warning({
+    //     message: 'Notification',
+    //     description: 'Check your input again!',
+    //   });
+    // }
+    console.log('form', formRef.getFieldsValue().points);
   };
 
   const onOkConfirm = async () => {
     handleUpdate(() => {
-      checkDirtyBeforeLeaving.setValue(false);
-      dirty.setValue(false);
+      setCheckDirtyBeforeLeaving(false);
+      setDirty(false);
       setVisibleConfirm(false);
       nextStep();
     });
@@ -211,36 +198,27 @@ const StepBasic = ({
 
   const onCancelConfirm = async () => {
     setVisibleConfirm(false);
-    checkDirtyBeforeLeaving.setValue(false);
-    dirty.setValue(false);
+    setCheckDirtyBeforeLeaving(false);
+    setDirty(false);
     nextStep();
   };
 
   const onCancelXConfirm = async () => {
-    checkDirtyBeforeLeaving.setValue(false);
+    setCheckDirtyBeforeLeaving(false);
     setVisibleConfirm(false);
   };
 
   const setRangeSlider = (value) => {
     if (value === 'easy') {
       setMinSliderValue(0);
-      setMaxSliderValue(0);
-      formRef.setFieldsValue({
-        points: '100',
-      });
+      setMaxSliderValue(100);
     } else if (value === 'medium') {
       setMinSliderValue(101);
-      setMaxSliderValue(101);
-      formRef.setFieldsValue({
-        points: '200',
-      });
+      setMaxSliderValue(200);
     } else {
       // hard
       setMinSliderValue(201);
-      setMaxSliderValue(201);
-      formRef.setFieldsValue({
-        points: '300',
-      });
+      setMaxSliderValue(300);
     }
   };
 
@@ -255,9 +233,7 @@ const StepBasic = ({
         }}
         scrollToFirstError={true}
         initialValues={initFormValues}
-        onValuesChange={(changedValue, allValues) =>
-          checkDirty(initFormValues, allValues)
-        }>
+        onValuesChange={checkChangedValue}>
         <Form.Item name='title' label='Title' rules={[{ required: true }]}>
           <Input />
         </Form.Item>
@@ -298,7 +274,7 @@ forecolor backcolor | alignleft aligncenter alignright alignjustify | \
           </Select>
         </Form.Item>
         <Form.Item name='points' label='LOC' rules={[{ required: true }]}>
-          <ExerciseLOC minValue={minSliderValue} maxValue={maxSliderValue} />
+          <ExerciseLOC min={minSliderValue} max={maxSliderValue} />
         </Form.Item>
         <Form.Item
           name='tags'
@@ -308,7 +284,7 @@ forecolor backcolor | alignleft aligncenter alignright alignjustify | \
           <ExerciseTags allTags={allTags} />
         </Form.Item>
         <Form.Item>
-          {!exerciseId.value ? (
+          {!exerciseId ? (
             <Button
               type='primary'
               size='large'
@@ -323,8 +299,8 @@ forecolor backcolor | alignleft aligncenter alignright alignjustify | \
               loading={buttonLoading}
               onClick={() =>
                 handleUpdate(() => {
-                  dirty.setValue(false);
-                  checkDirtyBeforeLeaving.setValue(false);
+                  setDirty(false);
+                  setCheckDirtyBeforeLeaving(false);
                   nextStep();
                 })
               }>

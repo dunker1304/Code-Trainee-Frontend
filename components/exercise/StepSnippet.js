@@ -104,7 +104,7 @@ const StepSnippet = ({ exerciseId = { value }, nextStep = () => {} }) => {
       if (activeIds.length === 0) {
         notification.error({
           message: 'Notification',
-          description: 'Exercise must support atleast one language.',
+          description: 'Exercise must support at least one language.',
         });
         setLoading(false);
         return;
