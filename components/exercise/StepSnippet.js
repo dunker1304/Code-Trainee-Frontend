@@ -102,7 +102,7 @@ const StepSnippet = ({ exerciseId = { value }, nextStep = () => {} }) => {
         .map((e) => e.key)
         .filter((e) => !activeIds.includes(e));
       if (activeIds.length === 0) {
-        notification.info({
+        notification.error({
           message: 'Notification',
           description: 'Exercise must support atleast one language.',
         });
