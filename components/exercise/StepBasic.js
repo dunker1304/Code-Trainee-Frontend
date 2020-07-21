@@ -104,13 +104,23 @@ const StepBasic = ({
     }
   }, [checkDirtyBeforeLeaving.value]);
 
+  const arraysEqual = (a, b) => {
+    if (a === b) return true;
+    if (a == null || b == null) return false;
+    if (a.length !== b.length) return false;
+    for (var i = 0; i < a.length; ++i) {
+      if (a[i] !== b[i]) return false;
+    }
+    return true;
+  };
   const checkDirty = (oldValue, currValue) => {
     console.log('checkDirty', { oldValue, currValue });
     if (
       oldValue.title !== currValue.title ||
       oldValue.content !== currValue.content ||
       oldValue.points !== currValue.points ||
-      oldValue.level !== currValue.level
+      oldValue.level !== currValue.level ||
+      !arraysEqual(oldValue.tags, currValue.tags)
     ) {
       dirty.setValue(true);
     } else {
