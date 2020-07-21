@@ -19,7 +19,7 @@ import SnippetTemplate from './SnippetTemplate';
 // import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/theme-kuroir';
 
-const StepSnippet = ({ exerciseId = { value }, nexStep = () => {} }) => {
+const StepSnippet = ({ exerciseId = { value }, nextStep = () => {} }) => {
   // table
   let [currPage, setCurrPage] = useState(1);
   let [currPageSize, setCurrPageSize] = useState(10);
@@ -116,7 +116,7 @@ const StepSnippet = ({ exerciseId = { value }, nexStep = () => {} }) => {
           message: 'Notification',
           description: <p>Success!</p>,
         });
-        nexStep();
+        nextStep();
       } else {
         notification.error({
           message: 'Notification',

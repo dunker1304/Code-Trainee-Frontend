@@ -48,22 +48,14 @@ const StepBasic = ({
   // run only one when component mounted
   useEffect(() => {
     (async () => {
-      // get old information
+      // get old information to update
       if (exerciseId.value) {
         try {
           const res = await axios.get(
             `${process.env.API}/api/exercise/basic-info/${exerciseId.value}`
           );
           if (res.data.success) {
-            setRangeSlider(res.data.data.level); // must on top of this scope
             let tags = res.data.data.tags.map((e) => e.name);
-            formRef.setFieldsValue({
-              title: res.data.data.title,
-              content: res.data.data.content,
-              points: res.data.data.points,
-              level: res.data.data.level,
-              tags: tags,
-            });
             setInitFormValues({
               title: res.data.data.title,
               content: res.data.data.content,
@@ -94,10 +86,17 @@ const StepBasic = ({
     })();
 
     return () => {
+      // run when component dis-mounted
       dirty.setValue(false);
       checkDirtyBeforeLeaving.setValue(false);
     };
   }, []);
+
+  useEffect(() => {
+    // init value for form
+    setRangeSlider(initFormValues.level);
+    formRef.setFieldsValue(initFormValues);
+  }, [initFormValues]);
 
   useEffect(() => {
     if (dirty.value && checkDirtyBeforeLeaving.value) {
@@ -106,6 +105,7 @@ const StepBasic = ({
   }, [checkDirtyBeforeLeaving.value]);
 
   const checkDirty = (oldValue, currValue) => {
+    console.log('checkDirty', { oldValue, currValue });
     if (
       oldValue.title !== currValue.title ||
       oldValue.content !== currValue.content ||
