@@ -6,6 +6,7 @@ import axios from 'axios';
 import ConfirmModal from '../ConfirmModal';
 import ExerciseTags from './ExerciseTags';
 import ExerciseLOC from './ExerciseLOC';
+import ExerciseLevel from './ExerciseLevel';
 
 const StepBasic = ({
   exerciseId,
@@ -32,7 +33,7 @@ const StepBasic = ({
   });
   // all tags from DB
   let [allTags, setAllTags] = useState([]);
-  // min max slider LOC
+  // min, max LOC slider
   let [minSliderValue, setMinSliderValue] = useState(0);
   let [maxSliderValue, setMaxSliderValue] = useState(100);
 
@@ -46,8 +47,16 @@ const StepBasic = ({
             `${process.env.API}/api/exercise/basic-info/${exerciseId}`
           );
           if (res.data.success) {
+            setRangeSlider(res.data.data.level);
             let tags = res.data.data.tags.map((e) => e.name);
             setInitFormValues({
+              title: res.data.data.title,
+              content: res.data.data.content,
+              points: res.data.data.points,
+              level: res.data.data.level,
+              tags: tags,
+            });
+            formRef.setFieldsValue({
               title: res.data.data.title,
               content: res.data.data.content,
               points: res.data.data.points,
@@ -84,13 +93,6 @@ const StepBasic = ({
   }, []);
 
   useEffect(() => {
-    // setRangeSlider(initFormValues.level);
-    formRef.setFieldsValue({
-      ...initFormValues,
-    });
-  }, [initFormValues]);
-
-  useEffect(() => {
     dirty && checkDirtyBeforeLeaving && setVisibleConfirm(true);
   }, [checkDirtyBeforeLeaving]);
 
@@ -98,19 +100,22 @@ const StepBasic = ({
     if (a === b) return true;
     if (a == null || b == null) return false;
     if (a.length !== b.length) return false;
-    for (var i = 0; i < a.length; ++i) {
+    for (let i = 0; i < a.length; ++i) {
       if (a[i] !== b[i]) return false;
     }
     return true;
   };
 
-  const checkChangedValue = (changedValue) => {
+  const onValuesChange = (changedValue) => {
     console.log('changed value', changedValue);
     const prop = Object.getOwnPropertyNames(changedValue)[0];
     if (prop === 'tags') {
       setDirty(!arraysEqual(changedValue[prop], initFormValues[prop]));
     } else {
       setDirty(changedValue[prop] !== initFormValues[prop]);
+    }
+    if (prop === 'level') {
+      setRangeSlider(changedValue[prop]);
     }
   };
 
@@ -208,17 +213,26 @@ const StepBasic = ({
     setVisibleConfirm(false);
   };
 
-  const setRangeSlider = (value) => {
-    if (value === 'easy') {
+  const setRangeSlider = (level) => {
+    console.log('level', level);
+    if (level === 'easy') {
       setMinSliderValue(0);
       setMaxSliderValue(100);
-    } else if (value === 'medium') {
+      formRef.setFieldsValue({
+        points: 0,
+      });
+    } else if (level === 'medium') {
       setMinSliderValue(101);
       setMaxSliderValue(200);
+      formRef.setFieldsValue({
+        points: 101,
+      });
     } else {
-      // hard
       setMinSliderValue(201);
       setMaxSliderValue(300);
+      formRef.setFieldsValue({
+        points: 201,
+      });
     }
   };
 
@@ -233,7 +247,7 @@ const StepBasic = ({
         }}
         scrollToFirstError={true}
         initialValues={initFormValues}
-        onValuesChange={checkChangedValue}>
+        onValuesChange={onValuesChange}>
         <Form.Item name='title' label='Title' rules={[{ required: true }]}>
           <Input />
         </Form.Item>
@@ -267,11 +281,7 @@ forecolor backcolor | alignleft aligncenter alignright alignjustify | \
           />
         </Form.Item>
         <Form.Item name='level' label='Level' rules={[{ required: true }]}>
-          <Select onChange={setRangeSlider}>
-            <Select.Option value='easy'>Easy</Select.Option>
-            <Select.Option value='medium'>Medium</Select.Option>
-            <Select.Option value='hard'>Hard</Select.Option>
-          </Select>
+          <ExerciseLevel min={minSliderValue} max={maxSliderValue} />
         </Form.Item>
         <Form.Item name='points' label='LOC' rules={[{ required: true }]}>
           <ExerciseLOC min={minSliderValue} max={maxSliderValue} />

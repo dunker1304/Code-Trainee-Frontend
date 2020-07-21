@@ -1,4 +1,5 @@
-import { Space, Slider, Row, Col, InputNumber } from 'antd';
+import { Space, Slider, Row, Col, InputNumber, notification } from 'antd';
+import { InfoCircleFilled } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 
 const ExerciseLOC = ({
@@ -9,34 +10,73 @@ const ExerciseLOC = ({
 }) => {
   let [sliderValue, setSliderValue] = useState(value);
   useEffect(() => {
-    console.log('init', value);
     setSliderValue(value);
   }, [value]);
+  const onSliderValueChange = (value) => {
+    if (value <= max && value >= min) {
+      setSliderValue(value);
+    }
+  };
+  const onInputValueChange = (value) => {
+    if (value <= max && value >= min) {
+      onChange(value);
+    }
+  };
   return (
     <div
       style={{
         width: '100%',
         display: 'flex',
         justifyContent: 'space-between',
+        alignItems: 'flex-start',
       }}>
-      <Slider
-        min={min}
-        max={max}
-        value={sliderValue}
-        onAfterChange={onChange}
-        onChange={setSliderValue}
-        style={{
-          width: '80%',
-          display: 'inline-block',
-        }}
-      />
       <InputNumber
         value={sliderValue}
-        min={min}
-        max={max}
-        onChange={onChange}
+        onChange={onInputValueChange}
         style={{
           width: '15%',
+          display: 'inline-block',
+          fontWeight: 'bold',
+        }}
+      />
+      <Slider
+        min={0}
+        max={300}
+        marks={{
+          0: {
+            style: { color: '#000000' },
+            label: <strong>0</strong>,
+          },
+          50: {
+            style: { color: '#000000' },
+            label: <span>50</span>,
+          },
+          100: {
+            style: { color: '#000000' },
+            label: <strong>100</strong>,
+          },
+          150: {
+            style: { color: '#000000' },
+            label: <span>150</span>,
+          },
+          200: {
+            style: { color: '#000000' },
+            label: <strong>200</strong>,
+          },
+          250: {
+            style: { color: '#000000' },
+            label: <span>250</span>,
+          },
+          300: {
+            style: { color: '#000000' },
+            label: <strong>300</strong>,
+          },
+        }}
+        value={sliderValue}
+        onAfterChange={onChange}
+        onChange={onSliderValueChange}
+        style={{
+          width: '78%',
           display: 'inline-block',
         }}
       />
