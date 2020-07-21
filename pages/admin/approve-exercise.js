@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { Table, notification, Tag, Space, Popconfirm, Button } from 'antd';
-import { CheckCircleOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
@@ -30,16 +30,49 @@ const ApproveExercise = ({}) => {
           message: 'Notification',
           description: 'Approve Exercise Successfully!',
         });
+      } else {
+        notification.error({
+          message: 'Notification',
+          description: 'Approve Exercise Fail',
+        });
       }
     } catch (e) {
       notification.error({
-        title: 'Notification',
-        message: 'Approve Exercise Fail',
+        message: 'Notification',
+        description: 'Approve Exercise Fail',
       });
       setTablLoading(false);
       console.log(e);
     }
   };
+  const handleDeleteExercise = async (record) => {
+    try {
+      const res = await axios.post(`${process.env.API}/api/exercise/delete`, {
+        id: record.key,
+      });
+      console.log(res.data);
+      if (res.data.success) {
+        notification.info({
+          message: 'Notification',
+          description: 'Success',
+        });
+        loadTable();
+      } else {
+        notification.error({
+          message: 'Notification',
+          description: 'Delete Fail',
+        });
+      }
+    } catch (e) {
+      notification.error({
+        message: 'Notification',
+        description: 'Delete Fail',
+      });
+      setTablLoading(false);
+      console.log(e);
+    }
+  };
+
   const loadTable = async () => {
     try {
       setTablLoading(true);
@@ -61,8 +94,8 @@ const ApproveExercise = ({}) => {
       }
     } catch (e) {
       notification.error({
-        title: 'Notification',
-        message: 'Load Data Fail',
+        message: 'Notification',
+        description: 'Load Data Fail',
       });
       setTablLoading(false);
       console.log(e);
@@ -135,7 +168,7 @@ const ApproveExercise = ({}) => {
             title: 'Action',
             key: 'action',
             fixed: 'right',
-            width: '150px',
+            width: '250px',
             render: (text, record) => (
               <Space size='middle'>
                 <Popconfirm
@@ -155,6 +188,25 @@ const ApproveExercise = ({}) => {
                       }}
                     />
                     Approve
+                  </Button>
+                </Popconfirm>
+                <Popconfirm
+                  title='Are you sure delete this exercise?'
+                  okText='Yes'
+                  onConfirm={() => handleDeleteExercise(record)}
+                  cancelText='No'>
+                  <Button
+                    type='primary'
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                    }}>
+                    <DeleteOutlined
+                      style={{
+                        fontSize: '17px',
+                      }}
+                    />
+                    Delete
                   </Button>
                 </Popconfirm>
               </Space>
