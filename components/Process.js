@@ -61,7 +61,7 @@ const Process = (props) => {
   }, [fontSize2])
 
   const fetchData = async ()=> {
-    let url = `http://localhost:1337/api/all-submission`
+    let url = `${process.env.API}/api/all-submission`
     let result =await  axios.get(url)
     await props.getExerciseOfUser()
     setDataSource(result.data.data)

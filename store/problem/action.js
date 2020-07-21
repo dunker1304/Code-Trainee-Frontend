@@ -1,6 +1,6 @@
 import axios from 'axios';
 export const searchQuestion = (data)=> {
-  const url = `http://localhost:1337/api/search-exercise`;
+  const url = `${process.env.API}/api/search-exercise`;
   return dispatch => {
     let promise = new Promise((resolve, reject) => {
       axios({
@@ -45,7 +45,7 @@ export const dropdownFilter = (value) => {
 
 export const getCategory = ()=> {
   ///api/get-category
-  const url = `http://localhost:1337/api/get-tag`;
+  const url = `${process.env.API}/api/get-tag`;
   return dispatch => {
     let promise = new Promise((resolve, reject) => {
       axios({
@@ -70,7 +70,7 @@ export const getCategory = ()=> {
 }
 
 export const addToWishList = (questionId) => {
-  const url = `http://localhost:1337/api/add-wishList`;
+  const url = `${process.env.API}/api/add-wishList`;
   return dispatch => {
     let promise = new Promise((resolve, reject) => {
       axios({
@@ -95,7 +95,7 @@ export const addToWishList = (questionId) => {
 }
 
 export const removeToWishList = (questionId ,typeWishList) => {
-  const url = `http://localhost:1337/api/remove-wishList`;
+  const url = `${process.env.API}/api/remove-wishList`;
   return dispatch => {
     let promise = new Promise((resolve, reject) => {
       axios({
@@ -120,7 +120,7 @@ export const removeToWishList = (questionId ,typeWishList) => {
 }
 
 export const getWishList = () => {
-  const url = `http://localhost:1337/api/wish-list`;
+  const url = `${process.env.API}/api/wish-list`;
   return dispatch => {
     let promise = new Promise((resolve, reject) => {
       axios({
@@ -144,7 +144,7 @@ export const getWishList = () => {
 }
 
 export const addTypeWishList = (name)=> {
-  const url = `http://localhost:1337/api/add-type-wish-list`;
+  const url = `${process.env.API}/api/add-type-wish-list`;
   return dispatch => {
     let promise = new Promise((resolve, reject) => {
       axios({
@@ -170,7 +170,7 @@ export const addTypeWishList = (name)=> {
 
 
 export const getWishListByType = (type) => {
-  const url = `http://localhost:1337/api/wish-list/${type}`;
+  const url = `${process.env.API}/api/wish-list/${type}`;
   return dispatch => {
     let promise = new Promise((resolve, reject) => {
       axios({
@@ -194,7 +194,7 @@ export const getWishListByType = (type) => {
 }
 
 export const getExerciseOfUser = ()=> {
-  const url = `http://localhost:1337/api/user/exercise`;
+  const url = `${process.env.API}/api/user/exercise`;
   return dispatch => {
     let promise = new Promise((resolve, reject) => {
       axios({

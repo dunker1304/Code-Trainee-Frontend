@@ -175,6 +175,10 @@ const Playground = props => {
     axios.get(`${process.env.API}/api/exercise/random`)
       .then((response) => {
         console.log(response.data, 'random question')
+        if (response.data.success) {
+          let exercise  = response.data.data
+          Router.push(`/playground?questionID=${exercise['id']}`,`/playground?questionID=${exercise['id']}`)
+        }
       })
       .catch((err) => {
         console.log(err)
@@ -267,9 +271,19 @@ const Playground = props => {
           />
 
           {
-            Array.isArray(testCaseProps) ?
+            (testCaseProps.length == 1 && testCaseProps[0].success == false) ?
             <Spin spinning={loading}>
-              <Tabs defaultActiveKey="1" tabPosition="left" onChange={handleChangeTab} 
+              <div className="console-status" style={ (consoleEditor == 'hide') ? {display: 'none'} : null }>
+                <div>Status: {testCaseProps[0].data ? testCaseProps[0].data.status.description : "Code - 400"}</div>
+                <div style={{ whiteSpace: 'pre-wrap' }} 
+                  dangerouslySetInnerHTML={{ __html: testCaseProps[0].data ? testCaseProps[0].data.compile_output ? testCaseProps[0].data.compile_output.toString() : testCaseProps[0].data.stderr.toString() 
+                                          :  (testCaseProps[0]?.message?.source_code ? ("Source Code: " + testCaseProps[0]?.message?.source_code[0]) : "Something went wrong") }}>                            
+              </div>
+              </div>
+            </Spin>
+            :
+            <Spin spinning={loading}>
+              <Tabs defaultActiveKey="1" tabPosition="left" 
                 style={ (consoleEditor == 'hide') ? {display: 'none'} : null } className="console-status">
                 {testCaseProps.map((testCase, key) => (
                   <TabPane tab={`Test Case ` + (key + 1)} key={key}>
@@ -278,14 +292,6 @@ const Playground = props => {
                 ))}
               </Tabs>
             </Spin> 
-            :
-            <Spin spinning={loading}>
-              <div className="console-status" style={ (consoleEditor == 'hide') ? {display: 'none'} : null }>
-                <div>Status: {testCaseProps && testCaseProps.data.status.description}</div>
-                <div style={{ whiteSpace: 'pre-wrap' }} 
-                  dangerouslySetInnerHTML={{__html: testCaseProps && testCaseProps.data.compile_output ? testCaseProps.data.compile_output.toString() : testCaseProps.data.stderr.toString()}}></div>
-              </div>
-            </Spin>
           }
 
           <div className="action-code-editor">
@@ -305,22 +311,18 @@ const Playground = props => {
 }
 
 Playground.getInitialProps = async function(ctx) {
-  console.log(JSON.stringify(process.env.API), 'env config')
-
   let id = ctx.query.questionID
   let urlExercise = `${process.env.API}/api/exercise?id=${id}`
   let urlLanguage = `${process.env.API}/api/program-language/all?exerciseId=${id}`
   const questionResponse = await axios.get(urlExercise)
   const languageResponse = await axios.get(urlLanguage)
-  console.log(questionResponse.data, 'questionResponse')
   return { question: questionResponse.data, language: languageResponse.data.data.result }
 }
 
-function mapStateToProps(state) {
+function mapStateToProps(state, ownProps) {
   return {
-    errorMessage: state.auth.errorMessage,
-    isShowLogin : state.auth.isShowLogin
+    auth: state.auth
   }
 }
 
-export default Playground 
+export default connect(mapStateToProps)(Playground)

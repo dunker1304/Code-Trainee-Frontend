@@ -22,7 +22,7 @@ Discuss.getInitialProps = async (ctx) => {
   const { store: { dispatch }, pathname, req, res ,query} = ctx
   let questionId = query.exerciseId ? query.exerciseId  : null;
   await dispatch(getDiscussByQuestionId(questionId))
-  let url = `http://localhost:1337/api/exercise?id=${questionId}`
+  let url = `${process.env.API}/api/exercise?id=${questionId}`
   const questionResponse = await axios.get(url)
   console.log(questionResponse.data)
   return { question: questionResponse.data.question, questionId : questionId }

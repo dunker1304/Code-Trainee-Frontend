@@ -129,19 +129,16 @@ Profile.getInitialProps = async (ctx) => {
 
    //get user info
    let userId = query.profileId ? query.profileId : null;
-   let url = `http://localhost:1337/api/profile/${userId}`
+   let url = `${process.env.API}/api/profile/${userId}`
    const userRes = await axios.get(url)
 
    //get- most recent submitssion
-   let urlMostSubmit = `http://localhost:1337/api/get-most-recent-sub/${userId}`
+   let urlMostSubmit = `${process.env.API}/api/get-most-recent-sub/${userId}`
    const submiss = await axios.get(urlMostSubmit)
 
    //get activity submit
-   let urlActivity = `http://localhost:1337/api/get-activity-calendar/${userId}`
+   let urlActivity = `${process.env.API}/api/get-activity-calendar/${userId}`
    const activity = await axios.get(urlActivity)
-
-   console.log(activity.data)
-
    return { profile: userRes.data.data , listSubmisions :submiss.data.data, listActivity: activity.data.data  }
 
 }
