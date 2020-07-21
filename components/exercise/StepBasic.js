@@ -157,39 +157,38 @@ const StepBasic = ({
   };
 
   const handleUpdate = async (onSuccess = () => {}) => {
-    // try {
-    //   setButtonLoading(true);
-    //   await formRef.validateFields();
-    //   let { content, title, points, level, tags } = formRef.getFieldsValue();
-    //   const res = await axios.post(`${process.env.API}/api/exercise/update`, {
-    //     id: exerciseId,
-    //     content: content,
-    //     title: title,
-    //     points: Number(points),
-    //     level: level,
-    //     tags: tags,
-    //   });
-    //   setButtonLoading(false);
-    //   if (res.data.success) {
-    //     notification.info({
-    //       message: 'Notification',
-    //       description: 'Success!',
-    //     });
-    //     onSuccess();
-    //   } else {
-    //     notification.error({
-    //       message: 'Notification',
-    //       description: 'Fail!',
-    //     });
-    //   }
-    // } catch (e) {
-    //   setButtonLoading(false);
-    //   notification.warning({
-    //     message: 'Notification',
-    //     description: 'Check your input again!',
-    //   });
-    // }
-    console.log('form', formRef.getFieldsValue().points);
+    try {
+      setButtonLoading(true);
+      await formRef.validateFields();
+      let { content, title, points, level, tags } = formRef.getFieldsValue();
+      const res = await axios.post(`${process.env.API}/api/exercise/update`, {
+        id: exerciseId,
+        content: content,
+        title: title,
+        points: Number(points),
+        level: level,
+        tags: tags,
+      });
+      setButtonLoading(false);
+      if (res.data.success) {
+        notification.info({
+          message: 'Notification',
+          description: 'Success!',
+        });
+        onSuccess();
+      } else {
+        notification.error({
+          message: 'Notification',
+          description: 'Fail!',
+        });
+      }
+    } catch (e) {
+      setButtonLoading(false);
+      notification.warning({
+        message: 'Notification',
+        description: 'Check your input again!',
+      });
+    }
   };
 
   const onOkConfirm = async () => {
