@@ -68,12 +68,7 @@ const Exercise = ({ id }) => {
         {currStep === 1 && (
           <StepSnippet
             exerciseId={{ value: exerciseId }}
-            nextStep={() => {
-              setCurrStep(wishStep);
-              console.log('curr', currStep);
-              console.log('wish step', wishStep);
-              console.log('curr', currStep);
-            }}
+            nextStep={() => setCurrStep(wishStep)}
           />
         )}
         {currStep === 2 && <StepTestCases exerciseId={exerciseId} />}

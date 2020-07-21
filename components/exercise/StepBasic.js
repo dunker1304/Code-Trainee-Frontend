@@ -224,20 +224,20 @@ const StepBasic = ({
   const setRangeSlider = (value) => {
     if (value === 'easy') {
       setMinSliderValue(0);
-      setMaxSliderValue(100);
+      setMaxSliderValue(0);
       formRef.setFieldsValue({
         points: '100',
       });
     } else if (value === 'medium') {
       setMinSliderValue(101);
-      setMaxSliderValue(200);
+      setMaxSliderValue(101);
       formRef.setFieldsValue({
         points: '200',
       });
     } else {
       // hard
       setMinSliderValue(201);
-      setMaxSliderValue(300);
+      setMaxSliderValue(201);
       formRef.setFieldsValue({
         points: '300',
       });
