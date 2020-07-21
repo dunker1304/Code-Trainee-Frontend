@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { Steps, Divider } from 'antd';
 import StepBasic from '../components/exercise/StepBasic';
@@ -14,20 +14,24 @@ const Exercise = ({ id }) => {
 
   const onChangeStep = (stepIndex) => {
     if (dirty) {
-      console.log('a');
+      console.log('step have dirty check');
       setWishStep(stepIndex);
       setCheckDirtyBeforeLeaving(true);
     } else {
-      console.log('b');
+      console.log('step not have dirty check');
       setCurrStep(stepIndex);
       setWishStep(stepIndex + 1);
     }
   };
 
+  useEffect(() => {
+    setWishStep(currStep + 1);
+  }, [currStep]);
+
   return (
     <React.Fragment>
       <Head>
-        <title>Create Exercise</title>
+        <title>{!exerciseId ? 'Create Exercise' : 'Update Exercise'}</title>
       </Head>
       <div
         className='exercise-page'
@@ -56,7 +60,9 @@ const Exercise = ({ id }) => {
               value: dirty,
               setValue: setDirty,
             }}
-            nextStep={() => setCurrStep(wishStep)}
+            nextStep={() => {
+              setCurrStep(wishStep);
+            }}
           />
         )}
         {currStep === 1 && (

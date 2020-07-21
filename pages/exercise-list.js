@@ -19,7 +19,7 @@ import axios from 'axios';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
-const ExerciseList = ({ ownerId = 5 }) => {
+const ExerciseList = ({ ownerId = 0 }) => {
   // table
   let [tableData, setTableData] = useState([]);
   let [currPageTable, setCurrPageTable] = useState(1);
@@ -238,5 +238,9 @@ const ExerciseList = ({ ownerId = 5 }) => {
       />
     </>
   );
+};
+ExerciseList.getInitialProps = async (ctx) => {
+  let ownerId = ctx.query?.ownerId;
+  return { ownerId };
 };
 export default ExerciseList;

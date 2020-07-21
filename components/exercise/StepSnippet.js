@@ -16,10 +16,9 @@ import AceEditor from 'react-ace';
 import axios from 'axios';
 import SnippetTemplate from './SnippetTemplate';
 
-// import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/theme-kuroir';
 
-const StepSnippet = ({ exerciseId = { value }, nexStep = () => {} }) => {
+const StepSnippet = ({ exerciseId = { value }, nextStep = () => {} }) => {
   // table
   let [currPage, setCurrPage] = useState(1);
   let [currPageSize, setCurrPageSize] = useState(10);
@@ -64,7 +63,7 @@ const StepSnippet = ({ exerciseId = { value }, nexStep = () => {} }) => {
       if (res.data.success) {
         notification.info({
           message: 'Notification',
-          description: <p>Success!</p>,
+          description: 'Success',
         });
         setDirtySnippetMap({
           ...dirtySnippetMap,
@@ -73,13 +72,13 @@ const StepSnippet = ({ exerciseId = { value }, nexStep = () => {} }) => {
       } else {
         notification.error({
           message: 'Notification',
-          description: <p>Fail!</p>,
+          description: 'Fail!',
         });
       }
     } catch (e) {
       notification.error({
         message: 'Notification',
-        description: <p>Fail!</p>,
+        description: 'Fail',
       });
     }
     setLoadingMap({
@@ -102,6 +101,14 @@ const StepSnippet = ({ exerciseId = { value }, nexStep = () => {} }) => {
       let notActiveIds = [...tableData]
         .map((e) => e.key)
         .filter((e) => !activeIds.includes(e));
+      if (activeIds.length === 0) {
+        notification.error({
+          message: 'Notification',
+          description: 'Exercise must support atleast one language.',
+        });
+        setLoading(false);
+        return;
+      }
       const res = await axios.post(
         `${process.env.API}/api/snippet/supported-language/update`,
         {
@@ -114,19 +121,19 @@ const StepSnippet = ({ exerciseId = { value }, nexStep = () => {} }) => {
       if (res.data.success) {
         notification.info({
           message: 'Notification',
-          description: <p>Success!</p>,
+          description: 'Success',
         });
-        nexStep();
+        nextStep();
       } else {
         notification.error({
           message: 'Notification',
-          description: <p>Fail!</p>,
+          description: 'Fail',
         });
       }
     } catch (e) {
       notification.error({
         message: 'Notification',
-        description: <p>Fail!</p>,
+        description: 'Fail',
       });
     }
     setLoading(false);
@@ -258,15 +265,6 @@ const StepSnippet = ({ exerciseId = { value }, nexStep = () => {} }) => {
             }
           },
           expandedRowRender: (record) => {
-            // if (readOnlyMap[record.key] === undefined) {
-            //   readOnlyMap[record.key] = true;
-            // }
-            // if (selectedMenuMap[record.key] === undefined) {
-            //   selectedMenuMap[record.key] = [];
-            // }
-            // if (loadingMap[record.key] === undefined) {
-            //   loadingMap[record.key] = false;
-            // }
             return (
               <Col>
                 <Row>Playground Templates</Row>
