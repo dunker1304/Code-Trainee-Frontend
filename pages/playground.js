@@ -66,7 +66,7 @@ const Playground = props => {
     let data = {
       language_id: languageID,
       source_code: code,
-      question_id: '1'
+      question_id: props.question.question.id
     }
     axios.post(`${process.env.API}/api/submissions`, data)
       .then(res => {
