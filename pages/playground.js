@@ -92,18 +92,29 @@ const Playground = props => {
       question: props.question.question,
       testcases: testCaseProps,
       answer: code,
-      language: langDB
+      language: langDB,
+      userID: 3
     }
     axios.post(`${process.env.API}/api/solution`, data)
       .then(res => {
         console.log(res, 'add solution')
         setLoading(false)
-        notification.success({
-          message: "Sucessfully added solution"
-        })
+        if (res.data.success) {
+          notification.success({
+            message: "Sucessfully added solution"
+          })
+        } else {
+          notification.error({
+            message: "Failed!"
+          })
+        }
+        
       })
       .catch(error => {
         console.log(error)
+        notification.error({
+          message: "Failed!"
+        })
       })
   }
 
@@ -113,7 +124,7 @@ const Playground = props => {
     if (!runCode) {
       handleRunCode(addSolution)
     } else {
-      addSolution()
+      addSolution(testCaseProps)
     }
   }
 
