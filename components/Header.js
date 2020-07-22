@@ -1,19 +1,95 @@
 import { BellFilled , UserOutlined ,HeartOutlined,
-  FileProtectOutlined,PieChartOutlined,UndoOutlined,LogoutOutlined   } from "@ant-design/icons"
+  FileProtectOutlined,PieChartOutlined,UndoOutlined,LogoutOutlined,TeamOutlined ,SnippetsOutlined  } from "@ant-design/icons"
 import Logo from "../static/images/codetrainee.png"
 import { Menu , Dropdown,Popover,Avatar} from 'antd';
 import Link from 'next/link'
-
-
+import axios from "axios"
+import Router from "next/router"
+import { openNotificationWithIcon } from "../components/Notification"
+import { connect } from "react-redux"
+const CONSTANTS = require("../utils/constants")
 
 const Header = (props) => {
+
+  const hanleSignOut = async ()=> {
+    let url = `${process.env.API}/signout`
+    let res = await  axios({
+      method: 'get',
+      withCredentials : true,
+      url: url,
+      //headers : { Authorization: `Bearer ${accessToken}` }
+    }) 
+    if(res.data.success) {
+      Router.push('/')
+    }
+    else {
+      openNotificationWithIcon('error','','The system has encountered an error!')
+    }
+
+    return ;
+  }
   const text = 
     <span>
-       <Avatar size="small" icon={<UserOutlined />} /><b className="user_name">quynhkt</b>
+       <Avatar size="small" icon={<UserOutlined />} /><b className="user_name">{props.userInfo ? props.userInfo['displayName']: ''}</b>
     </span>;
 
-  const content = (
-        <ul className = "prover_ul">
+
+
+  const renderNavForRole = (roleId) => {
+     switch(roleId) {
+       case CONSTANTS.ROLE.ROLE_STUDENT: 
+          return (
+            <Menu mode="horizontal">
+            <Menu.Item key="exercises">
+               <Link href="/problem" as="/problem">
+                <a href="">Exercises</a>
+              </Link>
+            </Menu.Item>
+            <Menu.Item key="profile">
+              <a href="">My Profile</a>
+            </Menu.Item>
+            <Menu.Item key="forum">
+              <a href="">Forum</a>
+            </Menu.Item>
+          </Menu>
+          )
+        case CONSTANTS.ROLE.ROLE_ADMIN : 
+           return (
+            <Menu mode="horizontal">
+            <Menu.Item key="exercises">
+               <Link href="/problem" as="/problem">
+                <a href="">Accounts</a>
+              </Link>
+            </Menu.Item>
+            <Menu.Item key="profile">
+              <a href="">Exercises</a>
+            </Menu.Item>
+          </Menu>
+           ) 
+         case  CONSTANTS.ROLE.ROLE_TEACHER:
+           return (
+            <Menu mode="horizontal">
+            <Menu.Item key="exercises">
+               <Link href="/problem" as="/problem">
+                <a href="">Exercises</a>
+              </Link>
+            </Menu.Item>
+            <Menu.Item key="profile">
+              <a href="">My Profile</a>
+            </Menu.Item>
+            <Menu.Item key="forum">
+              <a href="">Forum</a>
+            </Menu.Item>
+          </Menu>
+           )
+     }
+  }
+
+  const renderProverForRole = (roleId) => {
+    switch(roleId) {
+      case CONSTANTS.ROLE.ROLE_STUDENT: 
+         return (
+          <ul className = "prover_ul">
           <Link href="/list" as="/list">
                <li>
                <HeartOutlined style={{color : "#d05451",fontSize :"20px"}} className="icon_prover_header"/>My List
@@ -30,9 +106,58 @@ const Header = (props) => {
             </li>
           </Link>  
           <li> <UndoOutlined style={{color : "#ffdf00" ,fontSize :"20px"}} className="icon_prover_header"/> Change Password</li>
-          <li> <LogoutOutlined style={{color : "#fea116",fontSize :"20px"}} className="icon_prover_header"/> Sign out</li>
+          <li  onClick= {()=>hanleSignOut()} > <LogoutOutlined style={{color : "#fea116",fontSize :"20px"}} className="icon_prover_header"/> Sign out</li>
         </ul>
-  );  
+         )
+       case CONSTANTS.ROLE.ROLE_ADMIN : 
+          return (
+            <ul className = "prover_ul">
+            <Link href="/list" as="/list">
+                 <li>
+                  <TeamOutlined style={{color : "#d05451",fontSize :"20px"}} className="icon_prover_header"/>Accounts 
+                 </li>
+            </Link>
+            <Link href="/profile/[profileId]" as={`/profile/${5}`}>
+              <li>
+                <SnippetsOutlined style={{color : "#1da09c" ,fontSize :"20px"}} className="icon_prover_header"/> Exercises 
+              </li>
+            </Link> 
+           
+            <li> <UndoOutlined style={{color : "#ffdf00" ,fontSize :"20px"}} className="icon_prover_header"/> Change Password</li>
+            <li  onClick= {()=>hanleSignOut()} > <LogoutOutlined style={{color : "#fea116",fontSize :"20px"}} className="icon_prover_header"/> Sign out</li>
+          </ul>
+          ) 
+        case  CONSTANTS.ROLE.ROLE_TEACHER:
+          return (
+            <ul className = "prover_ul">
+            <Link href="/list" as="/list">
+                 <li>
+                 <HeartOutlined style={{color : "#d05451",fontSize :"20px"}} className="icon_prover_header"/>My List
+                 </li>
+            </Link>
+            <Link href="/profile/[profileId]" as={`/profile/${5}`}>
+              <li>
+                <FileProtectOutlined style={{color : "#1da09c" ,fontSize :"20px"}} className="icon_prover_header"/> My Profile
+              </li>
+            </Link> 
+            <Link href="/processes" as="/processes" >
+              <li>
+                <PieChartOutlined style={{color : "#8365cd" ,fontSize :"20px"}} className="icon_prover_header"/>My Process
+              </li>
+            </Link>  
+            <Link href="/processes" as="/processes" >
+              <li>
+                <PieChartOutlined style={{color : "#8365cd" ,fontSize :"20px"}} className="icon_prover_header"/>My Created Exercises
+              </li>
+            </Link>  
+            <li> <UndoOutlined style={{color : "#ffdf00" ,fontSize :"20px"}} className="icon_prover_header"/> Change Password</li>
+            <li  onClick= {()=>hanleSignOut()} > <LogoutOutlined style={{color : "#fea116",fontSize :"20px"}} className="icon_prover_header"/> Sign out</li>
+          </ul>
+          )
+    }
+  }
+
+
 
   return (
     <div className="coding-header">
@@ -42,26 +167,14 @@ const Header = (props) => {
         </div>
         <div className="conding-header-nav">
            <div className="header-left">
-               <Menu mode="horizontal">
-                <Menu.Item key="exercises">
-                   <Link href="/problem" as="/problem">
-                    <a href="">Exercises</a>
-                  </Link>
-                </Menu.Item>
-                <Menu.Item key="profile">
-                  <a href="">My Profile</a>
-                </Menu.Item>
-                <Menu.Item key="forum">
-                  <a href="">Forum</a>
-                </Menu.Item>
-              </Menu>
+                {props.userInfo && props.userInfo.role ? renderNavForRole(props.userInfo.role['id']) : ''}
            </div>
            <div className="header-right">
               <div className="header-ring">
                 <BellFilled/>
               </div>
               <div className="header-user">
-                 <Popover placement="bottomRight" title={text} content={content} trigger="click" className="header_proper">
+                 <Popover placement="bottomRight" title={text} content={props.userInfo && props.userInfo.role ? renderProverForRole(props.userInfo.role['id']): []} trigger="click" className="header_proper">
                     <UserOutlined/>
                   </Popover>
                 
@@ -74,4 +187,10 @@ const Header = (props) => {
   )
 }
 
-export default Header
+function mapStateToProps(state, ownProps) {
+  return {
+    userInfo : state.auth.userInfo
+  }
+}
+
+export default connect(mapStateToProps,null)(Header)

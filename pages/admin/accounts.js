@@ -7,6 +7,7 @@ import axios from "axios"
 import { openNotificationWithIcon} from "../../components/Notification"
 import moment from "moment"
 import _ from 'lodash'
+import composedAuthHOC from 'hocs';
 
 
 const role = [
@@ -506,16 +507,8 @@ const Admin = (props) => {
   )
 }
 
-// Admin.getInitialProps = async function(ctx) {
-//   console.log(JSON.stringify(process.env.API), 'env config')
+Admin.getInitialProps = async function(ctx) {
+ 
+}
 
-//   let id = ctx.query.questionID
-//   let urlExercise = `${process.env.API}/api/exercise?id=${id}`
-//   let urlLanguage = `${process.env.API}/api/program-language/all?exerciseId=${id}`
-//   const questionResponse = await axios.get(urlExercise)
-//   const languageResponse = await axios.get(urlLanguage)
-//   console.log(questionResponse.data, 'questionResponse')
-//   return { question: questionResponse.data, language: languageResponse.data.data.result }
-// }
-
-export default Admin;
+export default composedAuthHOC(Admin);
