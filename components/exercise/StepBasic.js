@@ -1,38 +1,29 @@
-import {
-  Form,
-  Input,
-  Button,
-  Select,
-  notification,
-  AutoComplete,
-  Tag,
-  Tooltip,
-} from 'antd';
+import { Form, Input, Button, Select, notification } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { Editor } from '@tinymce/tinymce-react';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import ConfirmModal from '../ConfirmModal';
 import ExerciseTags from './ExerciseTags';
+import ExerciseLOC from './ExerciseLOC';
+import ExerciseLevel from './ExerciseLevel';
 
 const StepBasic = ({
-  exerciseId = {
-    value,
-    setValue: () => {},
-  },
-  checkDirtyBeforeLeaving = {
-    value,
-    setValue: () => {},
-  },
-  dirty = {
-    value,
-    setValue: () => {},
-  },
+  exerciseId,
+  setExerciseId = () => {},
+  checkDirtyBeforeLeaving = false,
+  setCheckDirtyBeforeLeaving = () => {},
+  dirty = false,
+  setDirty = () => {},
   nextStep = () => {},
 }) => {
+  // visible of comfirm modal
   let [visibleConfirm, setVisibleConfirm] = useState(false);
+  // loading state
   let [buttonLoading, setButtonLoading] = useState(false);
+  // form instance
   let [formRef] = Form.useForm();
+  // init data of form
   let [initFormValues, setInitFormValues] = useState({
     title: '',
     content: '',
@@ -40,27 +31,32 @@ const StepBasic = ({
     level: 'easy',
     tags: ['#'],
   });
+  // all tags from DB
   let [allTags, setAllTags] = useState([]);
+  // min, max LOC slider
+  let [minSliderValue, setMinSliderValue] = useState(0);
+  let [maxSliderValue, setMaxSliderValue] = useState(100);
 
   // run only one when component mounted
   useEffect(() => {
     (async () => {
-      // get old information
-      if (exerciseId.value) {
+      // get old information to update
+      if (exerciseId) {
         try {
           const res = await axios.get(
-            `${process.env.API}/api/exercise/basic-info/${exerciseId.value}`
+            `${process.env.API}/api/exercise/basic-info/${exerciseId}`
           );
           if (res.data.success) {
+            setRangeSlider(res.data.data.level);
             let tags = res.data.data.tags.map((e) => e.name);
-            formRef.setFieldsValue({
+            setInitFormValues({
               title: res.data.data.title,
               content: res.data.data.content,
               points: res.data.data.points,
               level: res.data.data.level,
               tags: tags,
             });
-            setInitFormValues({
+            formRef.setFieldsValue({
               title: res.data.data.title,
               content: res.data.data.content,
               points: res.data.data.points,
@@ -90,27 +86,36 @@ const StepBasic = ({
     })();
 
     return () => {
-      dirty.setValue(false);
-      checkDirtyBeforeLeaving.setValue(false);
+      // run when component dis-mounted
+      setDirty(false);
+      setCheckDirtyBeforeLeaving(false);
     };
   }, []);
 
   useEffect(() => {
-    if (dirty.value && checkDirtyBeforeLeaving.value) {
-      setVisibleConfirm(true);
-    }
-  }, [checkDirtyBeforeLeaving.value]);
+    dirty && checkDirtyBeforeLeaving && setVisibleConfirm(true);
+  }, [checkDirtyBeforeLeaving]);
 
-  const checkDirty = (oldValue, currValue) => {
-    if (
-      oldValue.title !== currValue.title ||
-      oldValue.content !== currValue.content ||
-      oldValue.points !== currValue.points ||
-      oldValue.level !== currValue.level
-    ) {
-      dirty.setValue(true);
+  const arraysEqual = (a, b) => {
+    if (a === b) return true;
+    if (a == null || b == null) return false;
+    if (a.length !== b.length) return false;
+    for (let i = 0; i < a.length; ++i) {
+      if (a[i] !== b[i]) return false;
+    }
+    return true;
+  };
+
+  const onValuesChange = (changedValue) => {
+    console.log('changed value', changedValue);
+    const prop = Object.getOwnPropertyNames(changedValue)[0];
+    if (prop === 'tags') {
+      setDirty(!arraysEqual(changedValue[prop], initFormValues[prop]));
     } else {
-      dirty.setValue(false);
+      setDirty(changedValue[prop] !== initFormValues[prop]);
+    }
+    if (prop === 'level') {
+      setRangeSlider(changedValue[prop]);
     }
   };
 
@@ -132,9 +137,9 @@ const StepBasic = ({
           message: 'Notification',
           description: 'Success!',
         });
-        exerciseId.setValue(res.data.data.id);
-        dirty.setValue(false);
-        checkDirtyBeforeLeaving.setValue(false);
+        setExerciseId(res.data.data.id);
+        setDirty(false);
+        setCheckDirtyBeforeLeaving(false);
         nextStep();
       } else {
         notification.error({
@@ -157,7 +162,7 @@ const StepBasic = ({
       await formRef.validateFields();
       let { content, title, points, level, tags } = formRef.getFieldsValue();
       const res = await axios.post(`${process.env.API}/api/exercise/update`, {
-        id: exerciseId.value,
+        id: exerciseId,
         content: content,
         title: title,
         points: Number(points),
@@ -188,8 +193,8 @@ const StepBasic = ({
 
   const onOkConfirm = async () => {
     handleUpdate(() => {
-      checkDirtyBeforeLeaving.setValue(false);
-      dirty.setValue(false);
+      setCheckDirtyBeforeLeaving(false);
+      setDirty(false);
       setVisibleConfirm(false);
       nextStep();
     });
@@ -197,14 +202,37 @@ const StepBasic = ({
 
   const onCancelConfirm = async () => {
     setVisibleConfirm(false);
-    checkDirtyBeforeLeaving.setValue(false);
-    dirty.setValue(false);
+    setCheckDirtyBeforeLeaving(false);
+    setDirty(false);
     nextStep();
   };
 
   const onCancelXConfirm = async () => {
-    checkDirtyBeforeLeaving.setValue(false);
+    setCheckDirtyBeforeLeaving(false);
     setVisibleConfirm(false);
+  };
+
+  const setRangeSlider = (level) => {
+    console.log('level', level);
+    if (level === 'easy') {
+      setMinSliderValue(0);
+      setMaxSliderValue(100);
+      formRef.setFieldsValue({
+        points: 0,
+      });
+    } else if (level === 'medium') {
+      setMinSliderValue(101);
+      setMaxSliderValue(200);
+      formRef.setFieldsValue({
+        points: 101,
+      });
+    } else {
+      setMinSliderValue(201);
+      setMaxSliderValue(300);
+      formRef.setFieldsValue({
+        points: 201,
+      });
+    }
   };
 
   return (
@@ -218,9 +246,7 @@ const StepBasic = ({
         }}
         scrollToFirstError={true}
         initialValues={initFormValues}
-        onValuesChange={(changedValue, allValues) =>
-          checkDirty(initFormValues, allValues)
-        }>
+        onValuesChange={onValuesChange}>
         <Form.Item name='title' label='Title' rules={[{ required: true }]}>
           <Input />
         </Form.Item>
@@ -253,15 +279,31 @@ forecolor backcolor | alignleft aligncenter alignright alignjustify | \
             }}
           />
         </Form.Item>
-        <Form.Item name='points' label='LOC' rules={[{ required: true }]}>
-          <Input type='number' />
-        </Form.Item>
         <Form.Item name='level' label='Level' rules={[{ required: true }]}>
-          <Select>
-            <Select.Option value='easy'>Easy</Select.Option>
-            <Select.Option value='medium'>Medium</Select.Option>
-            <Select.Option value='hard'>Hard</Select.Option>
-          </Select>
+          <ExerciseLevel min={minSliderValue} max={maxSliderValue} />
+        </Form.Item>
+        <Form.Item
+          name='points'
+          label='LOC'
+          rules={[
+            { required: true },
+            ({ getFieldValue }) => ({
+              validator(rule, value) {
+                if (value && value < minSliderValue) {
+                  return Promise.reject(
+                    `Min available value is ${minSliderValue}`
+                  );
+                }
+                if (value && value > maxSliderValue) {
+                  return Promise.reject(
+                    `Max available value is ${maxSliderValue}`
+                  );
+                }
+                return Promise.resolve();
+              },
+            }),
+          ]}>
+          <ExerciseLOC min={minSliderValue} max={maxSliderValue} />
         </Form.Item>
         <Form.Item
           name='tags'
@@ -271,7 +313,7 @@ forecolor backcolor | alignleft aligncenter alignright alignjustify | \
           <ExerciseTags allTags={allTags} />
         </Form.Item>
         <Form.Item>
-          {!exerciseId.value ? (
+          {!exerciseId ? (
             <Button
               type='primary'
               size='large'
@@ -286,8 +328,8 @@ forecolor backcolor | alignleft aligncenter alignright alignjustify | \
               loading={buttonLoading}
               onClick={() =>
                 handleUpdate(() => {
-                  dirty.setValue(false);
-                  checkDirtyBeforeLeaving.setValue(false);
+                  setDirty(false);
+                  setCheckDirtyBeforeLeaving(false);
                   nextStep();
                 })
               }>

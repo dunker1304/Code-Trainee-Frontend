@@ -16,10 +16,9 @@ import AceEditor from 'react-ace';
 import axios from 'axios';
 import SnippetTemplate from './SnippetTemplate';
 
-// import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/theme-kuroir';
 
-const StepSnippet = ({ exerciseId = { value }, nexStep = () => {} }) => {
+const StepSnippet = ({ exerciseId, nextStep = () => {} }) => {
   // table
   let [currPage, setCurrPage] = useState(1);
   let [currPageSize, setCurrPageSize] = useState(10);
@@ -56,7 +55,7 @@ const StepSnippet = ({ exerciseId = { value }, nexStep = () => {} }) => {
       const res = await axios.post(
         `${process.env.API}/api/snippet/sample/update`,
         {
-          exerciseId: exerciseId.value,
+          exerciseId: exerciseId,
           languageId: languageId,
           sampleCode: valueMap[languageId].value,
         }
@@ -64,7 +63,7 @@ const StepSnippet = ({ exerciseId = { value }, nexStep = () => {} }) => {
       if (res.data.success) {
         notification.info({
           message: 'Notification',
-          description: <p>Success!</p>,
+          description: 'Success',
         });
         setDirtySnippetMap({
           ...dirtySnippetMap,
@@ -73,13 +72,13 @@ const StepSnippet = ({ exerciseId = { value }, nexStep = () => {} }) => {
       } else {
         notification.error({
           message: 'Notification',
-          description: <p>Fail!</p>,
+          description: 'Fail!',
         });
       }
     } catch (e) {
       notification.error({
         message: 'Notification',
-        description: <p>Fail!</p>,
+        description: 'Fail',
       });
     }
     setLoadingMap({
@@ -88,7 +87,7 @@ const StepSnippet = ({ exerciseId = { value }, nexStep = () => {} }) => {
     });
   };
 
-  const handleSaveAndNext = async () => {
+  const handleUpdateAndNext = async () => {
     try {
       setLoading(true);
       //save snippets if not save yet
@@ -102,10 +101,18 @@ const StepSnippet = ({ exerciseId = { value }, nexStep = () => {} }) => {
       let notActiveIds = [...tableData]
         .map((e) => e.key)
         .filter((e) => !activeIds.includes(e));
+      if (activeIds.length === 0) {
+        notification.error({
+          message: 'Notification',
+          description: 'Exercise must support at least one language.',
+        });
+        setLoading(false);
+        return;
+      }
       const res = await axios.post(
         `${process.env.API}/api/snippet/supported-language/update`,
         {
-          exerciseId: exerciseId.value,
+          exerciseId: exerciseId,
           activeLangIds: activeIds,
           notActiveLangIds: notActiveIds,
         }
@@ -114,19 +121,19 @@ const StepSnippet = ({ exerciseId = { value }, nexStep = () => {} }) => {
       if (res.data.success) {
         notification.info({
           message: 'Notification',
-          description: <p>Success!</p>,
+          description: 'Success',
         });
-        nexStep();
+        nextStep();
       } else {
         notification.error({
           message: 'Notification',
-          description: <p>Fail!</p>,
+          description: 'Fail',
         });
       }
     } catch (e) {
       notification.error({
         message: 'Notification',
-        description: <p>Fail!</p>,
+        description: 'Fail',
       });
     }
     setLoading(false);
@@ -139,7 +146,7 @@ const StepSnippet = ({ exerciseId = { value }, nexStep = () => {} }) => {
   const loadTable = async () => {
     setLoading(true);
     const res = await axios.get(
-      `${process.env.API}/api/program-language/all?exerciseId=${exerciseId.value}`
+      `${process.env.API}/api/program-language/all?exerciseId=${exerciseId}`
     );
     if (res.data.success) {
       let tableData = [];
@@ -176,7 +183,10 @@ const StepSnippet = ({ exerciseId = { value }, nexStep = () => {} }) => {
   };
 
   return (
-    <React.Fragment>
+    <div
+      style={{
+        marginBottom: '30px',
+      }}>
       <Table
         className='table-snippets'
         bordered
@@ -258,15 +268,6 @@ const StepSnippet = ({ exerciseId = { value }, nexStep = () => {} }) => {
             }
           },
           expandedRowRender: (record) => {
-            // if (readOnlyMap[record.key] === undefined) {
-            //   readOnlyMap[record.key] = true;
-            // }
-            // if (selectedMenuMap[record.key] === undefined) {
-            //   selectedMenuMap[record.key] = [];
-            // }
-            // if (loadingMap[record.key] === undefined) {
-            //   loadingMap[record.key] = false;
-            // }
             return (
               <Col>
                 <Row>Playground Templates</Row>
@@ -344,10 +345,10 @@ const StepSnippet = ({ exerciseId = { value }, nexStep = () => {} }) => {
         }}
       />
 
-      <Button type='primary' onClick={handleSaveAndNext} loading={loading}>
-        Save and Next
+      <Button type='primary' onClick={handleUpdateAndNext} loading={loading}>
+        Update and Next
       </Button>
-    </React.Fragment>
+    </div>
   );
 };
 

@@ -66,7 +66,7 @@ const Playground = props => {
     let data = {
       language_id: languageID,
       source_code: code,
-      question_id: '1'
+      question_id: props.question.question.id
     }
     axios.post(`${process.env.API}/api/submissions`, data)
       .then(res => {
@@ -92,18 +92,29 @@ const Playground = props => {
       question: props.question.question,
       testcases: testCaseProps,
       answer: code,
-      language: langDB
+      language: langDB,
+      userID: 3
     }
     axios.post(`${process.env.API}/api/solution`, data)
       .then(res => {
         console.log(res, 'add solution')
         setLoading(false)
-        notification.success({
-          message: "Sucessfully added solution"
-        })
+        if (res.data.success) {
+          notification.success({
+            message: "Sucessfully added solution"
+          })
+        } else {
+          notification.error({
+            message: "Failed!"
+          })
+        }
+        
       })
       .catch(error => {
         console.log(error)
+        notification.error({
+          message: "Failed!"
+        })
       })
   }
 
@@ -113,7 +124,7 @@ const Playground = props => {
     if (!runCode) {
       handleRunCode(addSolution)
     } else {
-      addSolution()
+      addSolution(testCaseProps)
     }
   }
 
@@ -175,6 +186,10 @@ const Playground = props => {
     axios.get(`${process.env.API}/api/exercise/random`)
       .then((response) => {
         console.log(response.data, 'random question')
+        if (response.data.success) {
+          let exercise  = response.data.data
+          Router.push(`/playground?questionID=${exercise['id']}`,`/playground?questionID=${exercise['id']}`)
+        }
       })
       .catch((err) => {
         console.log(err)
@@ -270,10 +285,10 @@ const Playground = props => {
             (testCaseProps.length == 1 && testCaseProps[0].success == false) ?
             <Spin spinning={loading}>
               <div className="console-status" style={ (consoleEditor == 'hide') ? {display: 'none'} : null }>
-                <div>Status: {testCaseProps[0].data ? testCaseProps[0].data.status.description : "Something Wrong"}</div>
+                <div>Status: {testCaseProps[0].data ? testCaseProps[0].data.status.description : "Code - 400"}</div>
                 <div style={{ whiteSpace: 'pre-wrap' }} 
                   dangerouslySetInnerHTML={{ __html: testCaseProps[0].data ? testCaseProps[0].data.compile_output ? testCaseProps[0].data.compile_output.toString() : testCaseProps[0].data.stderr.toString() 
-                                          : ("Source code: " + testCaseProps[0]?.message.source_code[0] || "Something Wrong") }}>                            
+                                          :  (testCaseProps[0]?.message?.source_code ? ("Source Code: " + testCaseProps[0]?.message?.source_code[0]) : "Something went wrong") }}>                            
               </div>
               </div>
             </Spin>

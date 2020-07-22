@@ -7,7 +7,7 @@ const ExerciseTags = ({ tags = [], setTags = (arr) => {}, allTags = [] }) => {
   let [inputValue, setInputValue] = useState('');
   let [editInputIndex, setEditInputIndex] = useState(-1);
   let [editInputValue, setEditInputValue] = useState('');
-  let [suggestTags, setSuggestTags] = useState([]);
+  let [suggestTags, setSuggestTags] = useState(allTags);
   let inputRef = useRef();
   let editInputRef = useRef();
 
@@ -63,7 +63,7 @@ const ExerciseTags = ({ tags = [], setTags = (arr) => {}, allTags = [] }) => {
   };
 
   const handleSearch = (value) => {
-    let suggestValues = allTags
+    let suggestValues = [...allTags]
       .filter((event) => event.toString().includes(value))
       .map((event) => ({ value: event }));
     setSuggestTags([...suggestValues]);
@@ -84,6 +84,9 @@ const ExerciseTags = ({ tags = [], setTags = (arr) => {}, allTags = [] }) => {
               key={tag}
               defaultValue={editInputValue}
               onSelect={onSelectSuggestion}
+              defaultOpen={true}
+              autoFocus={true}
+              onFocus={(e) => handleSearch(editInputValue)}
               onSearch={handleSearch}>
               <Input
                 ref={editInputRef}
@@ -104,6 +107,7 @@ const ExerciseTags = ({ tags = [], setTags = (arr) => {}, allTags = [] }) => {
           );
         }
         const isLongTag = tag.length > 15;
+        const handleLongTag = (tag) => tag.slice(0, 15) + '...';
         const tagElem = (
           <Tag
             color='green'
@@ -122,7 +126,7 @@ const ExerciseTags = ({ tags = [], setTags = (arr) => {}, allTags = [] }) => {
                   event.preventDefault();
                 }
               }}>
-              {isLongTag ? `{tag.slice(0, 15)}...` : tag}
+              {isLongTag ? handleLongTag(tag) : tag}
             </span>
           </Tag>
         );
@@ -140,7 +144,10 @@ const ExerciseTags = ({ tags = [], setTags = (arr) => {}, allTags = [] }) => {
           style={{ width: 200 }}
           defaultValue={inputValue}
           onSelect={onSelectSuggestion}
-          onSearch={handleSearch}>
+          onSearch={handleSearch}
+          autoFocus={true}
+          onFocus={(e) => handleSearch(inputValue)}
+          defaultOpen={true}>
           <Input
             ref={inputRef}
             type='text'
