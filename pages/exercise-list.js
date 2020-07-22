@@ -22,7 +22,7 @@ import Link from 'next/link';
 import Header from '../components/Header';
 import composedAuthHOC from 'hocs';
 
-const ExerciseList = ({ ownerId = 0 }) => {
+const ExerciseList = ({ ownerId = 7 }) => {
   // table
   let [tableData, setTableData] = useState([]);
   let [currPageTable, setCurrPageTable] = useState(1);
