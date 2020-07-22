@@ -282,7 +282,27 @@ forecolor backcolor | alignleft aligncenter alignright alignjustify | \
         <Form.Item name='level' label='Level' rules={[{ required: true }]}>
           <ExerciseLevel min={minSliderValue} max={maxSliderValue} />
         </Form.Item>
-        <Form.Item name='points' label='LOC' rules={[{ required: true }]}>
+        <Form.Item
+          name='points'
+          label='LOC'
+          rules={[
+            { required: true },
+            ({ getFieldValue }) => ({
+              validator(rule, value) {
+                if (value && value < minSliderValue) {
+                  return Promise.reject(
+                    `Min available value is ${minSliderValue}`
+                  );
+                }
+                if (value && value > maxSliderValue) {
+                  return Promise.reject(
+                    `Max available value is ${maxSliderValue}`
+                  );
+                }
+                return Promise.resolve();
+              },
+            }),
+          ]}>
           <ExerciseLOC min={minSliderValue} max={maxSliderValue} />
         </Form.Item>
         <Form.Item
