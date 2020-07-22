@@ -30,7 +30,7 @@ const StepTestCases = ({ exerciseId }) => {
 
   const loadTable = async () => {
     const res = await axios.get(
-      `${process.env.API}/api/testcase/get-by-exercise?exerciseId=${exerciseId}`
+      `${process.env.API}/api/testcase/exercise/${exerciseId}`
     );
     console.log(res.data);
     if (res.data.success) {

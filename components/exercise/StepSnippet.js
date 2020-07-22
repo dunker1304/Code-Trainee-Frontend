@@ -333,6 +333,7 @@ const StepSnippet = ({ exerciseId, nextStep = () => {} }) => {
               </Col>
             );
           },
+          expandRowByClick: true,
         }}
         pagination={{
           defaultPageSize: 10,

@@ -30,12 +30,13 @@ const ExerciseLevel = ({
       </Select>
       <div
         style={{
-          width: '220px',
+          width: '200px',
           display: 'flex',
           alignItems: 'center',
+          justifyContent: 'space-between',
         }}>
         <InfoCircleFilled style={{ fontSize: '18px' }} />
-        <span style={{ marginLeft: '10px' }}>
+        <span>
           <strong>LOC</strong> will in range <strong>{min}</strong> to{' '}
           <strong>{max}</strong>
         </span>
