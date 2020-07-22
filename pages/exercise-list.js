@@ -16,6 +16,7 @@ import {
 } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import Head from 'next/head';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
@@ -98,6 +99,9 @@ const ExerciseList = ({ ownerId = 0 }) => {
 
   return (
     <>
+      <Head>
+        <title>Exercise List</title>
+      </Head>
       <Table
         loading={tableLoading}
         title={() => (

@@ -18,7 +18,7 @@ import SnippetTemplate from './SnippetTemplate';
 
 import 'ace-builds/src-noconflict/theme-kuroir';
 
-const StepSnippet = ({ exerciseId = { value }, nextStep = () => {} }) => {
+const StepSnippet = ({ exerciseId, nextStep = () => {} }) => {
   // table
   let [currPage, setCurrPage] = useState(1);
   let [currPageSize, setCurrPageSize] = useState(10);
@@ -55,7 +55,7 @@ const StepSnippet = ({ exerciseId = { value }, nextStep = () => {} }) => {
       const res = await axios.post(
         `${process.env.API}/api/snippet/sample/update`,
         {
-          exerciseId: exerciseId.value,
+          exerciseId: exerciseId,
           languageId: languageId,
           sampleCode: valueMap[languageId].value,
         }
@@ -112,7 +112,7 @@ const StepSnippet = ({ exerciseId = { value }, nextStep = () => {} }) => {
       const res = await axios.post(
         `${process.env.API}/api/snippet/supported-language/update`,
         {
-          exerciseId: exerciseId.value,
+          exerciseId: exerciseId,
           activeLangIds: activeIds,
           notActiveLangIds: notActiveIds,
         }
@@ -146,7 +146,7 @@ const StepSnippet = ({ exerciseId = { value }, nextStep = () => {} }) => {
   const loadTable = async () => {
     setLoading(true);
     const res = await axios.get(
-      `${process.env.API}/api/program-language/all?exerciseId=${exerciseId.value}`
+      `${process.env.API}/api/program-language/all?exerciseId=${exerciseId}`
     );
     if (res.data.success) {
       let tableData = [];
