@@ -408,18 +408,18 @@
   position: relative;
   margin-top: 50px;
   z-index: 99;
-  .ant-tabs-bar {
-    margin: 0;
-    position: fixed;
-    top:50px;
-    left: 0;
-    right: 0;
-    background-color: #fff;
-    z-index: 99;
-  } 
-  .ant-tabs-content {
-    position: relative;
-    margin-top:40px;
-    z-index: 97px;
-  }
+  // .ant-tabs-bar {
+  //   margin: 0;
+  //   position: fixed;
+  //   top:50px;
+  //   left: 0;
+  //   right: 0;
+  //   background-color: #fff;
+  //   z-index: 99;
+  // } 
+  // .ant-tabs-content {
+  //   position: relative;
+  //   margin-top:40px;
+  //   z-index: 97px;
+  // }
 }

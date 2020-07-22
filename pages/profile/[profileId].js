@@ -7,6 +7,7 @@ import axios from "axios"
 import { useEffect } from "react"
 import Header from "../../components/Header"
 import Footer from "../../components/Footer"
+import composedAuthHOC from 'hocs';
 const Profile = (props)=> {
   const today = new Date();
   const columns = [
@@ -145,4 +146,4 @@ Profile.getInitialProps = async (ctx) => {
 
 
 
-export default Profile;
+export default composedAuthHOC(Profile);

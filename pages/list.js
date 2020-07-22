@@ -2,6 +2,7 @@
 import WishList from "../components/WishList"
 import Header from "../components/Header"
 import Footer from "../components/Footer"
+import composedAuthHOC from 'hocs';
 const MyList = (props)=> {
   return (
     <div >
@@ -14,4 +15,10 @@ const MyList = (props)=> {
     </div>
   )
 }
-export default MyList;
+
+MyList.getInitialProps = async (ctx) => {
+
+  return { }
+}
+
+export default composedAuthHOC(MyList);

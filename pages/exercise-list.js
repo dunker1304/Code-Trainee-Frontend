@@ -23,6 +23,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Header from '../components/Header';
+import composedAuthHOC from 'hocs';
 
 const ExerciseList = ({ ownerId }) => {
   // table
@@ -277,4 +278,4 @@ ExerciseList.getInitialProps = async (ctx) => {
   let ownerId = ctx.query?.ownerId || 0;
   return { ownerId: ownerId };
 };
-export default ExerciseList;
+export default composedAuthHOC(ExerciseList);

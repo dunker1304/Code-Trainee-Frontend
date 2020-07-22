@@ -5,7 +5,7 @@ import StepBasic from '../components/exercise/StepBasic';
 import StepTestCases from '../components/exercise/StepTestCase';
 import StepSnippet from '../components/exercise/StepSnippet';
 import Header from '../components/Header';
-
+import composedAuthHOC from 'hocs';
 const Exercise = ({ id }) => {
   let [exerciseId, setExerciseId] = useState(id);
   let [currStep, setCurrStep] = useState(0);
@@ -76,4 +76,4 @@ Exercise.getInitialProps = async (ctx) => {
   return { id };
 };
 
-export default Exercise;
+export default composedAuthHOC(Exercise);

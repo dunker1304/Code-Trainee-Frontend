@@ -27,6 +27,8 @@ import "ace-builds/src-noconflict/theme-solarized_light";
 import "ace-builds/src-noconflict/theme-terminal";
 import "ace-builds/src-noconflict/ext-language_tools"
 import Router , {useRouter} from 'next/router'
+import Header from "../components/Header"
+import composedAuthHOC from 'hocs';
 
 const { Option } = Select
 const { TabPane } = Tabs
@@ -198,6 +200,8 @@ const Playground = props => {
 
   return (
     <>
+     <Header/>
+     <div className="container-content">
       <Split
         sizes={[35, 65]}
         minSize={300}
@@ -317,6 +321,7 @@ const Playground = props => {
           </div>
         </div>
       </Split>
+      </div>
     </>
   );
 }
@@ -336,4 +341,4 @@ function mapStateToProps(state, ownProps) {
   }
 }
 
-export default connect(mapStateToProps)(Playground)
+export default connect(mapStateToProps)(composedAuthHOC(Playground))

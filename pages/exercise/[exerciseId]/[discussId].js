@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import {getDiscussByCommentId} from "../../../store/discuss/action"
 import Router , {useRouter} from 'next/router'
 import { getQuery }from "../../../helpers/utils"
+import composedAuthHOC from 'hocs';
 const DiscussDetail = (props) => {
   const router = useRouter()
   return(
@@ -26,4 +27,4 @@ function mapStateToProps(state, ownProps) {
 }
 
 
-export default connect(mapStateToProps,{getDiscussByCommentId})(DiscussDetail)
+export default connect(mapStateToProps,{getDiscussByCommentId})(composedAuthHOC(DiscussDetail))
