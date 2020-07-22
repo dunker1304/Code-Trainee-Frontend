@@ -13,6 +13,9 @@ const Exercise = (props) => {
   let [checkDirtyBeforeLeaving, setCheckDirtyBeforeLeaving] = useState(false);
   let [dirty, setDirty] = useState(false);
 
+  // state save step 2: snippet
+  let [alreadySave, setAlreadySave] = useState(false);
+
   const onChangeStep = (stepIndex) => {
     if (dirty) {
       console.log('step have dirty check');
@@ -64,8 +67,12 @@ const Exercise = (props) => {
         )}
         {currStep === 1 && (
           <StepSnippet
+            alreadySave={alreadySave}
             exerciseId={exerciseId}
-            nextStep={() => setCurrStep(wishStep)}
+            nextStep={() => {
+              setCurrStep(wishStep);
+              setAlreadySave(true);
+            }}
           />
         )}
         {currStep === 2 && <StepTestCases exerciseId={exerciseId} />}
