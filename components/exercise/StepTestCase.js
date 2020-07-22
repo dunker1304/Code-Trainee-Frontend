@@ -136,25 +136,29 @@ const StepTestCases = ({ exerciseId }) => {
         }}>
         Add Test Case
       </Button>
-      <TestCaseModal
-        title='Add Test Case'
-        okText='Add'
-        onCancel={() => setShowAddModal(false)}
-        onCancelX={() => setShowAddModal(false)}
-        onOK={handleAddRecord}
-        visible={showAddModal}
-      />
-      <TestCaseModal
-        title='Edit Test Case'
-        okText='Save'
-        visible={showEditModal}
-        onCancel={() => setShowEditModal(false)}
-        onCancelX={() => setShowEditModal(false)}
-        onOK={handleEditRecord}
-        input={currRecord.input}
-        output={currRecord.output}
-        isHidden={currRecord.hidden}
-      />
+      {showAddModal && (
+        <TestCaseModal
+          title='Add Test Case'
+          okText='Add'
+          onCancel={() => setShowAddModal(false)}
+          onCancelX={() => setShowAddModal(false)}
+          onOK={handleAddRecord}
+          visible={showAddModal}
+        />
+      )}
+      {showEditModal && (
+        <TestCaseModal
+          title='Edit Test Case'
+          okText='Save'
+          visible={showEditModal}
+          onCancel={() => setShowEditModal(false)}
+          onCancelX={() => setShowEditModal(false)}
+          onOK={handleEditRecord}
+          input={currRecord.input}
+          output={currRecord.output}
+          isHidden={currRecord.hidden}
+        />
+      )}
       <Table
         bordered
         columns={[

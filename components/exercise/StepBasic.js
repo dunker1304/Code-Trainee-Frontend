@@ -9,6 +9,7 @@ import ExerciseLOC from './ExerciseLOC';
 import ExerciseLevel from './ExerciseLevel';
 
 const StepBasic = ({
+  currUserId,
   exerciseId,
   setExerciseId = () => {},
   checkDirtyBeforeLeaving = false,
@@ -125,6 +126,7 @@ const StepBasic = ({
       await formRef.validateFields();
       let { content, title, points, level, tags } = formRef.getFieldsValue();
       const res = await axios.post(`${process.env.API}/api/exercise/create`, {
+        createdBy: currUserId,
         content: content,
         title: title,
         points: Number(points),
