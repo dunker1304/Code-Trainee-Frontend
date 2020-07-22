@@ -22,7 +22,7 @@ const ExerciseLevel = ({
         value={dropdownValue}
         onChange={onChange}
         style={{
-          width: '30%',
+          width: '200px',
         }}>
         <Select.Option value='easy'>Easy</Select.Option>
         <Select.Option value='medium'>Medium</Select.Option>
@@ -30,7 +30,7 @@ const ExerciseLevel = ({
       </Select>
       <div
         style={{
-          width: '40%',
+          width: '220px',
           display: 'flex',
           alignItems: 'center',
         }}>

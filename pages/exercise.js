@@ -4,6 +4,7 @@ import { Steps, Divider } from 'antd';
 import StepBasic from '../components/exercise/StepBasic';
 import StepTestCases from '../components/exercise/StepTestCase';
 import StepSnippet from '../components/exercise/StepSnippet';
+import Header from '../components/Header';
 
 const Exercise = ({ id }) => {
   let [exerciseId, setExerciseId] = useState(id);
@@ -33,11 +34,13 @@ const Exercise = ({ id }) => {
       <Head>
         <title>{!exerciseId ? 'Create Exercise' : 'Update Exercise'}</title>
       </Head>
+      <Header />
       <div
         className='exercise-page'
         style={{
           width: '90%',
           margin: '0 auto',
+          marginTop: '50px',
         }}>
         <Divider />
         <Steps current={currStep} onChange={onChangeStep} size='default'>

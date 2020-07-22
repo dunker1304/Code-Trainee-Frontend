@@ -8,19 +8,26 @@ import {
   CheckOutlined,
 } from '@ant-design/icons';
 import axios from 'axios';
+import { useRouter } from 'next/router';
 
 const StepTestCases = ({ exerciseId }) => {
+  // modal
   let [showAddModal, setShowAddModal] = useState(false);
   let [showEditModal, setShowEditModal] = useState(false);
+  // table
   let [currRecord, setCurrRecord] = useState({
     input: '',
     output: '',
     hidden: false,
   });
-
   let [tableData, setTableData] = useState([]);
   let [currPageTable, setCurrPageTable] = useState(1);
   let [currPageSize, setCurrPageSize] = useState(10);
+  // button finish
+  let [buttonLoading, setButtonLoading] = useState(false);
+
+  let router = useRouter();
+
   const loadTable = async () => {
     const res = await axios.get(
       `${process.env.API}/api/testcase/get-by-exercise?exerciseId=${exerciseId}`
@@ -108,9 +115,19 @@ const StepTestCases = ({ exerciseId }) => {
       });
     }
   };
+  const handleButtonFinish = () => {
+    setButtonLoading(true);
+    router.push({
+      pathname: '/exercise-list',
+      query: {},
+    });
+  };
 
   return (
-    <React.Fragment>
+    <div
+      style={{
+        marginBottom: 30,
+      }}>
       <Button type='primary' onClick={() => setShowAddModal(true)}>
         Add Test Case
       </Button>
@@ -145,7 +162,7 @@ const StepTestCases = ({ exerciseId }) => {
             },
           },
           { title: 'Data Input', dataIndex: 'input', key: 'input' },
-          { title: 'Expected Ouput', dataIndex: 'output', key: 'output' },
+          { title: 'Expected Output', dataIndex: 'output', key: 'output' },
           {
             title: 'Hidden',
             dataIndex: 'hidden',
@@ -197,7 +214,14 @@ const StepTestCases = ({ exerciseId }) => {
           setCurrPageTable(pagination.current);
         }}
       />
-    </React.Fragment>
+      <Button
+        type='primary'
+        onClick={handleButtonFinish}
+        loading={buttonLoading}
+        style={{ marginTop: 10 }}>
+        Finish
+      </Button>
+    </div>
   );
 };
 

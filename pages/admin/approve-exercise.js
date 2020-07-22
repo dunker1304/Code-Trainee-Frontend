@@ -3,6 +3,7 @@ import { Table, notification, Tag, Space, Popconfirm, Button } from 'antd';
 import { CheckCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import Header from '../../components/Header';
 
 const ApproveExercise = ({}) => {
   // table
@@ -106,124 +107,130 @@ const ApproveExercise = ({}) => {
       <Head>
         <title>Approve Exercise</title>
       </Head>
-      <Table
-        loading={tableLoading}
-        bordered
-        title={() => 'Exercises need to Approval'}
-        scroll={{ x: 1000 }}
-        columns={[
-          {
-            title: 'No.',
-            key: 'no',
-            width: '60px',
-            render: (text, record, index) => {
-              return index + 1 + (currPageTable - 1) * currPageSize;
+      <Header />
+      <div
+        style={{
+          marginTop: '50px',
+        }}>
+        <Table
+          loading={tableLoading}
+          bordered
+          title={() => 'Exercises need to Approval'}
+          scroll={{ x: 1000 }}
+          columns={[
+            {
+              title: 'No.',
+              key: 'no',
+              width: '60px',
+              render: (text, record, index) => {
+                return index + 1 + (currPageTable - 1) * currPageSize;
+              },
             },
-          },
-          {
-            title: 'Title',
-            dataIndex: 'title',
-            key: 'title',
-            width: '220px',
-            ellipsis: true,
-          },
-          {
-            title: 'Level',
-            dataIndex: 'level',
-            key: 'level',
-            width: '110px',
-            render: (text, record) => {
-              let tag = record.level.toUpperCase();
-              let color =
-                tag === 'HARD'
-                  ? 'volcano'
-                  : tag === 'MEDIUM'
-                  ? 'geekblue'
-                  : 'green';
-              return (
-                <>
-                  <Tag color={color} key={tag}>
-                    {tag}
-                  </Tag>
-                </>
-              );
+            {
+              title: 'Title',
+              dataIndex: 'title',
+              key: 'title',
+              width: '220px',
+              ellipsis: true,
             },
-          },
-          { title: 'LOC', dataIndex: 'points', key: 'points', width: '80px' },
-          {
-            title: 'Content',
-            dataIndex: 'content',
-            key: 'content',
-            ellipsis: true,
-            width: '360px',
-          },
-          {
-            title: 'Last Modified',
-            dataIndex: 'lastModified',
-            key: 'lastModified',
-            width: '200px',
-            ellipsis: true,
-          },
-          {
-            title: 'Action',
-            key: 'action',
-            fixed: 'right',
-            width: '250px',
-            render: (text, record) => (
-              <Space size='middle'>
-                <Popconfirm
-                  title='Are you sure approve this exercise?'
-                  okText='Yes'
-                  onConfirm={() => handleApproveExercise(record)}
-                  cancelText='No'>
-                  <Button
-                    type='primary'
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                    }}>
-                    <CheckCircleOutlined
+            {
+              title: 'Level',
+              dataIndex: 'level',
+              key: 'level',
+              width: '110px',
+              render: (text, record) => {
+                let tag = record.level.toUpperCase();
+                let color =
+                  tag === 'HARD'
+                    ? 'volcano'
+                    : tag === 'MEDIUM'
+                    ? 'geekblue'
+                    : 'green';
+                return (
+                  <>
+                    <Tag color={color} key={tag}>
+                      {tag}
+                    </Tag>
+                  </>
+                );
+              },
+            },
+            { title: 'LOC', dataIndex: 'points', key: 'points', width: '80px' },
+            {
+              title: 'Content',
+              dataIndex: 'content',
+              key: 'content',
+              ellipsis: true,
+              width: '360px',
+            },
+            {
+              title: 'Last Modified',
+              dataIndex: 'lastModified',
+              key: 'lastModified',
+              width: '200px',
+              ellipsis: true,
+            },
+            {
+              title: 'Action',
+              key: 'action',
+              fixed: 'right',
+              width: '250px',
+              render: (text, record) => (
+                <Space size='middle'>
+                  <Popconfirm
+                    title='Are you sure approve this exercise?'
+                    okText='Yes'
+                    onConfirm={() => handleApproveExercise(record)}
+                    cancelText='No'>
+                    <Button
+                      type='primary'
                       style={{
-                        fontSize: '17px',
-                      }}
-                    />
-                    Approve
-                  </Button>
-                </Popconfirm>
-                <Popconfirm
-                  title='Are you sure delete this exercise?'
-                  okText='Yes'
-                  onConfirm={() => handleDeleteExercise(record)}
-                  cancelText='No'>
-                  <Button
-                    type='primary'
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                    }}>
-                    <DeleteOutlined
+                        display: 'flex',
+                        alignItems: 'center',
+                      }}>
+                      <CheckCircleOutlined
+                        style={{
+                          fontSize: '17px',
+                        }}
+                      />
+                      Approve
+                    </Button>
+                  </Popconfirm>
+                  <Popconfirm
+                    title='Are you sure delete this exercise?'
+                    okText='Yes'
+                    onConfirm={() => handleDeleteExercise(record)}
+                    cancelText='No'>
+                    <Button
+                      type='primary'
                       style={{
-                        fontSize: '17px',
-                      }}
-                    />
-                    Delete
-                  </Button>
-                </Popconfirm>
-              </Space>
-            ),
-          },
-        ]}
-        dataSource={tableData}
-        pagination={{
-          defaultPageSize: 10,
-          showSizeChanger: true,
-          pageSizeOptions: ['10', '20', '30'],
-        }}
-        onChange={(pagination, filter, sorter) => {
-          setCurrPageSize(pagination.pageSize);
-          setCurrPageTable(pagination.current);
-        }}
-      />
+                        display: 'flex',
+                        alignItems: 'center',
+                      }}>
+                      <DeleteOutlined
+                        style={{
+                          fontSize: '17px',
+                        }}
+                      />
+                      Delete
+                    </Button>
+                  </Popconfirm>
+                </Space>
+              ),
+            },
+          ]}
+          dataSource={tableData}
+          pagination={{
+            defaultPageSize: 10,
+            showSizeChanger: true,
+            pageSizeOptions: ['10', '20', '30'],
+          }}
+          onChange={(pagination, filter, sorter) => {
+            setCurrPageSize(pagination.pageSize);
+            setCurrPageTable(pagination.current);
+          }}
+        />
+      </div>
     </>
   );
 };
