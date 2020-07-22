@@ -1,5 +1,5 @@
 import { BellFilled , UserOutlined ,HeartOutlined,
-  FileProtectOutlined,PieChartOutlined,UndoOutlined,LogoutOutlined,TeamOutlined ,SnippetsOutlined  } from "@ant-design/icons"
+  FileProtectOutlined,PieChartOutlined,UndoOutlined,LogoutOutlined,TeamOutlined ,SnippetsOutlined ,ContainerOutlined  } from "@ant-design/icons"
 import Logo from "../static/images/codetrainee.png"
 import { Menu , Dropdown,Popover,Avatar} from 'antd';
 import Link from 'next/link'
@@ -153,7 +153,7 @@ const Header = (props) => {
             </Link>  
             <Link href="/exercise-list" as="/exercise-list" >
               <li>
-                <PieChartOutlined style={{color : "#8365cd" ,fontSize :"20px"}} className="icon_prover_header"/>My Created Exercises
+                <ContainerOutlined style={{color : "#8365cd" ,fontSize :"20px"}} className="icon_prover_header"/>My Created Exercises
               </li>
             </Link>  
             <li> <UndoOutlined style={{color : "#ffdf00" ,fontSize :"20px"}} className="icon_prover_header"/> Change Password</li>
