@@ -13,6 +13,10 @@ export const ERROR_MESSAGE_FROM_SERVER = {
    "3" : "Content of comment too long!",
    "4" : "You have alreay voted this comment",
    "5" : "You dont have permission to delete this question"
- 
+}
 
+export const ROLE = {
+  ROLE_ADMIN : 3,
+  ROLE_TEACHER : 4,
+  ROLE_STUDENT : 5
 }

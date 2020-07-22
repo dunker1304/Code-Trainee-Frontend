@@ -151,12 +151,13 @@ const Problems = (props) => {
   }
 
   const translateClassName = (level) => {
-    switch (level) {
-      case 'Easy':
+    let key = level.toUpperCase();
+    switch (key) {
+      case 'EASY':
         return 'success';
-      case 'Medium':
+      case 'MEDIUM':
         return 'warning';
-      case 'Hard':
+      case 'HARD':
         return 'danger';
     }
   }
@@ -362,7 +363,7 @@ const Problems = (props) => {
                           </Link>
                         </td>
                         <td className="text-center">
-                          <div className={`badge badge-pill badge-${translateClassName(value.level)}`}>{value.level}</div>
+                          <div className={`badge badge-pill badge-${translateClassName(value.level)}`}>{value.level.toUpperCase()}</div>
                         </td>
 
                         <td className="text-center created_by">
