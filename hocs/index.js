@@ -23,12 +23,12 @@ const AuthHOC = Page => {
           await dispatch(loadUserInfo(accessToken))
           let isAuthenticated = getState().auth.isAuthenticated
           if(!isAuthenticated)  {
-            res.writeHead(302, { Location: '/' });
-            res.end();
+            // res.writeHead(302, { Location: '/' });
+            // res.end();
           }
         } else {
-          res.writeHead(302, { Location: '/' });
-          res.end();
+          // res.writeHead(302, { Location: '/' });
+          // res.end();
         }
       } 
      // }

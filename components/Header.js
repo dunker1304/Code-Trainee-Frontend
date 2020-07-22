@@ -46,7 +46,9 @@ const Header = (props) => {
               </Link>
             </Menu.Item>
             <Menu.Item key="profile">
-              <a href="">My Profile</a>
+              <Link href="/profile/[profileId]" as={`/profile/${props.userInfo ? props.userInfo['id']: 7}`}>
+               <a href="">My Profile</a>
+              </Link>
             </Menu.Item>
             <Menu.Item key="forum">
               <a href="">Forum</a>
@@ -57,12 +59,14 @@ const Header = (props) => {
            return (
             <Menu mode="horizontal">
             <Menu.Item key="exercises">
-               <Link href="/problem" as="/problem">
+               <Link href="/admin/accounts" as="/admin/accounts">
                 <a href="">Accounts</a>
               </Link>
             </Menu.Item>
             <Menu.Item key="profile">
-              <a href="">Exercises</a>
+              <Link href="/admin/approve-exercise" as="/admin/approve-exercise">
+               <a href="">Exercises</a>
+              </Link> 
             </Menu.Item>
           </Menu>
            ) 
@@ -75,7 +79,9 @@ const Header = (props) => {
               </Link>
             </Menu.Item>
             <Menu.Item key="profile">
-              <a href="">My Profile</a>
+              <Link href="/profile/[profileId]" as={`/profile/${props.userInfo ? props.userInfo['id']: 7}`}>
+               <a href="">My Profile</a>
+              </Link>
             </Menu.Item>
             <Menu.Item key="forum">
               <a href="">Forum</a>
@@ -95,7 +101,7 @@ const Header = (props) => {
                <HeartOutlined style={{color : "#d05451",fontSize :"20px"}} className="icon_prover_header"/>My List
                </li>
           </Link>
-          <Link href="/profile/[profileId]" as={`/profile/${5}`}>
+          <Link href="/profile/[profileId]" as={`/profile/${props.userInfo ? props.userInfo['id'] : 7 }`}>
             <li>
               <FileProtectOutlined style={{color : "#1da09c" ,fontSize :"20px"}} className="icon_prover_header"/> My Profile
             </li>
@@ -117,7 +123,7 @@ const Header = (props) => {
                   <TeamOutlined style={{color : "#d05451",fontSize :"20px"}} className="icon_prover_header"/>Accounts 
                  </li>
             </Link>
-            <Link href="/profile/[profileId]" as={`/profile/${5}`}>
+            <Link href="/admin/approve-exercise" as="/admin/approve-exercise">
               <li>
                 <SnippetsOutlined style={{color : "#1da09c" ,fontSize :"20px"}} className="icon_prover_header"/> Exercises 
               </li>
@@ -135,7 +141,7 @@ const Header = (props) => {
                  <HeartOutlined style={{color : "#d05451",fontSize :"20px"}} className="icon_prover_header"/>My List
                  </li>
             </Link>
-            <Link href="/profile/[profileId]" as={`/profile/${5}`}>
+            <Link href="/profile/[profileId]" as={`/profile/${props.userInfo ? props.userInfo['id'] : 7}`}>
               <li>
                 <FileProtectOutlined style={{color : "#1da09c" ,fontSize :"20px"}} className="icon_prover_header"/> My Profile
               </li>
@@ -145,7 +151,7 @@ const Header = (props) => {
                 <PieChartOutlined style={{color : "#8365cd" ,fontSize :"20px"}} className="icon_prover_header"/>My Process
               </li>
             </Link>  
-            <Link href="/processes" as="/processes" >
+            <Link href="/exercise-list" as="/exercise-list" >
               <li>
                 <PieChartOutlined style={{color : "#8365cd" ,fontSize :"20px"}} className="icon_prover_header"/>My Created Exercises
               </li>

@@ -3,6 +3,7 @@ import QuestionLayout from "../../../components/QuestionLayout"
 import { connect } from 'react-redux'
 import {getDiscussByQuestionId } from "../../../store/discuss/action"
 import axios from "axios"
+import composedAuthHOC from 'hocs';
 
 
 
@@ -37,4 +38,4 @@ function mapStateToProps(state, ownProps) {
 }
 
 
-export default connect(mapStateToProps,{getDiscussByQuestionId})(Discuss);
+export default connect(mapStateToProps,{getDiscussByQuestionId})(composedAuthHOC(Discuss));

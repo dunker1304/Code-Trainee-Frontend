@@ -4,6 +4,7 @@ import { CheckCircleOutlined, DeleteOutlined } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import Header from '../../components/Header';
+import composedAuthHOC from 'hocs';
 
 const ApproveExercise = ({}) => {
   // table
@@ -238,4 +239,4 @@ ApproveExercise.getInitialProps = async (ctx) => {
   let id = ctx.query?.id;
   return { id };
 };
-export default ApproveExercise;
+export default composedAuthHOC(ApproveExercise);
