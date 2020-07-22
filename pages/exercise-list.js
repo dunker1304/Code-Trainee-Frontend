@@ -7,12 +7,15 @@ import {
   Popconfirm,
   Tag,
   notification,
+  Tooltip,
 } from 'antd';
 import {
   CheckCircleTwoTone,
   EditOutlined,
   DeleteOutlined,
   LoadingOutlined,
+  EditTwoTone,
+  DeleteTwoTone,
 } from '@ant-design/icons';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
@@ -21,17 +24,16 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Header from '../components/Header';
 
-const ExerciseList = ({ ownerId = 0 }) => {
+const ExerciseList = ({ ownerId }) => {
   // table
   let [tableData, setTableData] = useState([]);
   let [currPageTable, setCurrPageTable] = useState(1);
   let [currPageSize, setCurrPageSize] = useState(10);
-  let [tableLoading, setTablLoading] = useState(false);
+  let [tableLoading, setTableLoading] = useState(false);
   // naviagte
   let router = useRouter();
   // state button loading
   let [loadingButtonCreate, setLoadingButtonCreate] = useState(false);
-  let [loadingButtonUpdate, setLoadingButtonUpdate] = useState(false);
 
   useEffect(() => {
     loadTable();
@@ -39,11 +41,11 @@ const ExerciseList = ({ ownerId = 0 }) => {
 
   const loadTable = async () => {
     try {
-      setTablLoading(true);
+      setTableLoading(true);
       const res = await axios.get(
-        `${process.env.API}/api/exercise/get-by-owner?ownerId=${ownerId}`
+        `${process.env.API}/api/exercise/owner/${ownerId}`
       );
-      setTablLoading(false);
+      setTableLoading(false);
       if (res.data.success) {
         let data = [];
         res.data.data.forEach((e) => {
@@ -62,40 +64,47 @@ const ExerciseList = ({ ownerId = 0 }) => {
         setTableData([...data]);
       }
     } catch (e) {
-      notification.error({
-        title: 'Notification',
-        message: 'Load Data Fail',
-      });
-      setTablLoading(false);
+      setTableLoading(false);
       console.log(e);
     }
   };
 
-  const handleCreateExercise = () => {
+  const handleButtonCreate = () => {
     setLoadingButtonCreate(true);
-    router.push({
-      pathname: '/exercise',
-      query: {},
-    });
+    router.push('/exercise');
   };
 
-  const handleDeleteRecord = async (record) => {
-    const res = await axios.post(`${process.env.API}/api/exercise/delete`, {
-      id: record.key,
-    });
-    console.log(res.data);
-    if (res.data.success) {
-      notification.info({
-        title: 'Notification',
-        message: 'Success',
+  const handleButtonDeleteRecord = async (record) => {
+    try {
+      setTableLoading(true);
+      const res = await axios.post(`${process.env.API}/api/exercise/delete`, {
+        id: record.key,
       });
-      loadTable();
-    } else {
+      setTableLoading(false);
+      if (res.data.success) {
+        notification.info({
+          message: 'Notification',
+          description: 'Delete Success!',
+        });
+        loadTable();
+      } else {
+        notification.error({
+          message: 'Notification',
+          description: 'Delete Failed!',
+        });
+      }
+    } catch (e) {
       notification.error({
-        title: 'Notification',
-        message: 'Fail',
+        message: 'Notification',
+        description: 'Delete Failed!',
       });
+      console.log(e);
     }
+  };
+
+  const handleButtonEditRecord = async (record) => {
+    setTableLoading(true);
+    router.push(`/exercise?id=${record.key}`, '/exercise');
   };
 
   return (
@@ -120,7 +129,7 @@ const ExerciseList = ({ ownerId = 0 }) => {
               <Col>
                 <Button
                   type='primary'
-                  onClick={handleCreateExercise}
+                  onClick={handleButtonCreate}
                   loading={loadingButtonCreate}>
                   Create Exercise
                 </Button>
@@ -214,24 +223,38 @@ const ExerciseList = ({ ownerId = 0 }) => {
               title: 'Action',
               key: 'action',
               fixed: 'right',
-              width: '150px',
+              width: '130px',
               render: (text, record) => (
-                <Space size='middle'>
-                  <Link href={`/exercise?id=${record.key}`} as={`/exercise`}>
-                    <a>
-                      <EditOutlined style={{ fontSize: '16px' }} />
-                    </a>
-                  </Link>
-                  <Popconfirm
-                    title='Are you sure delete this test case?'
-                    okText='Yes'
-                    onConfirm={() => handleDeleteRecord(record)}
-                    cancelText='No'>
-                    <a href='#'>
-                      <DeleteOutlined style={{ fontSize: '16px' }} />
-                    </a>
-                  </Popconfirm>
-                </Space>
+                <div style={{}}>
+                  <Tooltip placement='top' title={'Update'}>
+                    <Button
+                      ghost
+                      type='link'
+                      onClick={() => handleButtonEditRecord(record)}
+                      style={{
+                        border: 'none',
+                      }}>
+                      <EditTwoTone style={{ fontSize: '16px' }} />
+                    </Button>
+                  </Tooltip>
+                  <Tooltip placement='top' title={'Delete'}>
+                    <Popconfirm
+                      title='Are you sure delete this test case?'
+                      okText='Yes'
+                      onConfirm={() => handleButtonDeleteRecord(record)}
+                      cancelText='No'
+                      placement='topRight'>
+                      <Button
+                        ghost
+                        type='link'
+                        style={{
+                          border: 'none',
+                        }}>
+                        <DeleteTwoTone style={{ fontSize: '16px' }} />
+                      </Button>
+                    </Popconfirm>
+                  </Tooltip>
+                </div>
               ),
             },
           ]}
@@ -251,7 +274,7 @@ const ExerciseList = ({ ownerId = 0 }) => {
   );
 };
 ExerciseList.getInitialProps = async (ctx) => {
-  let ownerId = ctx.query?.ownerId;
-  return { ownerId };
+  let ownerId = ctx.query?.ownerId || 0;
+  return { ownerId: ownerId };
 };
 export default ExerciseList;
