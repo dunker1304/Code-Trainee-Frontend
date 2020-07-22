@@ -89,7 +89,7 @@ const TestCaseModal = ({
                   justifyContent: 'space-between',
                   width: '100%',
                 }}>
-                <div>Expected Ouput</div>
+                <div>Expected Output</div>
                 <Radio.Group defaultValue='editor'>
                   <Radio.Button value='editor'>editor</Radio.Button>
                   <Radio.Button value='upload'>upload</Radio.Button>

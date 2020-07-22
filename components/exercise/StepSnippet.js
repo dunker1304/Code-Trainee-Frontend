@@ -87,7 +87,7 @@ const StepSnippet = ({ exerciseId, nextStep = () => {} }) => {
     });
   };
 
-  const handleSaveAndNext = async () => {
+  const handleUpdateAndNext = async () => {
     try {
       setLoading(true);
       //save snippets if not save yet
@@ -183,7 +183,10 @@ const StepSnippet = ({ exerciseId, nextStep = () => {} }) => {
   };
 
   return (
-    <React.Fragment>
+    <div
+      style={{
+        marginBottom: '30px',
+      }}>
       <Table
         className='table-snippets'
         bordered
@@ -342,10 +345,10 @@ const StepSnippet = ({ exerciseId, nextStep = () => {} }) => {
         }}
       />
 
-      <Button type='primary' onClick={handleSaveAndNext} loading={loading}>
-        Save and Next
+      <Button type='primary' onClick={handleUpdateAndNext} loading={loading}>
+        Update and Next
       </Button>
-    </React.Fragment>
+    </div>
   );
 };
 
