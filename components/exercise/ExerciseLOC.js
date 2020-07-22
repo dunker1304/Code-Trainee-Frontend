@@ -1,6 +1,6 @@
 import { Space, Slider, Row, Col, InputNumber, notification } from 'antd';
 import { InfoCircleFilled } from '@ant-design/icons';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 const ExerciseLOC = ({
   value = 0,
@@ -9,9 +9,22 @@ const ExerciseLOC = ({
   max = 100,
 }) => {
   let [sliderValue, setSliderValue] = useState(value);
+  let sliderRef = useRef();
   useEffect(() => {
     setSliderValue(value);
   }, [value]);
+  useEffect(() => {
+    sliderRef.current.onKeyDown = (e) => {
+      if (e.keyCode === 37) {
+        // left arrow press
+        onSliderValueChange(sliderValue - 1);
+      }
+      if (e.keyCode === 39) {
+        // right arrow press
+        onSliderValueChange(sliderValue + 1);
+      }
+    };
+  }, [sliderValue]);
   const onSliderValueChange = (value) => {
     if (value <= max && value >= min) {
       setSliderValue(value);
@@ -40,6 +53,7 @@ const ExerciseLOC = ({
         }}
       />
       <Slider
+        ref={sliderRef}
         min={0}
         max={300}
         marks={{
