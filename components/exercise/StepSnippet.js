@@ -345,7 +345,11 @@ const StepSnippet = ({ exerciseId, nextStep = () => {} }) => {
         }}
       />
 
-      <Button type='primary' onClick={handleUpdateAndNext} loading={loading}>
+      <Button
+        type='primary'
+        onClick={handleUpdateAndNext}
+        loading={loading}
+        size='large'>
         Update and Next
       </Button>
     </div>

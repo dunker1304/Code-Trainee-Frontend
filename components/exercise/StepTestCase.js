@@ -128,7 +128,12 @@ const StepTestCases = ({ exerciseId }) => {
       style={{
         marginBottom: 30,
       }}>
-      <Button type='primary' onClick={() => setShowAddModal(true)}>
+      <Button
+        type='primary'
+        onClick={() => setShowAddModal(true)}
+        style={{
+          marginBottom: 10,
+        }}>
         Add Test Case
       </Button>
       <TestCaseModal
@@ -216,6 +221,7 @@ const StepTestCases = ({ exerciseId }) => {
       />
       <Button
         type='primary'
+        size='large'
         onClick={handleButtonFinish}
         loading={buttonLoading}
         style={{ marginTop: 10 }}>
