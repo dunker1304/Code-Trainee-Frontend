@@ -17,10 +17,11 @@ div#playground {
 .playground-action {
   display: flex;
   justify-content: space-between;
+  margin: 3px;
 }
 
 .content-right, .content-left {
-  height: 100vh;
+  height: calc(100vh - 50px);
   display: flex;
   flex-direction: column;
 }
@@ -77,6 +78,8 @@ div#playground {
   }
   .question-description {
     margin-top: 20px;
+    overflow: auto;
+    height: calc(100vh - 255px);
   }
 
   .question-level, .question-point, .question-reaction {
@@ -90,13 +93,13 @@ div#playground {
 }
 
 .question-fast-picker {
-  position: fixed;
   bottom: 0;
   width: 100%;
   bottom: 0;
-  padding: 10px 0px 10px 20px;
+  padding: 10px 10px 10px 20px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   button.ant-btn {
     display: flex;
     align-items: center;
@@ -114,10 +117,19 @@ div#playground {
   justify-content: space-between;
   .action {
     display: flex;
+    margin-right: 20px;
   }
   button.ant-btn {
     display: flex;
     align-items: center;
+    margin-right: 10px;
+  }
+  button.ant-btn.submit-code {
+    background: rgb(69, 90, 100);
+    color: white;
+  }
+  button.ant-btn.show-console {
+      margin-left: 10px;
   }
 }
 

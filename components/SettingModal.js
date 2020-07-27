@@ -39,8 +39,8 @@ const SettingModal = props => {
 
   return (
     <>
-      <Button type="primary" onClick={showModal}>
-        <span className="icon iconfont">&#xe600;</span>
+      <Button type="primary" onClick={showModal} style={{'display': 'flex', 'alignItems': 'center'}}>
+        <span className="icon iconfont" style={{'marginRight': '5px'}}>&#xe600;</span>
         Setting
       </Button>
       <Modal
