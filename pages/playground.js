@@ -178,8 +178,12 @@ const Playground = props => {
 
   const handleShowConsole = () => {
     if (consoleEditor == "hide") {
+      let icon = document.getElementById('icon-console')
+      icon.innerHTML = `<svg viewBox="0 0 24 24" width="1em" height="1em" class="icon__3Su4"><path fill-rule="evenodd" d="M7 10l5 5 5-5z"></path></svg>`
       setConsoleEditor('show')
     } else {
+      let icon = document.getElementById('icon-console')
+      icon.innerHTML = `<svg viewBox="0 0 24 24" width="1em" height="1em" class="icon__3Su4"><path fill-rule="evenodd" d="M7 14l5-5 5 5z"></path></svg>`
       setConsoleEditor('hide')
     }
   }
@@ -216,10 +220,7 @@ const Playground = props => {
         <div className="content-right" >
           <Tabs defaultActiveKey= {indexActive} activeKey = {indexActive} type="card" onChange={handleChangeTab}>
             <TabPane tab="Description" key="1">
-              <QuestionDescription question={props.question.question}/>
-            </TabPane>
-            <TabPane tab="Solutions" key="2">
-              Solution here
+              <QuestionDescription question={props.question.question} userInfo={props.userInfo} exerciseVote={props.exerciseVote}/>
             </TabPane>
             <TabPane tab="Submissions" key="3">
               <ExerciseSubmissions handleChangeCodeAce={onChange} exerciseID={props.question.question.id}></ExerciseSubmissions>
@@ -278,6 +279,7 @@ const Playground = props => {
             showGutter={gutter}
             showPrintMargin={false}
             editorProps={{ $blockScrolling: true }}
+            autoScrollEditorIntoView={false}
             setOptions={{
               enableBasicAutocompletion: true,
               enableLiveAutocompletion: true,
@@ -312,7 +314,9 @@ const Playground = props => {
           <div className="action-code-editor">
             <Button className="show-console" onClick={handleShowConsole}>
               <span>Console</span>
-              <svg viewBox="0 0 24 24" width="1em" height="1em" className="icon__3Su4"><path fillRule="evenodd" d="M7 14l5-5 5 5z"></path></svg>
+              <span id='icon-console'>
+                <svg viewBox="0 0 24 24" width="1em" height="1em" className="icon__3Su4"><path fillRule="evenodd" d="M7 14l5-5 5 5z"></path></svg>
+              </span>
             </Button>
             <div className="action">
               <Button type='primary' onClick={handleRunCode}>Run Code</Button>
@@ -327,17 +331,24 @@ const Playground = props => {
 }
 
 Playground.getInitialProps = async function(ctx) {
+  let userInfo = ctx.store.getState().auth.userInfo
   let id = ctx.query.questionID
   let urlExercise = `${process.env.API}/api/exercise?id=${id}`
   let urlLanguage = `${process.env.API}/api/program-language/all?exerciseId=${id}`
+  let urlVote = `${process.env.API}/api/exercise/vote?userID=${userInfo.id}&questionID=${id}`
   const questionResponse = await axios.get(urlExercise)
   const languageResponse = await axios.get(urlLanguage)
-  return { question: questionResponse.data, language: languageResponse.data.data.result }
+  const exerciseVote = await axios.get(urlVote)
+  return { 
+    question: questionResponse.data, 
+    language: languageResponse.data.data.result,
+    exerciseVote: exerciseVote.data.exerciseVote
+  }
 }
 
 function mapStateToProps(state, ownProps) {
   return {
-    auth: state.auth
+    userInfo: state.auth.userInfo
   }
 }
 
