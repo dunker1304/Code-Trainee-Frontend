@@ -9,32 +9,23 @@ const ExerciseLOC = ({
   max = 100,
 }) => {
   let [sliderValue, setSliderValue] = useState(value);
-  let sliderRef = useRef();
-  useEffect(() => {
-    setSliderValue(value);
-  }, [value]);
-  useEffect(() => {
-    sliderRef.current.onKeyDown = (e) => {
-      if (e.keyCode === 37) {
-        // left arrow press
-        onSliderValueChange(sliderValue - 1);
-      }
-      if (e.keyCode === 39) {
-        // right arrow press
-        onSliderValueChange(sliderValue + 1);
-      }
-    };
-  }, [sliderValue]);
+
   const onSliderValueChange = (value) => {
     if (value <= max && value >= min) {
       setSliderValue(value);
     }
   };
+
   const onInputValueChange = (value) => {
     if (value <= max && value >= min) {
       onChange(value);
     }
   };
+
+  useEffect(() => {
+    setSliderValue(value);
+  }, [value]);
+
   return (
     <div
       style={{
@@ -45,45 +36,37 @@ const ExerciseLOC = ({
       }}>
       <InputNumber
         value={sliderValue}
+        min={min}
+        max={max}
         onChange={onInputValueChange}
         style={{
           width: '15%',
           display: 'inline-block',
-          fontWeight: 'bold',
         }}
       />
       <Slider
-        ref={sliderRef}
-        min={0}
-        max={300}
+        min={min}
+        max={max}
         marks={{
-          0: {
+          [min]: {
             style: { color: '#000000' },
-            label: <strong>0</strong>,
+            label: <strong>{min}</strong>,
           },
-          50: {
+          [Math.floor((max + 3 * min) / 4)]: {
             style: { color: '#000000' },
-            label: <span>50</span>,
+            label: <span>{Math.floor((min + max) / 4)}</span>,
           },
-          100: {
+          [Math.floor((min + max) / 2)]: {
             style: { color: '#000000' },
-            label: <strong>100</strong>,
+            label: <strong>{Math.floor((min + max) / 2)}</strong>,
           },
-          150: {
+          [Math.floor((min + 3 * max) / 4)]: {
             style: { color: '#000000' },
-            label: <span>150</span>,
+            label: <span>{Math.floor((min + 3 * max) / 4)}</span>,
           },
-          200: {
+          [max]: {
             style: { color: '#000000' },
-            label: <strong>200</strong>,
-          },
-          250: {
-            style: { color: '#000000' },
-            label: <span>250</span>,
-          },
-          300: {
-            style: { color: '#000000' },
-            label: <strong>300</strong>,
+            label: <strong>{max}</strong>,
           },
         }}
         value={sliderValue}

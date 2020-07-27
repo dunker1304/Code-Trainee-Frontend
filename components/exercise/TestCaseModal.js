@@ -7,8 +7,9 @@ import {
   Upload,
   notification,
   Checkbox,
+  Popconfirm,
 } from 'antd';
-import React, { useState, useEffect, Row } from 'react';
+import React, { useState, useEffect, Row, useRef } from 'react';
 import { InboxOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
@@ -23,44 +24,125 @@ const TestCaseModal = ({
   onCancelX = () => {},
   onCancel = () => {},
   onOK = async (value) => {},
+  isCreate = true,
 }) => {
   let [loading, setLoading] = useState(false);
   let [form] = Form.useForm();
-  const handleOK = async () => {
+  let firstRun = useRef(true);
+
+  const runValidate = async () => {
     try {
       await form.validateFields();
+      return true;
     } catch (e) {
-      notification.warning({
+      notification.info({
         message: 'Warning',
-        description: <p>Check your input again.</p>,
+        description: 'Check your input again!',
       });
-      return;
+      return false;
     }
+  };
+
+  const handleOK = async () => {
     setLoading(true);
-    await onOK(form.getFieldsValue());
+    if (await runValidate()) {
+      await onOK(form.getFieldsValue());
+      onCancel();
+    }
     setLoading(false);
   };
+
+  const hanldeCancelX = () => {
+    onCancelX();
+  };
+
+  const hanldeCancel = () => {
+    onCancel();
+  };
+
+  const validateRequire = (label) => ({
+    validator(rule, value) {
+      return !value
+        ? Promise.reject(`'${label}' is required!`)
+        : Promise.resolve();
+    },
+  });
+
+  const onReset = () => {
+    form.setFieldsValue({
+      input: input,
+      output: output,
+      isHidden: isHidden,
+    });
+  };
+
+  useEffect(() => {
+    visible &&
+      form.setFieldsValue({
+        input: input,
+        output: output,
+        isHidden: isHidden,
+      });
+    !visible &&
+      form.setFieldsValue({
+        input: '',
+        output: '',
+        isHidden: false,
+      });
+  }, [visible]);
+
   return (
     <React.Fragment>
       <Modal
-        className='add-test-case-model'
+        className='test-case-model'
         title={title}
         visible={visible}
         maskClosable={false}
         destroyOnClose={true}
-        onCancel={onCancelX}
+        onCancel={hanldeCancelX}
         footer={
-          <React.Fragment>
-            <Button type='primary' danger onClick={onCancel} disabled={loading}>
-              {cancelText}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+            }}>
+            <Button
+              style={{
+                width: '100px',
+              }}
+              size='large'
+              onClick={onReset}
+              disabled={loading}>
+              Reset
             </Button>
-            <Button type='primary' onClick={handleOK} loading={loading}>
-              {okText}
-            </Button>
-          </React.Fragment>
+            <div>
+              <Button
+                style={{
+                  width: '100px',
+                }}
+                type='primary'
+                size='large'
+                danger
+                onClick={hanldeCancel}
+                disabled={loading}>
+                {cancelText}
+              </Button>
+              <Button
+                style={{
+                  width: '100px',
+                }}
+                type='primary'
+                size='large'
+                onClick={handleOK}
+                loading={loading}>
+                {okText}
+              </Button>
+            </div>
+          </div>
         }>
         <Form form={form} layout='vertical'>
           <Form.Item
+            required={isCreate}
             name='input'
             label={
               <div
@@ -69,7 +151,13 @@ const TestCaseModal = ({
                   justifyContent: 'space-between',
                   width: '100%',
                 }}>
-                <div>Data Input</div>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignSelf: 'center',
+                  }}>
+                  Data Input
+                </div>
                 <Radio.Group defaultValue='editor'>
                   <Radio.Button value='editor'>editor</Radio.Button>
                   <Radio.Button value='upload'>upload</Radio.Button>
@@ -77,10 +165,11 @@ const TestCaseModal = ({
               </div>
             }
             initialValue={input}
-            rules={[{ required: true, message: "'Data Input' is required!" }]}>
+            rules={[validateRequire('Data Input')]}>
             <Input.TextArea rows='3' />
           </Form.Item>
           <Form.Item
+            required={isCreate}
             name='output'
             label={
               <div
@@ -89,7 +178,13 @@ const TestCaseModal = ({
                   justifyContent: 'space-between',
                   width: '100%',
                 }}>
-                <div>Expected Output</div>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignSelf: 'center',
+                  }}>
+                  Expected Output
+                </div>
                 <Radio.Group defaultValue='editor'>
                   <Radio.Button value='editor'>editor</Radio.Button>
                   <Radio.Button value='upload'>upload</Radio.Button>
@@ -97,9 +192,7 @@ const TestCaseModal = ({
               </div>
             }
             initialValue={output}
-            rules={[
-              { required: true, message: "'Expected Output' is required!" },
-            ]}>
+            rules={[validateRequire('Expected Output')]}>
             <Input.TextArea rows='3' />
           </Form.Item>
           <Form.Item
