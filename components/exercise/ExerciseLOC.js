@@ -54,7 +54,7 @@ const ExerciseLOC = ({
           },
           [Math.floor((max + 3 * min) / 4)]: {
             style: { color: '#000000' },
-            label: <span>{Math.floor((min + max) / 4)}</span>,
+            label: <span>{Math.floor((max + 3 * min) / 4)}</span>,
           },
           [Math.floor((min + max) / 2)]: {
             style: { color: '#000000' },

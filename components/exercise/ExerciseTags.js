@@ -14,6 +14,8 @@ const ExerciseTags = ({ value = [], onChange = (newValue) => {} }) => {
   let [suggestedValues, setSuggestedValues] = useState([]);
   let [originalValues, setOriginalValues] = useState([]);
 
+  let isUnMounted = useRef(false);
+
   const handleRemoveTag = (removedTag) => {
     onChange([...value.filter((tag) => tag !== removedTag)]);
   };
@@ -77,7 +79,8 @@ const ExerciseTags = ({ value = [], onChange = (newValue) => {} }) => {
     try {
       const res = await axios.get(`${process.env.API}/api/tags/all`);
       if (res.data.success) {
-        setOriginalValues([...res.data.data.map((e) => e.name)]);
+        !isUnMounted.current &&
+          setOriginalValues([...res.data.data.map((e) => e.name)]);
       } else {
         throw new Error('');
       }
@@ -88,6 +91,9 @@ const ExerciseTags = ({ value = [], onChange = (newValue) => {} }) => {
 
   useEffect(() => {
     loadOriginalValues();
+    return () => {
+      isUnMounted.current = true;
+    };
   }, []);
 
   return (

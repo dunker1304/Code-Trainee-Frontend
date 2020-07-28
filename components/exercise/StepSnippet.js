@@ -20,12 +20,15 @@ import axios from 'axios';
 import 'ace-builds/src-noconflict/theme-kuroir';
 
 const StepSnippet = ({
+  exerciseId = 0,
   selectedLanguages = [],
   supportedLanguages = [],
   snippetValues = {},
   setSelectedLanguages = () => {},
   setSnippetValues = () => {},
   setSupportedLanguages = () => {},
+  next = () => {},
+  prev = () => {},
 }) => {
   // table
   let [currPage, setCurrPage] = useState(1);
@@ -33,6 +36,47 @@ const StepSnippet = ({
   let [loading, setLoading] = useState(false);
 
   let firstRun = useRef(true);
+
+  const handleNext = async () => {
+    setLoading(true);
+    if (selectedLanguages.length === 0) {
+      notification.info({
+        message: 'Notification',
+        description: 'At least one language must be selected.',
+      });
+      setLoading(false);
+    } else {
+      let supportedLangs = [...supportedLanguages].map((e) => {
+        let languageId = e.key;
+        let isActive = selectedLanguages.includes(languageId);
+        let sampleCode = snippetValues[languageId];
+        return { languageId, isActive, sampleCode };
+      });
+      try {
+        let res = await axios.post(`${process.env.API}/api/snippet/update`, {
+          supportedLanguages: supportedLangs,
+          exerciseId: exerciseId,
+        });
+        setLoading(false);
+        if (res.data.success) {
+          next();
+        } else {
+          throw new Error('');
+        }
+      } catch (e) {
+        setLoading(false);
+        notification.error({
+          message: 'Notification',
+          description: 'Something get wrong!',
+        });
+        console.log(e);
+      }
+    }
+  };
+
+  const handlePrevious = () => {
+    prev();
+  };
 
   useEffect(() => {
     !firstRun.current &&
@@ -147,6 +191,33 @@ const StepSnippet = ({
           setCurrPage(pagination.current);
         }}
       />
+      <div
+        className='step-actions'
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          marginBottom: '50px',
+        }}>
+        <Button
+          onClick={handlePrevious}
+          type='primary'
+          size='large'
+          style={{
+            width: 100,
+          }}>
+          Previous
+        </Button>
+        <Button
+          onClick={handleNext}
+          loading={loading}
+          type='primary'
+          size='large'
+          style={{
+            width: 100,
+          }}>
+          Next
+        </Button>
+      </div>
     </div>
   );
 };

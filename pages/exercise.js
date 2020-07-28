@@ -4,6 +4,7 @@ import { Steps, Divider, Button, Form, notification } from 'antd';
 import StepBasic from '../components/exercise/StepBasic';
 import StepTestCases from '../components/exercise/StepTestCase';
 import StepSnippet from '../components/exercise/StepSnippet';
+import StepReview from '../components/exercise/StepReview';
 import Header from '../components/Header';
 import composedAuthHOC from 'hocs';
 import axios from 'axios';
@@ -13,121 +14,22 @@ const Exercise = (props) => {
   let [exerciseId, setExerciseId] = useState(props.exerciseId);
   let isCreate = !props.exerciseId;
   // steps
-  let [currStep, setCurrStep] = useState(0);
-  // steps button action
-  let [loading, setLoading] = useState(false);
+  let [currStep, setCurrStep] = useState(3);
   // step basic infos
-  let [formRef] = Form.useForm();
+  let [basicInfos, setBasicInfos] = useState({
+    title: '',
+    content: '',
+    level: 'easy',
+    points: 0,
+    tags: ['#'],
+  });
+  let [isDoneLoadOldInfos, setDoneLoadOldInfos] = useState(false);
   // step code stubs
   let [supportedLanguages, setSupportedLanguages] = useState([]);
   let [selectedLanguages, setSelectedLanguages] = useState([]);
   let [snippetValues, setSnippetValues] = useState({});
+  // step reivew
 
-  const saveBasicInfos = async () => {
-    setLoading(true);
-    try {
-      await formRef.validateFields();
-    } catch (e) {
-      notification.info({
-        message: 'Infomation',
-        description: 'Please check your input again!',
-      });
-      setLoading(false);
-      return;
-    }
-    try {
-      let { content, title, points, level, tags } = formRef.getFieldsValue();
-      let res;
-      if (!exerciseId) {
-        res = await axios.post(`${process.env.API}/api/exercise/create`, {
-          createdBy: currUserId,
-          content: content,
-          title: title,
-          points: Number(points),
-          level: level,
-          tags: tags,
-        });
-      } else {
-        res = await axios.post(`${process.env.API}/api/exercise/update`, {
-          id: exerciseId,
-          content: content,
-          title: title,
-          points: Number(points),
-          level: level,
-          tags: tags,
-        });
-      }
-      if (res.data.success) {
-        setExerciseId(res.data.data.id);
-        setCurrStep(currStep + 1);
-      } else {
-        notification.error({
-          message: 'Notification',
-          description: 'Something get wrong!',
-        });
-      }
-    } catch (e) {
-      notification.error({
-        message: 'Notification',
-        description: 'Something get wrong!',
-      });
-      console.log(e);
-    }
-    setLoading(false);
-  };
-
-  const saveCodeStubs = async () => {
-    setLoading(true);
-    if (selectedLanguages.length === 0) {
-      notification.info({
-        message: 'Notification',
-        description: 'At least one language must be selected.',
-      });
-    } else {
-      let supportedLangs = [...supportedLanguages].map((e) => {
-        let languageId = e.key;
-        let isActive = selectedLanguages.includes(languageId);
-        let sampleCode = snippetValues[languageId];
-        return { languageId, isActive, sampleCode };
-      });
-      try {
-        let res = await axios.post(`${process.env.API}/api/snippet/update`, {
-          supportedLanguages: supportedLangs,
-          exerciseId: exerciseId,
-        });
-        if (res.data.success) {
-          setCurrStep(currStep + 1);
-        } else {
-          notification.error({
-            message: 'Notification',
-            description: 'Something get wrong!',
-          });
-        }
-      } catch (e) {
-        notification.error({
-          message: 'Notification',
-          description: 'Something get wrong!',
-        });
-        console.log(e);
-      }
-    }
-    setLoading(false);
-  };
-
-  const onFinish = () => {};
-
-  const handleNext = () => {
-    currStep === 0 && saveBasicInfos();
-    currStep === 1 && saveCodeStubs();
-    currStep === 2 && setCurrStep(3);
-    currStep === 3 && onFinish();
-  };
-
-  const handlePrevious = () => {
-    currStep === 1 && setCurrStep(0);
-    currStep === 2 && setCurrStep(1);
-    currStep === 3 && setCurrStep(2);
-  };
 
   const loadSupportedLanguages = async () => {
     try {
@@ -155,17 +57,14 @@ const Exercise = (props) => {
         setSelectedLanguages([...selectedLanguages]);
         setSnippetValues({ ...snippetValues });
       } else {
-        notification.error({
-          message: 'Notification',
-          description: 'Something get wrong!',
-        });
+        throw new Error('');
       }
     } catch (e) {
       notification.error({
         message: 'Notification',
         description: 'Something get wrong!',
       });
-      console.log('error', e);
+      console.log(e);
     }
   };
 
@@ -178,13 +77,14 @@ const Exercise = (props) => {
         let tagNames = res.data.data.tags.map((e) => e.name);
         tagNames = [...tagNames].filter((e) => e !== '#');
         tagNames.unshift('#');
-        formRef.setFieldsValue({
+        setBasicInfos({
           title: res.data.data.title,
           content: res.data.data.content,
           points: res.data.data.points,
           level: res.data.data.level,
           tags: tagNames,
         });
+        setDoneLoadOldInfos(true);
       } else {
         throw new Error('');
       }
@@ -231,49 +131,40 @@ const Exercise = (props) => {
             marginBottom: '50px',
           }}>
           {currStep === 0 && (
-            <StepBasic formRef={formRef} isCreate={isCreate} />
+            <StepBasic
+              basicInfos={basicInfos}
+              setBasicInfos={setBasicInfos}
+              exerciseId={exerciseId}
+              setExerciseId={setExerciseId}
+              isCreate={isCreate}
+              currUserId={currUserId}
+              isDoneLoadOldInfos={isDoneLoadOldInfos}
+              next={() => setCurrStep(1)}
+            />
           )}
           {currStep === 1 && (
             <StepSnippet
+              exerciseId={exerciseId}
               selectedLanguages={selectedLanguages}
               supportedLanguages={supportedLanguages}
               snippetValues={snippetValues}
               setSelectedLanguages={setSelectedLanguages}
               setSupportedLanguages={setSupportedLanguages}
               setSnippetValues={setSnippetValues}
+              next={() => setCurrStep(2)}
+              prev={() => setCurrStep(0)}
             />
           )}
-          {currStep === 2 && <StepTestCases exerciseId={exerciseId} />}
-          {currStep === 3 && <div> Chose Reviewer </div>}
-        </div>
-        <div
-          className='step-actions'
-          style={{
-            display: 'flex',
-            justifyContent: currStep === 0 ? 'flex-end' : 'space-between',
-            marginBottom: '50px',
-          }}>
-          {currStep > 0 && (
-            <Button
-              onClick={handlePrevious}
-              type='primary'
-              size='large'
-              style={{
-                width: 100,
-              }}>
-              Previous
-            </Button>
+          {currStep === 2 && (
+            <StepTestCases
+              exerciseId={exerciseId}
+              next={() => setCurrStep(3)}
+              prev={() => setCurrStep(1)}
+            />
           )}
-          <Button
-            onClick={handleNext}
-            loading={loading}
-            type='primary'
-            size='large'
-            style={{
-              width: 100,
-            }}>
-            {currStep === 3 ? 'Finish' : 'Next'}
-          </Button>
+          {currStep === 3 && (
+            <StepReview prev={() => setCurrStep(2)} exerciseId={exerciseId} />
+          )}
         </div>
       </div>
     </React.Fragment>

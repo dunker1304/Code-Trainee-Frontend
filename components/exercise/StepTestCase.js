@@ -8,8 +8,10 @@ import {
   DeleteTwoTone,
 } from '@ant-design/icons';
 import axios from 'axios';
+import next from 'next';
+import { previewImage } from 'antd/lib/upload/utils';
 
-const StepTestCases = ({ exerciseId }) => {
+const StepTestCases = ({ exerciseId, next = () => {}, prev = () => {} }) => {
   // modal
   let [showAddModal, setShowAddModal] = useState(false);
   let [showEditModal, setShowEditModal] = useState(false);
@@ -19,6 +21,14 @@ const StepTestCases = ({ exerciseId }) => {
   let [currPageTable, setCurrPageTable] = useState(1);
   let [currPageSize, setCurrPageSize] = useState(10);
   let [currRecord, setCurrRecord] = useState({});
+
+  const handleNext = () => {
+    next();
+  };
+
+  const handlePrevious = () => {
+    prev();
+  };
 
   const handleEditRecord = async (data) => {
     try {
@@ -159,101 +169,130 @@ const StepTestCases = ({ exerciseId }) => {
         output={currRecord.output}
         isHidden={currRecord.hidden}
       />
-      <Table
-        loading={loading}
-        bordered
-        columns={[
-          {
-            title: 'No.',
-            key: 'no',
-            width: '60px',
-            render: (text, record, index) => {
-              return index + 1 + (currPageTable - 1) * currPageSize;
+      <div style={{ minHeight: '450px' }}>
+        <Table
+          loading={loading}
+          bordered
+          columns={[
+            {
+              title: 'No.',
+              key: 'no',
+              width: '60px',
+              render: (text, record, index) => {
+                return index + 1 + (currPageTable - 1) * currPageSize;
+              },
             },
-          },
-          {
-            title: 'Data Input',
-            dataIndex: 'input',
-            key: 'input',
-            width: '300px',
-            ellipsis: true,
-          },
-          {
-            title: 'Expected Output',
-            dataIndex: 'output',
-            key: 'output',
-            width: '300px',
-            ellipsis: true,
-          },
-          {
-            title: 'Hidden',
-            dataIndex: 'hidden',
-            key: 'hidden',
-            width: '80px',
-            render: (hidden) => {
-              if (hidden) {
-                return <CheckOutlined style={{ fontSize: '16px' }} />;
-              } else {
-                // return <CloseOutlined style={{ fontSize: '16px' }} />;
-              }
+            {
+              title: 'Data Input',
+              dataIndex: 'input',
+              key: 'input',
+              width: '300px',
+              ellipsis: true,
             },
-          },
-          {
-            title: 'Action',
-            key: 'action',
-            width: '125px',
-            render: (text, record) => (
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                }}>
-                <Tooltip placement='top' title={'Edit'}>
-                  <Button
-                    ghost
-                    type='link'
-                    onClick={() => {
-                      setCurrRecord({ ...record });
-                      setShowEditModal(true);
-                    }}
-                    style={{
-                      border: 'none',
-                    }}>
-                    <EditTwoTone style={{ fontSize: '16px' }} />
-                  </Button>
-                </Tooltip>
-                <Tooltip placement='top' title={'Delete'}>
-                  <Popconfirm
-                    title='Are you sure delete this test case?'
-                    okText='Yes'
-                    onConfirm={() => handleDeleteRecord(record.key)}
-                    cancelText='No'
-                    placement='topRight'>
+            {
+              title: 'Expected Output',
+              dataIndex: 'output',
+              key: 'output',
+              width: '300px',
+              ellipsis: true,
+            },
+            {
+              title: 'Hidden',
+              dataIndex: 'hidden',
+              key: 'hidden',
+              width: '80px',
+              render: (hidden) => {
+                if (hidden) {
+                  return <CheckOutlined style={{ fontSize: '16px' }} />;
+                } else {
+                  // return <CloseOutlined style={{ fontSize: '16px' }} />;
+                }
+              },
+            },
+            {
+              title: 'Action',
+              key: 'action',
+              width: '125px',
+              render: (text, record) => (
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                  }}>
+                  <Tooltip placement='top' title={'Edit'}>
                     <Button
                       ghost
                       type='link'
+                      onClick={() => {
+                        setCurrRecord({ ...record });
+                        setShowEditModal(true);
+                      }}
                       style={{
                         border: 'none',
                       }}>
-                      <DeleteTwoTone style={{ fontSize: '16px' }} />
+                      <EditTwoTone style={{ fontSize: '16px' }} />
                     </Button>
-                  </Popconfirm>
-                </Tooltip>
-              </div>
-            ),
-          },
-        ]}
-        dataSource={tableData}
-        pagination={{
-          defaultPageSize: 10,
-          showSizeChanger: true,
-          pageSizeOptions: ['10', '20', '30'],
-        }}
-        onChange={(pagination, filter, sorter) => {
-          setCurrPageSize(pagination.pageSize);
-          setCurrPageTable(pagination.current);
-        }}
-      />
+                  </Tooltip>
+                  <Tooltip placement='top' title={'Delete'}>
+                    <Popconfirm
+                      title='Are you sure delete this test case?'
+                      okText='Yes'
+                      onConfirm={() => handleDeleteRecord(record.key)}
+                      cancelText='No'
+                      placement='topRight'>
+                      <Button
+                        ghost
+                        type='link'
+                        style={{
+                          border: 'none',
+                        }}>
+                        <DeleteTwoTone style={{ fontSize: '16px' }} />
+                      </Button>
+                    </Popconfirm>
+                  </Tooltip>
+                </div>
+              ),
+            },
+          ]}
+          dataSource={tableData}
+          pagination={{
+            defaultPageSize: 10,
+            showSizeChanger: true,
+            pageSizeOptions: ['10', '20', '30'],
+          }}
+          onChange={(pagination, filter, sorter) => {
+            setCurrPageSize(pagination.pageSize);
+            setCurrPageTable(pagination.current);
+          }}
+        />
+      </div>
+      <div
+        className='step-actions'
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          marginBottom: '50px',
+        }}>
+        <Button
+          onClick={handlePrevious}
+          type='primary'
+          size='large'
+          style={{
+            width: 100,
+          }}>
+          Previous
+        </Button>
+        <Button
+          onClick={handleNext}
+          loading={loading}
+          type='primary'
+          size='large'
+          style={{
+            width: 100,
+          }}>
+          Next
+        </Button>
+      </div>
     </div>
   );
 };
