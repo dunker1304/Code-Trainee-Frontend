@@ -55,11 +55,11 @@ const QuestionDescription = props => {
         <div className='question-level'>{props.question.level}</div>
         <button className='question-reaction' onClick={handleLikeQuestion}>
           {status == 1 ? (<LikeFilled></LikeFilled>) : (<LikeOutlined></LikeOutlined>)}
-          {like}
+          <span>{like}</span>
         </button>
         <button className='question-reaction' onClick={handleDislikeQuestion}>
           {status == -1 ? (<DislikeFilled></DislikeFilled>) : (<DislikeOutlined></DislikeOutlined>)}
-          {dislike}
+          <span>{dislike}</span>
         </button>
         <div className='question-point'>LOC: {props.question.points}</div>
       </div>

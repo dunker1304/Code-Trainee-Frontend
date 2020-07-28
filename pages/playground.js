@@ -25,7 +25,10 @@ import "ace-builds/src-noconflict/theme-textmate";
 import "ace-builds/src-noconflict/theme-solarized_dark";
 import "ace-builds/src-noconflict/theme-solarized_light";
 import "ace-builds/src-noconflict/theme-terminal";
-import "ace-builds/src-noconflict/ext-language_tools"
+import "ace-builds/src-noconflict/ext-language_tools";
+import "ace-builds/src-noconflict/keybinding-vim";
+import "ace-builds/src-noconflict/keybinding-emacs";
+import "ace-builds/src-noconflict/keybinding-vscode";
 import Router , {useRouter} from 'next/router'
 import Header from "../components/Header"
 import composedAuthHOC from 'hocs';
@@ -172,8 +175,6 @@ const Playground = props => {
       Router.push(`/playground?questionID=${questionId}&tab=${key}`)
       setIndexActive(key)
     }
-   
-   
   }
 
   const handleShowConsole = () => {
@@ -251,6 +252,11 @@ const Playground = props => {
           </div>
         </div>
         <div className="content-left playground-wrapper" >
+          { !props.userInfo.id ? (
+            <div className="guest-confirm">
+              <div>Vui lòng <a className="login-redirect">Đăng nhập</a> để tiếp tục</div>
+            </div>) 
+          : null}
           <div className="playground-action">
             <Select defaultValue={props.language[0].code} style={{ width: 120 }} onSelect={handleChangeLanguage}>
               {props.language && props.language.map((lang, key) => (
