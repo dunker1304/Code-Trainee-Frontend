@@ -38,9 +38,6 @@ const QuestionLayout = (props)=> {
             <TabPane tab="Description" key="1">
               {/* <QuestionDescription question={props.question.question}/> */}
             </TabPane>
-            <TabPane tab="Solutions" key="2">
-              Solution here
-            </TabPane>
             <TabPane tab="Submissions" key="3">
               Submissions here
             </TabPane>

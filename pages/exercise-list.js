@@ -25,7 +25,7 @@ import Link from 'next/link';
 import Header from '../components/Header';
 import composedAuthHOC from 'hocs';
 
-const ExerciseList = ({ ownerId }) => {
+const ExerciseList = (props) => {
   // table
   let [tableData, setTableData] = useState([]);
   let [currPageTable, setCurrPageTable] = useState(1);
@@ -44,7 +44,7 @@ const ExerciseList = ({ ownerId }) => {
     try {
       setTableLoading(true);
       const res = await axios.get(
-        `${process.env.API}/api/exercise/owner/${ownerId}`
+        `${process.env.API}/api/exercise/owner/${props.userInfo?.id || 0}`
       );
       setTableLoading(false);
       if (res.data.success) {
@@ -275,7 +275,7 @@ const ExerciseList = ({ ownerId }) => {
   );
 };
 ExerciseList.getInitialProps = async (ctx) => {
-  let ownerId = ctx.query?.ownerId || 0;
-  return { ownerId: ownerId };
+  // let ownerId = ctx.query?.ownerId || 0;
+  return {};
 };
 export default composedAuthHOC(ExerciseList);

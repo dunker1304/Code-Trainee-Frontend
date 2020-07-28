@@ -18,7 +18,11 @@ import SnippetTemplate from './SnippetTemplate';
 
 import 'ace-builds/src-noconflict/theme-kuroir';
 
-const StepSnippet = ({ exerciseId, nextStep = () => {} }) => {
+const StepSnippet = ({
+  exerciseId,
+  alreadySave,
+  nextStep = () => {},
+}) => {
   // table
   let [currPage, setCurrPage] = useState(1);
   let [currPageSize, setCurrPageSize] = useState(10);
@@ -351,7 +355,7 @@ const StepSnippet = ({ exerciseId, nextStep = () => {} }) => {
         onClick={handleUpdateAndNext}
         loading={loading}
         size='large'>
-        Update and Next
+        {alreadySave ? 'Update and Next' : 'Save and Next'}
       </Button>
     </div>
   );

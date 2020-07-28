@@ -6,12 +6,15 @@ import StepTestCases from '../components/exercise/StepTestCase';
 import StepSnippet from '../components/exercise/StepSnippet';
 import Header from '../components/Header';
 import composedAuthHOC from 'hocs';
-const Exercise = ({ id }) => {
-  let [exerciseId, setExerciseId] = useState(id);
+const Exercise = (props) => {
+  let [exerciseId, setExerciseId] = useState(props.id);
   let [currStep, setCurrStep] = useState(0);
   let [wishStep, setWishStep] = useState(currStep + 1);
   let [checkDirtyBeforeLeaving, setCheckDirtyBeforeLeaving] = useState(false);
   let [dirty, setDirty] = useState(false);
+
+  // state save step 2: snippet
+  let [alreadySave, setAlreadySave] = useState(false);
 
   const onChangeStep = (stepIndex) => {
     if (dirty) {
@@ -27,6 +30,7 @@ const Exercise = ({ id }) => {
 
   useEffect(() => {
     setWishStep(currStep + 1);
+    console.log('user', props.userInfo);
   }, [currStep]);
 
   return (
@@ -51,6 +55,7 @@ const Exercise = ({ id }) => {
         <Divider />
         {currStep === 0 && (
           <StepBasic
+            currUserId={props.userInfo?.id || 0}
             exerciseId={exerciseId}
             setExerciseId={setExerciseId}
             checkDirtyBeforeLeaving={checkDirtyBeforeLeaving}
@@ -62,8 +67,12 @@ const Exercise = ({ id }) => {
         )}
         {currStep === 1 && (
           <StepSnippet
+            alreadySave={alreadySave}
             exerciseId={exerciseId}
-            nextStep={() => setCurrStep(wishStep)}
+            nextStep={() => {
+              setCurrStep(wishStep);
+              setAlreadySave(true);
+            }}
           />
         )}
         {currStep === 2 && <StepTestCases exerciseId={exerciseId} />}

@@ -39,8 +39,8 @@ const SettingModal = props => {
 
   return (
     <>
-      <Button type="primary" onClick={showModal}>
-        <span className="icon iconfont">&#xe600;</span>
+      <Button type="primary" onClick={showModal} style={{'display': 'flex', 'alignItems': 'center'}}>
+        <span className="icon iconfont" style={{'marginRight': '5px'}}>&#xe600;</span>
         Setting
       </Button>
       <Modal
@@ -114,8 +114,8 @@ const SettingModal = props => {
           </Col>
           <Col span={8}>
             <div className="setting-select">
-            <Select defaultValue="default" style={{ width: 120 }} onChange={onChangeKeyboardHandler}>
-              <Option value="default">Default</Option>
+            <Select defaultValue="vscode" style={{ width: 120 }} onChange={onChangeKeyboardHandler}>
+              <Option value="vscode">Default</Option>
               <Option value="vim">Vim</Option>
               <Option value="emacs">Emacs</Option>
             </Select>
