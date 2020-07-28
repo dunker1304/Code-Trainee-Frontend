@@ -49,6 +49,7 @@ const SettingModal = props => {
         onOk={handleOk}
         onCancel={handleCancel}
         className='settings-editor-modal'
+        cancelButtonProps={{ style: { display: 'none' } }}
       >
         <Row>
           <Col span={16}>

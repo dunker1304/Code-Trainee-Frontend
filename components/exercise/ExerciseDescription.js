@@ -12,44 +12,48 @@ const QuestionDescription = props => {
   const [dislike, setDislike] = useState(props.question.dislike)
 
   const handleLikeQuestion = () => {
-    let data = {
-      userID: props.userInfo.id,
-      exerciseID: props.question.id,
-      status: 'like'
+    console.log(props.userInfo)
+    if (props.userInfo.id) {
+      let data = {
+        userID: props.userInfo.id,
+        exerciseID: props.question.id,
+        status: 'like'
+      }
+      axios.post(`${process.env.API}/api/exercise/react`, data)
+        .then(res => {
+          console.log(res.data, 'dunker DNDz')
+          setStatus(res.data.resultVote.statusVote)
+          setLike(res.data.updatedExercise.like)
+          setDislike(res.data.updatedExercise.dislike)
+        })
+        .catch(error => {
+          console.log(error)
+        })
     }
-    axios.post(`${process.env.API}/api/exercise/react`, data)
-      .then(res => {
-        console.log(res.data, 'dunker DNDz')
-        setStatus(res.data.resultVote.statusVote)
-        setLike(res.data.updatedExercise.like)
-        setDislike(res.data.updatedExercise.dislike)
-      })
-      .catch(error => {
-        console.log(error)
-      })
   }
 
   const handleDislikeQuestion = () => {
-    let data = {
-      userID: props.userInfo.id,
-      exerciseID: props.question.id,
-      status: 'dislike'
+    if (props.userInfo.id) {
+      let data = {
+        userID: props.userInfo.id,
+        exerciseID: props.question.id,
+        status: 'dislike'
+      }
+      axios.post(`${process.env.API}/api/exercise/react`, data)
+        .then(res => {
+          console.log(res.data, 'dunker dislike')
+          setStatus(res.data.resultVote.statusVote)
+          setLike(res.data.updatedExercise.like)
+          setDislike(res.data.updatedExercise.dislike)
+        })
+        .catch(error => {
+          console.log(error)
+        })
     }
-    axios.post(`${process.env.API}/api/exercise/react`, data)
-      .then(res => {
-        console.log(res.data, 'dunker dislike')
-        setStatus(res.data.resultVote.statusVote)
-        setLike(res.data.updatedExercise.like)
-        setDislike(res.data.updatedExercise.dislike)
-      })
-      .catch(error => {
-        console.log(error)
-      })
   }
 
   return (
     <div className="question-desc-wrapper">
-      {console.log(props.exerciseVote, 'easd')}
       <h4 className='question-title'>Title: {props.question.title}</h4>
       <div className='question-info'>
         <div className='question-level'>{props.question.level}</div>
