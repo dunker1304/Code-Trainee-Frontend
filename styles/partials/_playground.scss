@@ -47,9 +47,15 @@ div#playground {
 .exercise-submission {
   margin: 20px;
   border: 1px solid #f0f0f0;
+  height: calc(100vh - 175px);
+  overflow: auto;
+  overflow-x: hidden;
 
   tr.ant-table-row.ant-table-row-level-0 {
     cursor: pointer;
+  }
+  .ant-table-pagination.ant-pagination {
+    margin-right: 20px;
   }
 }
 

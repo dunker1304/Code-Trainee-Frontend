@@ -300,7 +300,7 @@ const Playground = props => {
             </Spin>
             :
             <Spin spinning={loading}>
-              <Tabs defaultActiveKey="1" tabPosition="left" 
+              <Tabs tabPosition="left" type="line"
                 style={ (consoleEditor == 'hide') ? {display: 'none'} : null } className="console-status">
                 {testCaseProps.map((testCase, key) => (
                   <TabPane tab={`Test Case ` + (key + 1)} key={key}>
