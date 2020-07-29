@@ -367,6 +367,7 @@ const Problems = (props) => {
                     <th className="text-center">#</th>
                     <th className="text-center">Title</th>
                     <th className="text-center">Difficulty</th>
+                    <th className="text-center">LOC</th>
                     <th className="text-center">Author</th>
                    
                   </tr>
@@ -384,6 +385,9 @@ const Problems = (props) => {
                         </td>
                         <td className="text-center">
                           <div className={`badge badge-pill badge-${translateClassName(value.level)}`}>{value.level.toUpperCase()}</div>
+                        </td>
+                        <td className="text-center">
+                          {value.points}
                         </td>
 
                         <td className="text-center created_by">
