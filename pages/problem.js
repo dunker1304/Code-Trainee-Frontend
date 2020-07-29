@@ -247,6 +247,24 @@ const Problems = (props) => {
    }
     
   }
+  const select = (array) => {
+    return (
+      <div>
+        <Input className="filterSearch" placeholder="Filter topics.." onChange={(e) => onSearchDropDown(e)} />
+        <div className="list_tags">
+        {
+          array.map((value, index) => (
+            <li onClick={() => handleIsClicked(value)} key={index}>
+              {value.isClicked ? <CheckOutlined /> : ''}<span >{value.name}</span></li>
+          ))
+        }
+        
+       </div>
+
+
+      </div>
+    )
+  }
 
 
 
@@ -288,26 +306,28 @@ const Problems = (props) => {
                   <Input placeholder="Search question title, discription" value={termSearch} onChange={textChange} onKeyUp={submitTermSearch}></Input>
                 </div>
                 <div className="pull-right col-sm-6 col-lg-5">
-                  <Dropdown overlay={menuTag(Level)} placement="bottomRight" trigger="['click']" overlayClassName="my_dropdown">
+                <div style={{ position: 'relative' }} id="area_level">
+                  <Dropdown overlay={menuTag(Level)} placement="bottomRight" trigger="['click']" overlayClassName="my_dropdown" getPopupContainer={() => document.getElementById('area_level')}>
                     <Button>Difficulty <DownOutlined /></Button>
                   </Dropdown>
-
-                  <Dropdown overlay={menuStatus(Status)} placement="bottomRight" trigger="['click']" overlayClassName="my_dropdown">
+                </div>
+                <div style={{ position: 'relative' }} id="area_status">
+                  <Dropdown overlay={menuStatus(Status)} placement="bottomRight" trigger="['click']" overlayClassName="my_dropdown"  getPopupContainer={() => document.getElementById('area_status')}>
                     <Button>Status <DownOutlined /></Button>
                   </Dropdown>
-
-                  {/* <Dropdown overlay={select(props.tags)}
+                </div>
+                <div style={{ position: 'relative' }} id="area_tags">
+                  <Dropdown overlay={select(props.dropdownCategorySearch)}
                     placement="bottomRight"
                     overlayClassName="my_dropdown"
                     trigger="['click']"
                     visible={visible}
                     onVisibleChange={onChange}
+                    getPopupContainer={() => document.getElementById('area_tags')}
                   >
                     <Button>Tags <DownOutlined /></Button>
-                  </Dropdown> */}
-                   <Popover placement="bottomRight" title={text} content={content(props.dropdownCategorySearch)} trigger="click">
-                     <Button>Tags <DownOutlined /></Button>
-                  </Popover>
+                  </Dropdown>
+                  </div>
                   <SwitcherOutlined onClick = {()=> setIsTable(!isTable)} title = {`${isTable ? 'Grid Layout':'Table Layout'}`}style={{ fontSize: '16px', color: '#08c' }}/>
 
 
@@ -347,6 +367,7 @@ const Problems = (props) => {
                     <th className="text-center">#</th>
                     <th className="text-center">Title</th>
                     <th className="text-center">Difficulty</th>
+                    <th className="text-center">LOC</th>
                     <th className="text-center">Author</th>
                    
                   </tr>
@@ -364,6 +385,9 @@ const Problems = (props) => {
                         </td>
                         <td className="text-center">
                           <div className={`badge badge-pill badge-${translateClassName(value.level)}`}>{value.level.toUpperCase()}</div>
+                        </td>
+                        <td className="text-center">
+                          {value.points}
                         </td>
 
                         <td className="text-center created_by">

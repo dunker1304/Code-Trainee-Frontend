@@ -1,15 +1,36 @@
-import { BellFilled , UserOutlined ,HeartOutlined,
-  FileProtectOutlined,PieChartOutlined,UndoOutlined,LogoutOutlined,TeamOutlined ,SnippetsOutlined ,ContainerOutlined  } from "@ant-design/icons"
+import { BellFilled , UserOutlined ,HeartOutlined,CheckOutlined,DeleteOutlined ,
+  FileProtectOutlined,PieChartOutlined,UndoOutlined,EllipsisOutlined,LogoutOutlined,TeamOutlined ,SnippetsOutlined ,ContainerOutlined  ,CommentOutlined} from "@ant-design/icons"
 import Logo from "../static/images/codetrainee.png"
-import { Menu , Dropdown,Popover,Avatar} from 'antd';
+import { Menu , Empty,Popover,Avatar} from 'antd';
 import Link from 'next/link'
 import axios from "axios"
 import Router from "next/router"
 import { openNotificationWithIcon } from "../components/Notification"
 import { connect } from "react-redux"
+import { useEffect ,useState } from "react"
+import  moment from "moment"
+import classnames from "classnames"
 const CONSTANTS = require("../utils/constants")
 
 const Header = (props) => {
+
+  const [listNoti , setListNoti] = useState([])
+
+  useEffect(()=>{
+     fetchData()
+  },[])
+
+  const fetchData = async ()=>{
+    let url = `${process.env.API}/api/get-most-notification`
+    let resData = await axios.get(url)
+    if(resData.data.success) {
+         setListNoti(resData.data.data)
+    }
+    else {
+      openNotificationWithIcon('error','','Load Data Fail!');
+    }
+    return;
+  }
 
   const hanleSignOut = async ()=> {
     let url = `${process.env.API}/signout`
@@ -163,8 +184,106 @@ const Header = (props) => {
     }
   }
 
+  const text2 = <h1 className="title_noti">Notifications</h1>;
+  const contentAtionComment = (isRead,notiId)=>{
+    return(
+      <div className="action_comment">
+        <div style={{display:"flex"}}>
+         <CheckOutlined style={{position:"relative", top:"8px",height:"fit-content",fontSize:"18px"}}/>
+         <p onClick= {()=> markAsRead(notiId,isRead)}> {isRead ? 'Mark As Read' : 'Mark As Don\'t Read'} </p>
+         </div>
+         <div style={{display:"flex"}}>
+         <DeleteOutlined style={{position:"relative", top:"8px",height:"fit-content",fontSize:"18px"}} />
+          <p onClick = {()=>removeNoti(notiId)}>Remove This Notification</p>
+          </div>
+    </div>
+    )
+  }
 
+  const markAsRead = async (notiId, isRead)=> {
+     let url = `${process.env.API}/api/mark-as-read`
+     let data = {
+      notificationId : notiId,
+      isRead : isRead
+     }
 
+     let resResult = await axios.post(url,data);
+     if(resResult.data.success) {
+       let tmp = [...listNoti];
+       tmp.forEach(element => {
+         if(element['id'] == notiId){
+           element['isRead'] = isRead
+         }
+       });
+       setListNoti(tmp);
+     }
+     else {
+      openNotificationWithIcon('error','','Sorry, an error occured')
+     }
+  }
+
+  const removeNoti = async ( notiId)=> {
+    let url = `${process.env.API}/api/remove-notification`
+    let data = {
+      notificationId : notiId
+    }
+
+    let resResult = await axios.post(url,data);
+    if(resResult.data.success) {
+      let tmp = [...listNoti];
+      let tmpArray = tmp.filter(element => {
+        return element['id'] != notiId
+      });
+      setListNoti(tmpArray);
+    }
+    else {
+      openNotificationWithIcon('error','','Sorry, an error occured')
+     }
+  }
+  
+  const content = (
+    <div>
+      <div className="noti-content">
+         {listNoti.length > 0 ? listNoti.map((value,index)=> (
+           <div className="noti_wrapper">
+            <div className = {classnames('item_noti', value.isRead ? 'item-noti-readed':'')} key={index} onClick = {()=> Router.push(value['linkAction'])}>
+              <div className="item_left">
+                <CommentOutlined />
+              </div>
+              <div className="item_right">
+                    <div className="notification-main-content" dangerouslySetInnerHTML = {{__html : value['content']}}>
+                    
+                    </div>
+                    <div className="time_comemnt">
+                      <span>{moment(value.createdAt).fromNow()}</span>
+    
+                    </div>
+                 
+              </div>
+           </div>
+           <div className="layer_2">
+           <div style={{ position: 'relative' }} id= {`area_${index}`}>
+           <Popover placement="bottomRight" 
+                    title={''} 
+                    trigger="['click']"
+                    content={()=>contentAtionComment(!value.isRead,value.id)} 
+                    getPopupContainer={() => document.getElementById(`area_${index}`)}
+            >
+             <EllipsisOutlined />
+           </Popover>
+           </div>
+           </div>
+           </div>
+         )) : <Empty/>}
+     
+      </div>
+      <div className="noti-footer">
+       <Link href="/notification">
+        <a>See all notifications</a>
+        </Link>
+      </div>
+    </div>
+  );
   return (
     <div className="coding-header">
       <div className="container header-content">
@@ -177,7 +296,17 @@ const Header = (props) => {
            </div>
            <div className="header-right">
               <div className="header-ring">
-                <BellFilled/>
+              <div style={{ position: 'relative' }} id="area_noti">
+               
+                <Popover placement="bottomRight" 
+                  title={text2} content={content} 
+                  trigger="click"  
+                  overlayClassName="popover_noti"
+                  getPopupContainer={() => document.getElementById('area_noti')}
+                  >
+                   <BellFilled/>
+                </Popover>
+                </div>
               </div>
               <div className="header-user">
                  <Popover placement="bottomRight" title={text} content={props.userInfo && props.userInfo.role ? renderProverForRole(props.userInfo.role['id']): []} trigger="click" className="header_proper">
