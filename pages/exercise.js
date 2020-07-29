@@ -14,7 +14,7 @@ const Exercise = (props) => {
   let [exerciseId, setExerciseId] = useState(props.exerciseId);
   let isCreate = !props.exerciseId;
   // steps
-  let [currStep, setCurrStep] = useState(3);
+  let [currStep, setCurrStep] = useState(0);
   // step basic infos
   let [basicInfos, setBasicInfos] = useState({
     title: '',
