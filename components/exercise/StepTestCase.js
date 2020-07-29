@@ -169,10 +169,11 @@ const StepTestCases = ({ exerciseId, next = () => {}, prev = () => {} }) => {
         output={currRecord.output}
         isHidden={currRecord.hidden}
       />
-      <div style={{ minHeight: '450px' }}>
+      <div style={{ minHeight: '350px' }}>
         <Table
           loading={loading}
           bordered
+          scroll={{ x: 1000 }}
           columns={[
             {
               title: 'No.',
@@ -212,7 +213,8 @@ const StepTestCases = ({ exerciseId, next = () => {}, prev = () => {} }) => {
             {
               title: 'Action',
               key: 'action',
-              width: '90px',
+              width: '130px',
+              fixed: 'right',
               render: (text, record) => (
                 <div
                   style={{
