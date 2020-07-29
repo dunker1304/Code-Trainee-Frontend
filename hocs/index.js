@@ -124,6 +124,11 @@ const     ignoreRouter = (pathname , isAuthenticated ,userInfo) =>{
            }
     }
 
+    return  {
+      isIgnore: true,
+      
+   }
+
 }
 
 const mapStateToProps = store => ({
