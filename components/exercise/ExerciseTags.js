@@ -1,107 +1,128 @@
 import { useState, useEffect, useRef } from 'react';
 import { Tag, Input, Tooltip, AutoComplete, Space, notification } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
+import axios from 'axios';
 
-const ExerciseTags = ({ tags = [], setTags = (arr) => {}, allTags = [] }) => {
+const ExerciseTags = ({ value = [], onChange = (newValue) => {} }) => {
+  // input new tag
   let [inputVisible, setInputVisible] = useState(false);
   let [inputValue, setInputValue] = useState('');
+  // edit old tag
   let [editInputIndex, setEditInputIndex] = useState(-1);
   let [editInputValue, setEditInputValue] = useState('');
-  let [suggestTags, setSuggestTags] = useState(allTags);
-  let inputRef = useRef();
-  let editInputRef = useRef();
+  // suggest tags
+  let [suggestedValues, setSuggestedValues] = useState([]);
+  let [originalValues, setOriginalValues] = useState([]);
 
-  const handleClose = (removedTag) => {
-    setTags([...tags.filter((tag) => tag !== removedTag)]);
+  let isUnMounted = useRef(false);
+
+  const handleRemoveTag = (removedTag) => {
+    onChange([...value.filter((tag) => tag !== removedTag)]);
   };
 
   const showInput = () => {
     setInputVisible(true);
   };
 
-  useEffect(() => {
-    if (inputVisible) {
-      inputRef.current?.focus();
-    }
-  }, [inputVisible]);
-
-  const handleInputChange = (event) => {
-    let value = event.target.value;
+  const handleInputChange = (value) => {
     setInputValue(value);
   };
 
   const handleInputConfirm = () => {
-    if (inputValue && tags.indexOf(inputValue.trim()) === -1) {
-      setTags([...tags, inputValue.trim()]);
+    if (inputValue && value.indexOf(inputValue.trim()) === -1) {
+      onChange([...value, inputValue.trim()]);
     }
-    console.log('tags', tags);
     setInputVisible(false);
     setInputValue('');
   };
 
-  const handleEditInputChange = (event) => {
-    let value = event.target.value;
+  const handleEditInputChange = (value) => {
     setEditInputValue(value);
   };
 
   const handleEditInputConfirm = () => {
-    const newTags = [...tags];
-    if (editInputValue && tags.indexOf(editInputValue.trim()) === -1) {
+    const newTags = [...value];
+    if (editInputValue && value.indexOf(editInputValue.trim()) === -1) {
       newTags[editInputIndex] = editInputValue.trim();
     }
-    setTags(newTags);
+    onChange(newTags);
     setEditInputIndex(-1);
     setEditInputValue('');
   };
 
-  const onSelectSuggestion = (value) => {
+  const onSelectSuggestion = (selectedValue) => {
     if (editInputIndex === -1) {
-      handleInputChange({ target: { value: value } });
+      if (selectedValue && value.indexOf(selectedValue.trim()) === -1) {
+        onChange([...value, selectedValue.trim()]);
+      }
+      setInputVisible(false);
+      setInputValue('');
     } else {
-      handleEditInputChange({ target: { value: value } });
+      const newTags = [...value];
+      if (selectedValue && value.indexOf(selectedValue.trim()) === -1) {
+        newTags[editInputIndex] = selectedValue.trim();
+      }
+      onChange(newTags);
+      setEditInputIndex(-1);
+      setEditInputValue('');
     }
   };
 
-  const handleSearch = (value) => {
-    let suggestValues = [...allTags]
+  const handleTriggerSelection = (value) => {
+    let suggestValues = [...originalValues]
       .filter((event) => event.toString().includes(value))
       .map((event) => ({ value: event }));
-    setSuggestTags([...suggestValues]);
+    setSuggestedValues([...suggestValues]);
+  };
+
+  const loadOriginalValues = async () => {
+    try {
+      const res = await axios.get(`${process.env.API}/api/tags/all`);
+      if (res.data.success) {
+        !isUnMounted.current &&
+          setOriginalValues([...res.data.data.map((e) => e.name)]);
+      } else {
+        throw new Error('');
+      }
+    } catch (e) {
+      console.log('error', e);
+    }
   };
 
   useEffect(() => {
-    editInputRef.current?.focus();
-  }, [editInputIndex, editInputValue]);
+    loadOriginalValues();
+    return () => {
+      isUnMounted.current = true;
+    };
+  }, []);
 
   return (
     <>
-      {tags.map((tag, index) => {
+      {value.map((tag, index) => {
         if (editInputIndex === index) {
           return (
             <AutoComplete
-              options={suggestTags}
+              options={suggestedValues}
               style={{ width: 200 }}
               key={tag}
               defaultValue={editInputValue}
               onSelect={onSelectSuggestion}
+              onChange={handleEditInputChange}
+              onSearch={handleTriggerSelection}
+              onBlur={handleEditInputConfirm}
+              onFocus={(e) => handleTriggerSelection(editInputValue)}
               defaultOpen={true}
-              autoFocus={true}
-              onFocus={(e) => handleSearch(editInputValue)}
-              onSearch={handleSearch}>
+              autoFocus={true}>
               <Input
-                ref={editInputRef}
                 key={tag}
                 size='small'
                 className='tag-input'
                 value={editInputValue}
-                onChange={handleEditInputChange}
-                onBlur={handleEditInputConfirm}
                 onPressEnter={handleEditInputConfirm}
                 style={{
                   width: 200,
                   verticalAlign: 'top',
                 }}
-                maxLength={20}
               />
             </AutoComplete>
           );
@@ -114,7 +135,7 @@ const ExerciseTags = ({ tags = [], setTags = (arr) => {}, allTags = [] }) => {
             className='edit-tag'
             key={tag}
             closable={index !== 0} // disable first tag, cannot deletable
-            onClose={() => handleClose(tag)}
+            onClose={() => handleRemoveTag(tag)}
             style={{
               userSelect: 'none',
             }}>
@@ -140,28 +161,26 @@ const ExerciseTags = ({ tags = [], setTags = (arr) => {}, allTags = [] }) => {
       })}
       {inputVisible ? (
         <AutoComplete
-          options={suggestTags}
+          options={suggestedValues}
           style={{ width: 200 }}
           defaultValue={inputValue}
           onSelect={onSelectSuggestion}
-          onSearch={handleSearch}
+          onSearch={handleTriggerSelection}
+          onChange={handleInputChange}
+          onBlur={handleInputConfirm}
           autoFocus={true}
-          onFocus={(e) => handleSearch(inputValue)}
+          onFocus={(e) => handleTriggerSelection(inputValue)}
           defaultOpen={true}>
           <Input
-            ref={inputRef}
             type='text'
             size='small'
             className='tag-input'
             value={inputValue}
-            onChange={handleInputChange}
-            onBlur={handleInputConfirm}
             onPressEnter={handleInputConfirm}
             style={{
               width: 200,
               verticalAlign: 'top',
             }}
-            maxLength={20}
           />
         </AutoComplete>
       ) : (

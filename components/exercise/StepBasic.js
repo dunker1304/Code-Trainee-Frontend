@@ -1,357 +1,212 @@
-import { Form, Input, Button, Select, notification } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { Form, Input, Button, notification, Select } from 'antd';
 import { Editor } from '@tinymce/tinymce-react';
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import ConfirmModal from '../ConfirmModal';
+import { useState, useEffect, ReactNode, useReducer, useRef } from 'react';
 import ExerciseTags from './ExerciseTags';
 import ExerciseLOC from './ExerciseLOC';
-import ExerciseLevel from './ExerciseLevel';
+import ExerciseContent from './ExerciseContent';
+import axios from 'axios';
 
-const StepBasic = ({
-  currUserId,
-  exerciseId,
+const StepBasicInfos = ({
+  basicInfos,
+  setBasicInfos = () => {},
+  exerciseId = 0,
   setExerciseId = () => {},
-  checkDirtyBeforeLeaving = false,
-  setCheckDirtyBeforeLeaving = () => {},
-  dirty = false,
-  setDirty = () => {},
-  nextStep = () => {},
+  currUserId = 0,
+  isCreate = true,
+  isDoneLoadOldInfos = false,
+  next = () => {},
 }) => {
-  // visible of comfirm modal
-  let [visibleConfirm, setVisibleConfirm] = useState(false);
-  // loading state
-  let [buttonLoading, setButtonLoading] = useState(false);
-  // form instance
   let [formRef] = Form.useForm();
-  // init data of form
-  let [initFormValues, setInitFormValues] = useState({
-    title: '',
-    content: '',
-    points: 0,
-    level: 'easy',
-    tags: ['#'],
+  let [initialValues, setInitialValues] = useState({ ...basicInfos });
+  // button next's loading
+  let [loading, setLoading] = useState(false);
+  // min, max LOC slider value
+  let [rangeValue, setRangeValue] = useState([1, 100]);
+
+  const setRangePoints = (level) => {
+    switch (level) {
+      case 'easy':
+        setRangeValue([1, 100]);
+        break;
+      case 'medium':
+        setRangeValue([101, 200]);
+        break;
+      case 'hard':
+        setRangeValue([201, 300]);
+        break;
+    }
+  };
+
+  const setDefaultPoints = (level) => {
+    switch (level) {
+      case 'easy':
+        formRef.setFieldsValue({
+          points: 1,
+        });
+        break;
+      case 'medium':
+        formRef.setFieldsValue({
+          points: 101,
+        });
+        break;
+      case 'hard':
+        formRef.setFieldsValue({
+          points: 201,
+        });
+        break;
+    }
+  };
+
+  const onFormValuesChange = (changedValue) => {
+    const propName = Object.getOwnPropertyNames(changedValue)[0];
+    const propValue = changedValue[propName];
+    if (propName === 'level') {
+      setRangePoints(propValue);
+    }
+  };
+
+  const validateRequire = (label) => ({
+    transform: (value) => {
+      return value === null ? '' : value + '';
+    },
+    validator(rule, value) {
+      return !value
+        ? Promise.reject(`'${label}' is required!`)
+        : Promise.resolve();
+    },
   });
-  // all tags from DB
-  let [allTags, setAllTags] = useState([]);
-  // min, max LOC slider
-  let [minSliderValue, setMinSliderValue] = useState(0);
-  let [maxSliderValue, setMaxSliderValue] = useState(100);
 
-  // run only one when component mounted
-  useEffect(() => {
-    (async () => {
-      // get old information to update
-      if (exerciseId) {
-        try {
-          const res = await axios.get(
-            `${process.env.API}/api/exercise/basic-info/${exerciseId}`
-          );
-          if (res.data.success) {
-            setRangeSlider(res.data.data.level);
-            let tags = res.data.data.tags.map((e) => e.name);
-            setInitFormValues({
-              title: res.data.data.title,
-              content: res.data.data.content,
-              points: res.data.data.points,
-              level: res.data.data.level,
-              tags: tags,
-            });
-            formRef.setFieldsValue({
-              title: res.data.data.title,
-              content: res.data.data.content,
-              points: res.data.data.points,
-              level: res.data.data.level,
-              tags: tags,
-            });
-          } else {
-            console.log('get basic-info data fail');
-          }
-        } catch (e) {
-          console.log(e);
-        }
-      }
-    })();
-    (async () => {
-      // get all tags
-      try {
-        const res = await axios.get(`${process.env.API}/api/tags/all`);
-        if (res.data.success) {
-          setAllTags([...res.data.data.map((e) => e.name)]);
-        } else {
-          console.log('get tags data fail');
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    })();
-
-    return () => {
-      // run when component dis-mounted
-      setDirty(false);
-      setCheckDirtyBeforeLeaving(false);
-    };
-  }, []);
-
-  useEffect(() => {
-    dirty && checkDirtyBeforeLeaving && setVisibleConfirm(true);
-  }, [checkDirtyBeforeLeaving]);
-
-  const arraysEqual = (a, b) => {
-    if (a === b) return true;
-    if (a == null || b == null) return false;
-    if (a.length !== b.length) return false;
-    for (let i = 0; i < a.length; ++i) {
-      if (a[i] !== b[i]) return false;
-    }
-    return true;
-  };
-
-  const onValuesChange = (changedValue) => {
-    console.log('changed value', changedValue);
-    const prop = Object.getOwnPropertyNames(changedValue)[0];
-    if (prop === 'tags') {
-      setDirty(!arraysEqual(changedValue[prop], initFormValues[prop]));
-    } else {
-      setDirty(changedValue[prop] !== initFormValues[prop]);
-    }
-    if (prop === 'level') {
-      setRangeSlider(changedValue[prop]);
-    }
-  };
-
-  const handleCreate = async () => {
+  const handleNext = async () => {
+    setLoading(true);
     try {
-      setButtonLoading(true);
       await formRef.validateFields();
-      let { content, title, points, level, tags } = formRef.getFieldsValue();
-      const res = await axios.post(`${process.env.API}/api/exercise/create`, {
-        createdBy: currUserId,
-        content: content,
-        title: title,
-        points: Number(points),
-        level: level,
-        tags: tags,
+    } catch (e) {
+      notification.error({
+        message: 'Infomation',
+        description: 'Please check your input again!',
       });
-      setButtonLoading(false);
-      if (res.data.success) {
-        notification.info({
-          message: 'Notification',
-          description: 'Success!',
+      setLoading(false);
+      return;
+    }
+    try {
+      let { content, title, points, level, tags } = formRef.getFieldsValue();
+      let res;
+      if (!exerciseId) {
+        res = await axios.post(`${process.env.API}/api/exercise/create`, {
+          createdBy: currUserId,
+          content: content,
+          title: title,
+          points: Number(points),
+          level: level,
+          tags: tags,
         });
+      } else {
+        res = await axios.post(`${process.env.API}/api/exercise/update`, {
+          id: exerciseId,
+          content: content,
+          title: title,
+          points: Number(points),
+          level: level,
+          tags: tags,
+        });
+      }
+      setLoading(false);
+      if (res.data.success) {
         setExerciseId(res.data.data.id);
-        setDirty(false);
-        setCheckDirtyBeforeLeaving(false);
-        nextStep();
+        setBasicInfos(formRef.getFieldsValue());
+        next();
       } else {
-        notification.error({
-          message: 'Notification',
-          description: 'Failed!',
-        });
+        throw new Error('');
       }
     } catch (e) {
-      setButtonLoading(false);
-      notification.warning({
+      setLoading(false);
+      notification.error({
         message: 'Notification',
-        description: 'Check your input again!',
+        description: 'Something get wrong!',
       });
+      console.log(e);
     }
   };
 
-  const handleUpdate = async (onSuccess = () => {}) => {
-    try {
-      setButtonLoading(true);
-      await formRef.validateFields();
-      let { content, title, points, level, tags } = formRef.getFieldsValue();
-      const res = await axios.post(`${process.env.API}/api/exercise/update`, {
-        id: exerciseId,
-        content: content,
-        title: title,
-        points: Number(points),
-        level: level,
-        tags: tags,
-      });
-      setButtonLoading(false);
-      if (res.data.success) {
-        notification.info({
-          message: 'Notification',
-          description: 'Success!',
-        });
-        onSuccess();
-      } else {
-        notification.error({
-          message: 'Notification',
-          description: 'Fail!',
-        });
-      }
-    } catch (e) {
-      setButtonLoading(false);
-      notification.warning({
-        message: 'Notification',
-        description: 'Check your input again!',
-      });
-    }
-  };
+  useEffect(() => {
+    setRangePoints(basicInfos.level);
+    setInitialValues({ ...basicInfos });
+    formRef.setFieldsValue({ ...basicInfos });
+  }, [basicInfos]);
 
-  const onOkConfirm = async () => {
-    handleUpdate(() => {
-      setCheckDirtyBeforeLeaving(false);
-      setDirty(false);
-      setVisibleConfirm(false);
-      nextStep();
-    });
-  };
+  useEffect(() => {
+    let { level } = formRef.getFieldsValue();
+    setDefaultPoints(level);
+  }, [rangeValue]);
 
-  const onCancelConfirm = async () => {
-    setVisibleConfirm(false);
-    setCheckDirtyBeforeLeaving(false);
-    setDirty(false);
-    nextStep();
-  };
-
-  const onCancelXConfirm = async () => {
-    setCheckDirtyBeforeLeaving(false);
-    setVisibleConfirm(false);
-  };
-
-  const setRangeSlider = (level) => {
-    console.log('level', level);
-    if (level === 'easy') {
-      setMinSliderValue(0);
-      setMaxSliderValue(100);
-      formRef.setFieldsValue({
-        points: 0,
-      });
-    } else if (level === 'medium') {
-      setMinSliderValue(101);
-      setMaxSliderValue(200);
-      formRef.setFieldsValue({
-        points: 101,
-      });
-    } else {
-      setMinSliderValue(201);
-      setMaxSliderValue(300);
-      formRef.setFieldsValue({
-        points: 201,
-      });
-    }
-  };
+  useEffect(() => {
+    formRef.resetFields(['points']);
+  }, [initialValues]);
 
   return (
-    <>
+    <div>
       <Form
         form={formRef}
+        initialValues={initialValues}
         labelCol={{ span: 4 }}
         wrapperCol={{ span: 16 }}
-        validateMessages={{
-          required: "'${label}' is required!",
-        }}
         scrollToFirstError={true}
-        initialValues={initFormValues}
-        onValuesChange={onValuesChange}>
-        <Form.Item name='title' label='Title' rules={[{ required: true }]}>
+        onValuesChange={onFormValuesChange}>
+        <Form.Item
+          required={isCreate}
+          name='title'
+          label='Title'
+          rules={[validateRequire('Title')]}>
           <Input />
         </Form.Item>
         <Form.Item
-          name='content'
+          required={isCreate}
           label='Content'
-          rules={[{ required: true }]}
-          trigger='onEditorChange'
-          validateTrigger='onEditorChange'>
-          <Editor
-            id='exercise-content'
-            init={{
-              height: 300,
-              menubar: false,
-              plugins: [
-                'advlist autolink lists link preview',
-                'searchreplace visualblocks fullscreen codesample',
-                'table paste code',
-              ],
-              toolbar:
-                'undo redo | fontselect fontsizeselect formatselect | bold italic underline strikethrough | \
-forecolor backcolor | alignleft aligncenter alignright alignjustify | \
- bullist numlist outdent indent | table link  codesample | code | fullscreen preview',
-              content_css: '//www.tiny.cloud/css/codepen.min.css',
-              importcss_append: true,
-              quickbars_selection_toolbar:
-                'bold italic | quicklink h2 h3 blockquote quicktable',
-              toolbar_mode: 'sliding',
-              contextmenu: 'link table configurepermanentpen',
-            }}
-          />
+          name='content'
+          rules={[validateRequire('Content')]}>
+          <ExerciseContent />
         </Form.Item>
-        <Form.Item name='level' label='Level' rules={[{ required: true }]}>
-          <ExerciseLevel min={minSliderValue} max={maxSliderValue} />
+        <Form.Item name='level' label='Level'>
+          <Select
+            style={{
+              width: '200px',
+            }}>
+            <Select.Option value='easy'>Easy</Select.Option>
+            <Select.Option value='medium'>Medium</Select.Option>
+            <Select.Option value='hard'>Hard</Select.Option>
+          </Select>
         </Form.Item>
         <Form.Item
           name='points'
           label='LOC'
-          rules={[
-            { required: true },
-            ({ getFieldValue }) => ({
-              validator(rule, value) {
-                if (value && value < minSliderValue) {
-                  return Promise.reject(
-                    `Min available value is ${minSliderValue}`
-                  );
-                }
-                if (value && value > maxSliderValue) {
-                  return Promise.reject(
-                    `Max available value is ${maxSliderValue}`
-                  );
-                }
-                return Promise.resolve();
-              },
-            }),
-          ]}>
-          <ExerciseLOC min={minSliderValue} max={maxSliderValue} />
+          required={isCreate}
+          rules={[validateRequire('LOC')]}>
+          <ExerciseLOC min={rangeValue[0]} max={rangeValue[1]} />
         </Form.Item>
-        <Form.Item
-          name='tags'
-          label='Tags'
-          valuePropName='tags'
-          trigger='setTags'>
-          <ExerciseTags allTags={allTags} />
-        </Form.Item>
-        <Form.Item>
-          {!exerciseId ? (
-            <Button
-              type='primary'
-              size='large'
-              loading={buttonLoading}
-              onClick={handleCreate}>
-              Save and Next
-            </Button>
-          ) : (
-            <Button
-              type='primary'
-              size='large'
-              loading={buttonLoading}
-              onClick={() =>
-                handleUpdate(() => {
-                  setDirty(false);
-                  setCheckDirtyBeforeLeaving(false);
-                  nextStep();
-                })
-              }>
-              Update and Next
-            </Button>
-          )}
+        <Form.Item name='tags' label='Tags'>
+          <ExerciseTags />
         </Form.Item>
       </Form>
-      <ConfirmModal
-        okText='Save'
-        cancelText='Discard'
-        visible={visibleConfirm}
-        title='Save Changes?'
-        content='You have unsaved changes. Would you like to save them before leaving this page?'
-        onCancelX={onCancelXConfirm}
-        onOk={onOkConfirm}
-        onCancel={onCancelConfirm}
-      />
-    </>
+      <div
+        className='step-actions'
+        style={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          marginBottom: '50px',
+        }}>
+        <Button
+          onClick={handleNext}
+          loading={loading}
+          type='primary'
+          size='large'
+          style={{
+            width: 100,
+          }}>
+          Next
+        </Button>
+      </div>
+    </div>
   );
 };
 
-export default StepBasic;
+export default StepBasicInfos;

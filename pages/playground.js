@@ -340,14 +340,14 @@ Playground.getInitialProps = async function(ctx) {
   let userInfo = ctx.store.getState().auth.userInfo
   let id = ctx.query.questionID
   let urlExercise = `${process.env.API}/api/exercise?id=${id}`
-  let urlLanguage = `${process.env.API}/api/program-language/all?exerciseId=${id}`
+  let urlLanguage = `${process.env.API}/api/language/exercise/${id}`
   let urlVote = `${process.env.API}/api/exercise/vote?userID=${userInfo.id}&questionID=${id}`
   const questionResponse = await axios.get(urlExercise)
   const languageResponse = await axios.get(urlLanguage)
   const exerciseVote = await axios.get(urlVote)
   return { 
     question: questionResponse.data, 
-    language: languageResponse.data.data.result,
+    language: languageResponse.data.data,
     exerciseVote: exerciseVote.data.exerciseVote
   }
 }
