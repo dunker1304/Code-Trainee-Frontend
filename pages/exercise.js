@@ -6,11 +6,12 @@ import StepTestCases from '../components/exercise/StepTestCase';
 import StepSnippet from '../components/exercise/StepSnippet';
 import StepReview from '../components/exercise/StepReview';
 import Header from '../components/Header';
+import Footer from '../components/Footer';
 import composedAuthHOC from 'hocs';
 import axios from 'axios';
 
 const Exercise = (props) => {
-  let currUserId = props.userInfo ? props.userInfo.id : 0;
+  let currUserId = props.userInfo.id || 0;
   let [exerciseId, setExerciseId] = useState(props.exerciseId);
   let isCreate = !props.exerciseId;
   // steps
@@ -29,7 +30,6 @@ const Exercise = (props) => {
   let [selectedLanguages, setSelectedLanguages] = useState([]);
   let [snippetValues, setSnippetValues] = useState({});
   // step reivew
-
 
   const loadSupportedLanguages = async () => {
     try {
@@ -167,6 +167,7 @@ const Exercise = (props) => {
           )}
         </div>
       </div>
+      <Footer />
     </React.Fragment>
   );
 };

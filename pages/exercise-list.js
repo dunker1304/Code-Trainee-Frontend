@@ -23,9 +23,11 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Header from '../components/Header';
+import Footer from '../components/Footer';
 import composedAuthHOC from 'hocs';
 
 const ExerciseList = (props) => {
+  let currUserId = props.userInfo.id || 0;
   // table
   let [tableData, setTableData] = useState([]);
   let [currPageTable, setCurrPageTable] = useState(1);
@@ -44,7 +46,7 @@ const ExerciseList = (props) => {
     try {
       setTableLoading(true);
       const res = await axios.get(
-        `${process.env.API}/api/exercise/owner/${props.userInfo?.id || 0}`
+        `${process.env.API}/api/exercise/owner/${currUserId}`
       );
       setTableLoading(false);
       if (res.data.success) {
@@ -103,7 +105,7 @@ const ExerciseList = (props) => {
     }
   };
 
-  const handleButtonEditRecord = async (record) => {
+  const handleButtonEditRecord = (record) => {
     setTableLoading(true);
     router.push(`/exercise?id=${record.key}`, '/exercise');
   };
@@ -224,10 +226,13 @@ const ExerciseList = (props) => {
               title: 'Action',
               key: 'action',
               fixed: 'right',
-              width: '130px',
+              width: '120px',
               render: (text, record) => (
-                <div style={{}}>
-                  <Tooltip placement='top' title={'Update'}>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between'
+                }}>
+                  <Tooltip placement='top' title={'Edit'}>
                     <Button
                       ghost
                       type='link'
@@ -244,7 +249,7 @@ const ExerciseList = (props) => {
                       okText='Yes'
                       onConfirm={() => handleButtonDeleteRecord(record)}
                       cancelText='No'
-                      placement='topRight'>
+                      placement='left'>
                       <Button
                         ghost
                         type='link'
@@ -271,10 +276,11 @@ const ExerciseList = (props) => {
           }}
         />
       </div>
+      <Footer />
     </>
   );
 };
-ExerciseList.getInitialProps = async (ctx) => {
+ExerciseList.getInitialProps = (ctx) => {
   // let ownerId = ctx.query?.ownerId || 0;
   return {};
 };

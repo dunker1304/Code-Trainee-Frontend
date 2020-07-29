@@ -186,21 +186,21 @@ const StepTestCases = ({ exerciseId, next = () => {}, prev = () => {} }) => {
               title: 'Data Input',
               dataIndex: 'input',
               key: 'input',
-              width: '300px',
+              width: '340px',
               ellipsis: true,
             },
             {
               title: 'Expected Output',
               dataIndex: 'output',
               key: 'output',
-              width: '300px',
+              width: '340px',
               ellipsis: true,
             },
             {
               title: 'Hidden',
               dataIndex: 'hidden',
               key: 'hidden',
-              width: '80px',
+              width: '100px',
               render: (hidden) => {
                 if (hidden) {
                   return <CheckOutlined style={{ fontSize: '16px' }} />;
@@ -212,7 +212,7 @@ const StepTestCases = ({ exerciseId, next = () => {}, prev = () => {} }) => {
             {
               title: 'Action',
               key: 'action',
-              width: '125px',
+              width: '90px',
               render: (text, record) => (
                 <div
                   style={{
@@ -239,7 +239,7 @@ const StepTestCases = ({ exerciseId, next = () => {}, prev = () => {} }) => {
                       okText='Yes'
                       onConfirm={() => handleDeleteRecord(record.key)}
                       cancelText='No'
-                      placement='topRight'>
+                      placement='left'>
                       <Button
                         ghost
                         type='link'
