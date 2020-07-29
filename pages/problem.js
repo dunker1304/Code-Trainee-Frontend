@@ -367,8 +367,8 @@ const Problems = (props) => {
                         </td>
 
                         <td className="text-center created_by">
-                          <Link href={{pathname : '/profile/[profileId]'}} as={`/profile/${value.author['id']}`}>
-                          <a>{value.author.displayName}</a>
+                          <Link href={{pathname : '/profile/[profileId]'}} as={`/profile/${value.author ? value.author['id'] : ''}`}>
+                          <a>{value.author ? value.author.displayName : ''}</a>
                           </Link>
                           
                         </td>
