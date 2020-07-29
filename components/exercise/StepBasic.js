@@ -129,10 +129,9 @@ const StepBasicInfos = ({
   };
 
   useEffect(() => {
-    console.log('basicInfos: ', basicInfos);
+    setRangePoints(basicInfos.level);
     setInitialValues({ ...basicInfos });
     formRef.setFieldsValue({ ...basicInfos });
-    setRangePoints(basicInfos.level);
   }, [basicInfos]);
 
   useEffect(() => {

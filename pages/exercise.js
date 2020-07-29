@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Head from 'next/head';
-import { Steps, Divider, Button, Form, notification } from 'antd';
+import { Steps, Divider, notification } from 'antd';
 import StepBasic from '../components/exercise/StepBasic';
 import StepTestCases from '../components/exercise/StepTestCase';
 import StepSnippet from '../components/exercise/StepSnippet';
@@ -121,7 +121,7 @@ const Exercise = (props) => {
         <Steps current={currStep}>
           <Steps.Step title='Basic Information' key='0' />
           <Steps.Step title='Code Stubs' key='1' />
-          <Steps.Step title='Test Cases' key='2' />
+          <Steps.Step title='Testcases' key='2' />
           <Steps.Step title='Review' key='3' />
         </Steps>
         <Divider />
