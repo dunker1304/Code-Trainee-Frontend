@@ -149,21 +149,29 @@
      }
     } 
 }
-// .my_dropdown {
-//   min-width: 120px !important;
-//   -webkit-box-shadow: 0 2px 12px rgba(0,0,0,0.175);
-//   background-color: #fff;
-    .ant-popover-inner-content {
+.my_dropdown {
+  min-width: 120px !important;
+  -webkit-box-shadow: 0 2px 12px rgba(0,0,0,0.175);
+  background-color: #fff;
+    .list_tags {
       overflow: auto;
+      max-height: 200px;
         li {
         padding : 8px 18px 10px 20px;
       }
       li:hover {
         cursor: pointer;
       }
+      .anticon-check{
+        top: -3px;
+        position: relative;
+        padding-right: 10px;
+        font-size: 13px;
+        color :#449d44 !important;
+      }
     }
 
-
+  }
   .filterSearch {
     outline: 0;
     border-radius: 5px;
