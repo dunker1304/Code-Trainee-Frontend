@@ -91,7 +91,7 @@ const StepBasicInfos = ({
     try {
       let { content, title, points, level, tags } = formRef.getFieldsValue();
       let res;
-      if (isCreate) {
+      if (!exerciseId) {
         res = await axios.post(`${process.env.API}/api/exercise/create`, {
           createdBy: currUserId,
           content: content,
