@@ -179,7 +179,6 @@ const StepBasicInfos = ({
         <Form.Item
           name='points'
           label='LOC'
-          required={isCreate}
           rules={[validateRequire('LOC')]}>
           <ExerciseLOC min={rangeValue[0]} max={rangeValue[1]} />
         </Form.Item>
