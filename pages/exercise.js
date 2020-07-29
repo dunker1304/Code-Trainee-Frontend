@@ -21,7 +21,7 @@ const Exercise = (props) => {
     title: '',
     content: '',
     level: 'easy',
-    points: 0,
+    points: 1,
     tags: ['#'],
   });
   let [isDoneLoadOldInfos, setDoneLoadOldInfos] = useState(false);

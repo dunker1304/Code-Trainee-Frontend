@@ -21,12 +21,12 @@ const StepBasicInfos = ({
   // button next's loading
   let [loading, setLoading] = useState(false);
   // min, max LOC slider value
-  let [rangeValue, setRangeValue] = useState([0, 100]);
+  let [rangeValue, setRangeValue] = useState([1, 100]);
 
   const setRangePoints = (level) => {
     switch (level) {
       case 'easy':
-        setRangeValue([0, 100]);
+        setRangeValue([1, 100]);
         break;
       case 'medium':
         setRangeValue([101, 200]);
@@ -41,7 +41,7 @@ const StepBasicInfos = ({
     switch (level) {
       case 'easy':
         formRef.setFieldsValue({
-          points: 0,
+          points: 1,
         });
         break;
       case 'medium':
