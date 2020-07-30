@@ -12,6 +12,7 @@ const ExercisePreviewModal = ({
   return (
     <>
       <Modal
+        className='preview-exercise-modal'
         title={title}
         visible={visible}
         width={600}
@@ -65,7 +66,7 @@ const ExercisePreviewModal = ({
             dangerouslySetInnerHTML={{ __html: data.content }}
             style={{
               overflow: 'auto',
-              maxHeight: '300px',
+              maxHeight: '280px',
             }}></div>
         </div>
       </Modal>
