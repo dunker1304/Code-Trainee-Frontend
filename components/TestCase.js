@@ -3,7 +3,10 @@ import { Row, Col } from 'antd'
 const TestCase = props => {
   const testCase = props.testCaseProps
   return (
-    <div className="test-case-wrapper">
+    testCase.isHidden ? 
+    (<div className='test-case-wrapper'> Hidden </div>)
+    :
+    (<div className="test-case-wrapper">
       <Row>
         <Col className="title" span={6}>
           <div className="status">Status:</div>
@@ -40,7 +43,7 @@ const TestCase = props => {
         </Col>
       </Row>
 
-    </div>
+    </div>) 
   )
 }
 

@@ -57,9 +57,10 @@ const Playground = props => {
    }
    else
     setIndexActive(activeTab)
- },[]);
+  },[]);
   const [runCode, setRunCode] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [loadingAllPage, setLoadingAllPage] = useState(false)
 
   const onChange = (newValue) => {
     setCode(newValue)
@@ -190,9 +191,10 @@ const Playground = props => {
   }
 
   const handlePickRandomQuestion = () => {
+    setLoadingAllPage(true);
     axios.get(`${process.env.API}/api/exercise/random`)
       .then((response) => {
-        console.log(response.data, 'random question')
+        setLoadingAllPage(false)
         if (response.data.success) {
           let exercise  = response.data.data
           Router.push(`/playground?questionID=${exercise['id']}`,`/playground?questionID=${exercise['id']}`)
@@ -200,6 +202,7 @@ const Playground = props => {
       })
       .catch((err) => {
         console.log(err)
+        setLoadingAllPage(false)
       })
   }
 
@@ -207,6 +210,7 @@ const Playground = props => {
     <>
      <Header/>
      <div className="container-content">
+      <Spin spinning={loadingAllPage}>
       <Split
         sizes={[35, 65]}
         minSize={300}
@@ -232,9 +236,9 @@ const Playground = props => {
           </Tabs>
 
           <div className="question-fast-picker" >
-            <Button type='default'>
+            <Button type='default' onClick={() => { Router.push(`/list`) }}>
               <svg viewBox="0 0 24 24" width="1em" height="1em" className="icon__3Su4"><path fillRule="evenodd" d="M7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7zM3 5h2v2H3V5zm0 6h2v2H3v-2zm0 6h2v2H3v-2z"></path></svg>
-              <span>Problems</span>
+              <span>Favorite Exercises</span>
             </Button>
             <Button type='default' onClick={handlePickRandomQuestion}>
               <svg viewBox="0 0 24 24" width="1em" height="1em" className="icon__3Su4 shuffle-icon__dV27"><path fillRule="evenodd" d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"></path></svg>
@@ -331,6 +335,7 @@ const Playground = props => {
           </div>
         </div>
       </Split>
+      </Spin>
       </div>
     </>
   );
