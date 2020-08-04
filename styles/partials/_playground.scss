@@ -1,3 +1,9 @@
+body {
+  button.ant-btn:hover {
+    color: #545454;
+    border-color: gray;
+  }
+}
 div#playground {
   width: 100% !important;
   height: 100% !important;
@@ -33,6 +39,7 @@ div#playground {
 .content-left.playground-wrapper {
   margin-left: 2px;
   border-left: 1px solid #f0f0f0;
+  position: relative;
   .guest-confirm {
     position: absolute;
     width: 100%;
@@ -44,6 +51,10 @@ div#playground {
     justify-content: center;
     color: white;
     font-size: 25px;
+    a.login-redirect {
+      background: #036ade;
+      padding: 7px;
+    }
   }
 }
 
@@ -75,6 +86,7 @@ div#playground {
   padding: 20px;
   h4.question-title {
     font-size: 18px;
+    overflow-wrap: break-word;
   }
   .question-level {
     text-transform: capitalize;

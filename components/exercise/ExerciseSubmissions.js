@@ -21,7 +21,7 @@ const ExerciseSubmissions = props => {
             status: submission.status,
             runtime: NaN,
             memory: NaN,
-            language: submission.programLanguageId,
+            language: submission.programLanguageId.name,
             code: submission.answer
           }
           dataTable.push(obj)
