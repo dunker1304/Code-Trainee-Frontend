@@ -181,3 +181,46 @@ div#playground {
     align-items: center;
   }
 }
+
+.submission-detail {
+  .title {
+    text-align: center;
+    font-size: 20px;
+  }
+
+  .status {
+      text-align: center;
+  }
+
+  .time-submmited {
+      text-align: center;
+  }
+
+  .language {
+      text-align: center;
+  }
+
+  .alert-info.testcase-table {
+      white-space: pre;
+      margin-top: 10px;
+      padding: 10px;
+  }
+
+  .action {
+    text-align: center;
+    margin-top: 15px;
+    button.ant-btn.ant-btn-primary {
+      background: #337ab7;
+      border-color: #2e6da4;
+      border-radius: 5px;
+    }
+    
+    button.ant-btn.ant-btn-primary:hover {
+        color: #fff;
+        background-color: #286090;
+        border-color: #204d74;
+    }
+  }
+
+  
+}
