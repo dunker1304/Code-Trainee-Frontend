@@ -228,7 +228,7 @@ const Playground = props => {
               <QuestionDescription question={props.question.question} userInfo={props.userInfo} exerciseVote={props.exerciseVote}/>
             </TabPane>
             <TabPane tab="Submissions" key="3">
-              <ExerciseSubmissions handleChangeCodeAce={onChange} exerciseID={props.question.question.id}></ExerciseSubmissions>
+              <ExerciseSubmissions handleChangeCodeAce={onChange} exerciseID={props.question.question.id} exercise={props.question.question}></ExerciseSubmissions>
             </TabPane>
             <TabPane tab="Discussions" key="4">
               Discussion Here

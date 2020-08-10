@@ -74,12 +74,27 @@ const ExerciseSubmissions = props => {
   return (
     <div className="exercise-submission">
       <Modal
-        title="Load submitted code"
+        title="Submisstion Detail"
         visible={openModal}
         onOk={handleAddSnippetCode}
         onCancel={handleCancel}
+        okButtonProps={{ style: { display: 'none' } }}
       >
-        <p>Confirm to load submitted code to your playground?</p>
+        <div className="submission-detail">
+          {console.log(props.exercise, rowClicked, 'row clicked')}
+          <div className="result">
+            <div className="title">{props.exercise.title}</div>
+            <div className="status">Status: {rowClicked?.status}</div>
+            <div className="time-submmited">Submitted: {rowClicked?.time}</div>
+            <div className="language">Language: {rowClicked?.language}</div>
+            <div className="alert-info testcase-table">
+              {rowClicked?.code}
+            </div>
+          </div>
+          <div className="action">
+            <Button type="primary" onClick={handleAddSnippetCode}>Edit Code</Button>
+          </div>
+        </div>
       </Modal>
       <Table 
         columns={columns} 
