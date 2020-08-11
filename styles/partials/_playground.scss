@@ -1,3 +1,9 @@
+body {
+  button.ant-btn:hover {
+    color: #545454;
+    border-color: gray;
+  }
+}
 div#playground {
   width: 100% !important;
   height: 100% !important;
@@ -33,6 +39,7 @@ div#playground {
 .content-left.playground-wrapper {
   margin-left: 2px;
   border-left: 1px solid #f0f0f0;
+  position: relative;
   .guest-confirm {
     position: absolute;
     width: 100%;
@@ -44,6 +51,10 @@ div#playground {
     justify-content: center;
     color: white;
     font-size: 25px;
+    a.login-redirect {
+      background: #036ade;
+      padding: 7px;
+    }
   }
 }
 
@@ -75,6 +86,7 @@ div#playground {
   padding: 20px;
   h4.question-title {
     font-size: 18px;
+    overflow-wrap: break-word;
   }
   .question-level {
     text-transform: capitalize;
@@ -168,4 +180,47 @@ div#playground {
     display: flex;
     align-items: center;
   }
+}
+
+.submission-detail {
+  .title {
+    text-align: center;
+    font-size: 20px;
+  }
+
+  .status {
+      text-align: center;
+  }
+
+  .time-submmited {
+      text-align: center;
+  }
+
+  .language {
+      text-align: center;
+  }
+
+  .alert-info.testcase-table {
+      white-space: pre;
+      margin-top: 10px;
+      padding: 10px;
+  }
+
+  .action {
+    text-align: center;
+    margin-top: 15px;
+    button.ant-btn.ant-btn-primary {
+      background: #337ab7;
+      border-color: #2e6da4;
+      border-radius: 5px;
+    }
+    
+    button.ant-btn.ant-btn-primary:hover {
+        color: #fff;
+        background-color: #286090;
+        border-color: #204d74;
+    }
+  }
+
+  
 }
