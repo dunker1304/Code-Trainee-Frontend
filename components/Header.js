@@ -21,7 +21,7 @@ const Header = (props) => {
   },[])
 
   const fetchData = async ()=>{
-    let url = `${process.env.API}/api/get-most-notification`
+    let url = `${process.env.API}/api/get-most-notification/${props.userInfo['id']}`
     let resData = await axios.get(url)
     if(resData.data.success) {
          setListNoti(resData.data.data)
@@ -194,7 +194,7 @@ const Header = (props) => {
          </div>
          <div style={{display:"flex"}}>
          <DeleteOutlined style={{position:"relative", top:"8px",height:"fit-content",fontSize:"18px"}} />
-          <p onClick = {()=>removeNoti(notiId)}>Remove This Notification</p>
+          <p onClick = {()=>removeNoti(notiId)}>Remove </p>
           </div>
     </div>
     )
@@ -204,7 +204,8 @@ const Header = (props) => {
      let url = `${process.env.API}/api/mark-as-read`
      let data = {
       notificationId : notiId,
-      isRead : isRead
+      isRead : isRead,
+      userId : props.userInfo['id'] ? props.userInfo['id']:null
      }
 
      let resResult = await axios.post(url,data);
@@ -225,7 +226,8 @@ const Header = (props) => {
   const removeNoti = async ( notiId)=> {
     let url = `${process.env.API}/api/remove-notification`
     let data = {
-      notificationId : notiId
+      notificationId : notiId,
+      userId : props.userInfo['id'] ? props.userInfo['id']:null
     }
 
     let resResult = await axios.post(url,data);

@@ -6,6 +6,7 @@ import Router from "next/router"
 import moment from "moment"
 import InfiniteScroll from 'react-infinite-scroller';
 import composeHOC from "../hocs"
+import {connect} from 'react-redux'
 
 class Notification extends React.Component {
   state = {
@@ -23,7 +24,7 @@ class Notification extends React.Component {
  
 
   fetchData = async ()=>{
-    let url = `${process.env.API}/api/get-all-notification`
+    let url = `${process.env.API}/api/get-all-notification/${this.props.userInfo['id']}`
     let resData = await axios.get(url);
     return resData.data;
   }
@@ -94,4 +95,12 @@ class Notification extends React.Component {
   }
 }
 
-export default composeHOC(Notification);
+function mapStateToProps(state,ownProps) {
+  return {
+    authMessage: state.auth.authMessage,
+  
+  }
+}
+
+
+export default connect(mapStateToProps,null)(composeHOC(Notification)); 
