@@ -13,8 +13,10 @@ import axios from 'axios';
 import { useRouter } from 'next/router';
 import { route } from 'next/dist/next-server/server/router';
 import Head from 'next/head';
+import composedAuthHOC from 'hocs';
 
-const ReviewExercise = ({ exerciseId }) => {
+const ReviewExercise = ({ exerciseId, userInfo = {} }) => {
+  let currUserId = userInfo.id || 0;
   let [exercise, setExercise] = useState({
     tags: [],
     codeSnippets: [],
@@ -65,9 +67,37 @@ const ReviewExercise = ({ exerciseId }) => {
     setConfirm(true);
   };
 
-  const onOkReject = () => {};
+  const onOkReject = async () => {
+    try {
+      const res = await axios.post(`${process.env.API}/api/review`, {
+        comment: comment,
+        isAccepted: false,
+        exerciseId: exerciseId,
+        userId: currUserId,
+      });
+      if (res.data.success) {
+        router.push('/exercise-list', '/exercise-list');
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
-  const onOkAccept = () => {};
+  const onOkAccept = async () => {
+    try {
+      const res = await axios.post(`${process.env.API}/api/review`, {
+        comment: comment,
+        isAccepted: true,
+        exerciseId: exerciseId,
+        userId: currUserId,
+      });
+      if (res.data.success) {
+        router.push('/exercise-list', '/exercise-list');
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   const getExercise = async () => {
     try {
@@ -190,4 +220,4 @@ ReviewExercise.getInitialProps = (ctx) => {
   return { exerciseId: id };
 };
 
-export default ReviewExercise;
+export default composedAuthHOC(ReviewExercise);

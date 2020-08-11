@@ -16,6 +16,10 @@ import {
   LoadingOutlined,
   EditTwoTone,
   DeleteTwoTone,
+  EyeOutlined,
+  EyeTwoTone,
+  EyeInvisibleFilled,
+  EyeInvisibleTwoTone,
 } from '@ant-design/icons';
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
@@ -126,6 +130,11 @@ const ExerciseList = (props) => {
     } else {
       return elementInColumnAction(target.parentNode);
     }
+  };
+
+  const handleSelfReview = (record) => {
+    setTableLoading(true);
+    router.push(`/review?id=${record.key}`, `/review`);
   };
 
   useEffect(() => {
@@ -280,7 +289,7 @@ const ExerciseList = (props) => {
               title: 'Action',
               key: 'action',
               fixed: 'right',
-              width: '130px',
+              width: '170px',
               render: (text, record) => (
                 <div
                   style={{
@@ -314,6 +323,29 @@ const ExerciseList = (props) => {
                         <DeleteTwoTone style={{ fontSize: '16px' }} />
                       </Button>
                     </Popconfirm>
+                  </Tooltip>
+                  <Tooltip placement='top' title={'Self-review'}>
+                    {!record.approved ? (
+                      <Button
+                        ghost
+                        type='link'
+                        style={{
+                          border: 'none',
+                        }}
+                        onClick={() => handleSelfReview(record)}>
+                        <EyeTwoTone style={{ fontSize: '16px' }} />
+                      </Button>
+                    ) : (
+                      <Button
+                        disabled
+                        ghost
+                        type='link'
+                        style={{
+                          border: 'none',
+                        }}>
+                        <EyeInvisibleTwoTone style={{ fontSize: '16px' }} />
+                      </Button>
+                    )}
                   </Tooltip>
                 </div>
               ),
