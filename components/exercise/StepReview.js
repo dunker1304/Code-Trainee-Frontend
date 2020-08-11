@@ -33,13 +33,21 @@ const StepReview = ({
     setLoading(true);
     try {
       let reviewerIds = [...listTeachers]
-        .filter((t) => reviewers.indexOf(t) !== -1)
+        .filter((t) => reviewers.indexOf(t.email) !== -1)
         .map((t) => t.id);
-      const res = await axios.post(`${process.env.API}/api/notification/push`, {
+      console.log({ reviewerIds });
+      const res = await axios.post(`${process.env.API}/api/review/request`, {
+        exerciseId,
         reviewerIds,
-        content: 'You have requested to review a exercise.',
-        linkAction: `/review?id=${exerciseId}`,
       });
+      const res1 = await axios.post(
+        `${process.env.API}/api/notification/push`,
+        {
+          reviewerIds,
+          content: 'You have requested to review a exercise.',
+          linkAction: `/review?id=${exerciseId}`,
+        }
+      );
       setLoading(false);
       if (res.data.success) {
         router.push({
@@ -108,8 +116,6 @@ const StepReview = ({
               }}
               options={options}
               placeholder='Type here ...'
-              autoFocus={true}
-              defaultOpen={true}
               onFocus={(e) => onSearchReviewer(searchInput)}
               onSearch={onSearchReviewer}
               onSelect={onSelectReviewer}
