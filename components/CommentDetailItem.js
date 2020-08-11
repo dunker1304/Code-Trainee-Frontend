@@ -4,6 +4,7 @@ import { Modal, Button, Space } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import React, { useState } from 'react';  
 import moment from "moment"
+import { connect } from "react-redux"
 var md = require('markdown-it')({html: false , highlight : function (str, lang) {
      try {
       return hljs.highlightAuto(str).value 
@@ -50,13 +51,13 @@ const CommentDetailItem = (props)=> {
          <img src = {props.discussDetail.senderId.imageLink ? props.discussDetail.senderId.imageLink :"https://kenh14cdn.com/zoom/460_289/2020/6/26/landscape-avatar-1593167946440982942769-crop-15931679693791808157553.png"} className = "__avatar"/>
          <div className = "user_info">{props.discussDetail.senderId.displayName}</div>
          <div className="post_info">
-             <div className ="action_vote">
+             <div className ="action_vote" style={{display: props.isAuthenticated ? 'block':'none'}}>
                 <span >{props.discussDetail.like} {props.discussDetail.statusVote == 1 ? <LikeFilled onClick= {()=> handleVoteComment(0)}/> : <LikeOutlined onClick= {()=> handleVoteComment(1)}/>}</span>
                 <span >{props.discussDetail.dislike} {props.discussDetail.statusVote == -1 ? <DislikeFilled onClick= {()=> handleVoteComment(0)}/> :<DislikeOutlined onClick= {()=> handleVoteComment(-1)}/>}</span>
              </div>
           
              <div className = "time_created">{moment(props.discussDetail.createdAt).fromNow()}</div>
-            <div className = "action_comment">
+            <div className = "action_comment" style={{display: props.isAuthenticated ? 'block':'none'}}>
                {props.discussDetail.isYourComment ? <span> <DeleteFilled onClick= {()=>showConfirm()}/> Delete </span> : ''}
             </div>
          </div>
@@ -69,4 +70,12 @@ const CommentDetailItem = (props)=> {
   )
 }
 
-export default CommentDetailItem ;
+function mapStateToProps(state, ownProps) {
+  return {
+    isAuthenticated : state.auth.isAuthenticated,
+  
+  }
+}
+
+
+export default connect(mapStateToProps,null)(CommentDetailItem) ;

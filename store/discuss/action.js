@@ -1,4 +1,5 @@
 import axios from 'axios';
+import {getCookie} from "../../utils/cookies"
 
 export const getDiscussByQuestionId = (questionId,page,sortBy)=> {
   const url = `${process.env.API}/api/get-comment-question-id`;
@@ -25,15 +26,15 @@ export const getDiscussByQuestionId = (questionId,page,sortBy)=> {
   }
 }
 
-export const getDiscussByCommentId = (commentId)=> {
+export const getDiscussByCommentId = (commentId,req)=> {
   const url = `${process.env.API}/api/get-comment-comment-id`;
   return dispatch => {
     let promise = new Promise((resolve, reject) => {
       axios({
         method: 'post',
         url: url,
-        data: {commentId : commentId}
-        //headers : { Authorization: `Bearer ${accessToken}` }
+        data: {commentId : commentId},
+        headers : { Authorization: `Bearer ${getCookie('access_token',req)}` }
       }) .then( res => {
         dispatch({
           type: 'GET_COMMENT_COMMENT_ID',
@@ -57,8 +58,8 @@ export const voteAComment = (commentId , statusVote ) => {
       axios({
         method: 'post',
         url: url,
-        data: {commentId : commentId, statusVote :statusVote}
-        //headers : { Authorization: `Bearer ${accessToken}` }
+        data: {commentId : commentId, statusVote :statusVote},
+        headers : { Authorization: `Bearer ${getCookie('access_token',null)}` }
       }) .then( res => {
         dispatch({
           type: 'VOTE_A_COMMENT',
@@ -85,8 +86,8 @@ export const createACommentChildren = (data) => {
       axios({
         method: 'post',
         url: url,
-        data: data
-        //headers : { Authorization: `Bearer ${accessToken}` }
+        data: data,
+        headers : { Authorization: `Bearer ${getCookie('access_token',null)}` }
       }) .then( res => {
         dispatch({
           type: 'CREATE_A_COMMENT_CHILDREN',
@@ -110,8 +111,8 @@ export const deleteAComment = (data)=> {
       axios({
         method: 'post',
         url: url,
-        data: data
-        //headers : { Authorization: `Bearer ${accessToken}` }
+        data: data,
+        headers : { Authorization: `Bearer ${getCookie('access_token',null)}` }
       }) .then( res => {
         dispatch({
           type: 'DELETE_A_COMMENT',

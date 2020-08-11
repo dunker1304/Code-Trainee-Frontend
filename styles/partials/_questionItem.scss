@@ -25,7 +25,7 @@
       color: #898980;
       font-size: 12px;
     }
-    .question-category-item:first-child{
+    .question-category-item{
       margin-right:5px;    }
   }
   .question-level {
@@ -52,5 +52,21 @@
 .question-item:hover {
   cursor: pointer;
   transform: translateY(-5px);
+}
+.btn_icon {
+  background-color: transparent;
+  border : none;
+  .anticon-heart {
+    position: relative;
+    top:-7px;
+  }
+}
+.btn_icon:hover {
+  background-color: transparent;
+}
+
+.btn_icon .ant-btn[disabled] {
+  background-color: transparent;
+  border : none;
 }
 

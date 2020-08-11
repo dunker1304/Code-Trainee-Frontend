@@ -1,7 +1,7 @@
 import { BellFilled , UserOutlined ,HeartOutlined,CheckOutlined,DeleteOutlined ,
   FileProtectOutlined,PieChartOutlined,UndoOutlined,EllipsisOutlined,LogoutOutlined,TeamOutlined ,SnippetsOutlined ,ContainerOutlined  ,CommentOutlined} from "@ant-design/icons"
 import Logo from "../static/images/codetrainee.png"
-import { Menu , Empty,Popover,Avatar} from 'antd';
+import { Menu , Empty,Popover,Avatar ,Button , Modal} from 'antd';
 import Link from 'next/link'
 import axios from "axios"
 import Router from "next/router"
@@ -10,6 +10,9 @@ import { connect } from "react-redux"
 import { useEffect ,useState } from "react"
 import  moment from "moment"
 import classnames from "classnames"
+import  { displayLogin } from "../store/auth/action"
+import Login from "../components/Login"
+import Register from "../components/Register"
 const CONSTANTS = require("../utils/constants")
 
 const Header = (props) => {
@@ -294,7 +297,7 @@ const Header = (props) => {
            <div className="header-left">
                 {props.userInfo && props.userInfo.role ? renderNavForRole(props.userInfo.role['id']) : ''}
            </div>
-           <div className="header-right">
+           <div className="header-right" style= {{ display : props.isAuthenticated ? 'flex' : 'none'}}>
               <div className="header-ring">
               <div style={{ position: 'relative' }} id="area_noti">
                
@@ -315,6 +318,27 @@ const Header = (props) => {
                 
               </div>
            </div>
+      
+            <div className="header-right" style= {{ display : props.isAuthenticated ? 'none' : 'flex'}}>
+               <Button className ="header_button" onClick={()=>props.displayLogin(true,1)}>Sign In</Button>
+               <Button className ="header_button" onClick={()=>props.displayLogin(true,2)}>Sign Up</Button>
+               <Modal
+                  style={{ top: 20 }}
+                  closable = {false}
+                  visible={props.isShowLogin.isShow}
+                  footer = {null}
+                  onOk={()=> props.displayLogin(false,1)}
+                  onCancel={()=> props.displayLogin(false,1)}
+                  wrapClassName = 'login-modal'
+                  className="my-modal-class"
+                >
+                  {
+                    props.isShowLogin.type == 1 ?   <Login  type = "1"></Login>
+                    : <Register type = "2" ></Register>
+                  }
+               
+                </Modal>
+            </div> 
         </div>
       </div>
 
@@ -324,8 +348,10 @@ const Header = (props) => {
 
 function mapStateToProps(state, ownProps) {
   return {
-    userInfo : state.auth.userInfo
+    userInfo : state.auth.userInfo,
+    isAuthenticated : state.auth.isAuthenticated,
+    isShowLogin : state.auth.isShowLogin
   }
 }
 
-export default connect(mapStateToProps,null)(Header)
+export default connect(mapStateToProps, {displayLogin})(Header)

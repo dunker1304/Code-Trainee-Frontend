@@ -78,6 +78,10 @@ const DetailComment = (props) => {
                   options={{
                      status:false,
                      spellChecker: false,
+                     hideIcons: ["image",'side-by-side'],
+                     onToggleFullScreen : false,
+                     sideBySideFullscreen : false,
+                     placeholder: "Type here...(Markdown is supported)",
                      renderingConfig: {
                         singleLineBreaks: false,
                         codeSyntaxHighlighting: true,
@@ -87,7 +91,7 @@ const DetailComment = (props) => {
                   />
                  </div>
                  <div className="input_action">
-                     <Button className="post-btn" htmlType="submit" >Post</Button>
+                     <Button className="post-btn" htmlType="submit" disabled= {!props.isAuthenticated} title = {!props.isAuthenticated ? 'Login to Discuss':''}>Post</Button>
                  </div>
               </form>
             </div>
@@ -110,7 +114,9 @@ const DetailComment = (props) => {
 function mapStateToProps(state, ownProps) {
    return {
      discussDetail : state.discuss.discussDetail,
-     discuss : state.discuss.discuss
+     discuss : state.discuss.discuss,
+     isAuthenticated : state.auth.isAuthenticated,
+   
    }
  }
 

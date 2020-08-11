@@ -5,6 +5,7 @@
   align-items: center;
   justify-content: flex-start;
   transition: background-color 500ms linear;
+  cursor: pointer;
  .topic-item {
     .topic-info {
       img {
@@ -73,4 +74,10 @@
        cursor: default;
      }
   }
+}
+.isDisabled {
+  color: currentColor;
+  cursor: not-allowed;
+  text-decoration: none;
+  
 }

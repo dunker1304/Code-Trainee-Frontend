@@ -1,10 +1,11 @@
 import axios from 'axios';
+import httpAuth from "../../utils/axios"
 
 export const loadUserInfo = (accessToken) => {
   const url = `${process.env.API}/api/current_user`;
   return dispatch => {
     let promise = new Promise((resolve, reject) => {
-      axios({
+      httpAuth({
         method: 'get',
         withCredentials : true,
         url: url,
@@ -26,11 +27,11 @@ export const loadUserInfo = (accessToken) => {
 }
 
 
-  export const signIn = (email,password)=> {
+  export const signIn = (email,password,role)=> {
     const url = `${process.env.API}/signin`;
     
     const config = { headers: { 'Content-Type': 'application/json' } };
-    const data = {email : email , password : password}
+    const data = {email : email , password : password , role : role}
     return dispatch => {
       let promise = new Promise((resolve, reject) => {
         axios({
@@ -72,7 +73,6 @@ export const loadUserInfo = (accessToken) => {
           url: url,
           data :data
         }) .then( res => {
-          console.log(res)
           dispatch({
             type: 'SIGN_UP',
             payload: res.data

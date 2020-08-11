@@ -6,9 +6,21 @@ import { UpCircleOutlined } from '@ant-design/icons'
 import CodeTrainee from 'hocs';
 import * as action from "../store/auth/action"
 import Login from "../components/Login"
+import Register from "../components/Register"
+const CONSTANTS = require('../utils/constants')
+import { redirectRouter } from "../helpers/utils"
 
 
 class Index extends Component {
+
+  UNSAFE_componentWillReceiveProps(nextProps){
+    if(this.props.isAuthenticated != nextProps.isAuthenticated) {
+      if(nextProps.isAuthenticated == true) {
+        console.log(nextProps)
+        redirectRouter(nextProps.userInfo['role']['id'])
+      }
+    }
+  }
 
   render() {
     return (
@@ -39,8 +51,11 @@ class Index extends Component {
                   wrapClassName = 'login-modal'
                   className="my-modal-class"
                 >
-      
-                 <Login  type = {this.props.isShowLogin.type ?this.props.isShowLogin.type:1 }></Login>
+                  {
+                    this.props.isShowLogin.type == 1 ?   <Login  type = "1"></Login>
+                    : <Register type = "2" ></Register>
+                  }
+               
                 </Modal>
                 <div className="col-sm-6 col-12">
                   <ul className='header-btn'>
@@ -208,7 +223,9 @@ class Index extends Component {
 function mapStateToProps(state) {
   return {
     errorMessage: state.auth.errorMessage,
-    isShowLogin : state.auth.isShowLogin
+    isShowLogin : state.auth.isShowLogin,
+    isAuthenticated : state.auth.isAuthenticated,
+    userInfo : state.auth.userInfo
   }
 }
 

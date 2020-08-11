@@ -80,7 +80,7 @@ const AuthHOC = Page => {
 const     ignoreRouter = (pathname , isAuthenticated ,userInfo) =>{
 
   // ignore router
-  const routerIgnore = [ '/problem' , '/playground', 'accessDeny']
+  const routerIgnore = [ '/problem' , '/playground', '/accessDeny','/exercise/[exerciseId]/discuss']
   
   for(let i= 0 ; i < routerIgnore.length ; i++) {
      if(pathname.includes(routerIgnore[i])){
