@@ -118,6 +118,16 @@ const ExerciseList = (props) => {
     router.push(`/exercise?id=${record.key}`, '/exercise');
   };
 
+  const elementInColumnAction = (target) => {
+    if (target.tagName === 'TD') {
+      return target.cellIndex === 9;
+    } else if (target.className === 'ant-popover-inner-content') {
+      return true;
+    } else {
+      return elementInColumnAction(target.parentNode);
+    }
+  };
+
   useEffect(() => {
     loadTable();
   }, []);
@@ -312,9 +322,7 @@ const ExerciseList = (props) => {
           onRow={(record, rowIndex) => {
             return {
               onClick: (event) => {
-                let cellIndex = event.target.cellIndex;
-                console.log('cellIndex', cellIndex);
-                if (cellIndex === 9) {
+                if (elementInColumnAction(event.target)) {
                   // this is column 'action', => do nothing
                   return;
                 }

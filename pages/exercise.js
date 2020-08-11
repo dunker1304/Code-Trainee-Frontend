@@ -30,6 +30,8 @@ const Exercise = (props) => {
   let [selectedLanguages, setSelectedLanguages] = useState([]);
   let [snippetValues, setSnippetValues] = useState({});
   // step reivew
+  let [listTeachers, setListTeachers] = useState([]);
+  let [reviewers, setReviewers] = useState([]);
 
   const loadSupportedLanguages = async () => {
     try {
@@ -97,12 +99,30 @@ const Exercise = (props) => {
     }
   };
 
+  const loadAllTeachers = async () => {
+    try {
+      const res = await axios.get(`${process.env.API}/api/user/teacher/all`);
+      if (res.data.success) {
+        setListTeachers(res.data.data);
+      } else {
+        throw new Error('');
+      }
+    } catch (e) {
+      notification.error({
+        message: 'Notification',
+        description: 'Something get wrong!',
+      });
+      console.log(e);
+    }
+  };
+
   useEffect(() => {
     exerciseId && loadSupportedLanguages();
   }, [exerciseId]);
 
   useEffect(() => {
     !isCreate && loadOldBasicInfos();
+    loadAllTeachers();
   }, []);
 
   return (
@@ -119,7 +139,7 @@ const Exercise = (props) => {
         }}>
         <Divider />
         <Steps current={currStep}>
-          <Steps.Step title='Basic Information' key='0' />
+          <Steps.Step title='Basic Informations' key='0' />
           <Steps.Step title='Code Stubs' key='1' />
           <Steps.Step title='Testcases' key='2' />
           <Steps.Step title='Review' key='3' />
@@ -163,7 +183,13 @@ const Exercise = (props) => {
             />
           )}
           {currStep === 3 && (
-            <StepReview prev={() => setCurrStep(2)} exerciseId={exerciseId} />
+            <StepReview
+              prev={() => setCurrStep(2)}
+              exerciseId={exerciseId}
+              listTeachers={listTeachers}
+              reviewers={reviewers}
+              setReviewers={setReviewers}
+            />
           )}
         </div>
       </div>
