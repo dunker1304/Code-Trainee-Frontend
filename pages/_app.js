@@ -9,10 +9,7 @@ import Head from 'next/head'
 import "simplemde/dist/simplemde.min.css";
 import 'highlight.js/styles/github.css';
 import 'react-calendar-heatmap/dist/styles.css';
-import socketIOClient from 'socket.io-client'
-import ChatSocket from "../utils/chatSocket"
-let socket = new ChatSocket()
-let io = socket.instance
+
 
 
 // function MyApp({ Component, pageProps }) {
@@ -33,20 +30,7 @@ let io = socket.instance
 
 class MyApp extends App {
   static async getInitialProps({ Component, ctx }) {
-    io.socket.on('connect', () => {
-      console.log("1")
-  })
-
-  io.socket.on('foo', function (msg) {
-    console.log("2")
-  })
-  io.socket.on('connect_error', (err) => {
-      console.log('Error when connect to socket ===>>> ' + err)
-  })
-  io.socket.on('disconnect', function () {
-      console.log('Disconnected---------')
-     
-  })
+    
     return {
       pageProps: Component.getInitialProps
         ? await Component.getInitialProps(ctx)
