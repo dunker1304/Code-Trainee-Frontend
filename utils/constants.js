@@ -9,10 +9,11 @@ export const languageMap = {
 
 export const ERROR_MESSAGE_FROM_SERVER = {
    "1" : "hệ thống đã có lỗi xảy ra",
-   "2" : "Content of comment may not empty!",
+   "2" : "Minimum post length is 12 characters.",
    "3" : "Content of comment too long!",
    "4" : "You have alreay voted this comment",
-   "5" : "You dont have permission to delete this question"
+   "5" : "You dont have permission to delete this question",
+   "7" : "Title too long"
 }
 
 export const ROLE = {

@@ -15,14 +15,15 @@ export const getCookieFromReq = (req, cookieKey) => {
 }; 
 
 export const translateClassName = (level) => {
-  switch (level) {
-    case 'Easy':
-      return 'success';
-    case 'Medium':
-      return 'warning';
-    case 'Hard':
-      return 'danger';
-  }
+  let key = level.toUpperCase();
+    switch (key) {
+      case 'EASY':
+        return 'success';
+      case 'MEDIUM':
+        return 'warning';
+      case 'HARD':
+        return 'danger';
+    }
 }
 
 export const getQuery = (query)=> {
@@ -31,8 +32,6 @@ export const getQuery = (query)=> {
 }
 
 export const redirectRouter = (roleId) => {
-  console.log(roleId)
-  console.log(roleId == 3) 
   switch(roleId) {
     case CONSTANTS.ROLE.ROLE_ADMIN : 
         Router.push('/admin/accounts')
@@ -44,4 +43,24 @@ export const redirectRouter = (roleId) => {
         Router.push('/problem')
         break        
   }
+}
+
+export const validateDisplayName = (value) => {
+   if(value.length > 25 ) {
+      value = value.substring(0,22) + '...';
+   }
+
+   return value;
+
+}
+
+export const getCookie = (name) => {
+  let matches = undefined;
+  if (typeof window !== "undefined") {
+     matches = document.cookie.match(new RegExp(
+      "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+    ));
+   }
+ 
+  return matches ? decodeURIComponent(matches[1]) : undefined;
 }

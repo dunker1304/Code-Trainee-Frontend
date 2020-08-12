@@ -5,6 +5,7 @@ import React, { useState, createElement } from 'react';
 import classnames from 'classnames'
 import Router , {useRouter} from 'next/router'
 import axios from 'axios'
+import httpAuth from "../utils/axios"
 import { openNotificationWithIcon } from "../components/Notification"
 import  { ERROR_MESSAGE_FROM_SERVER} from "../utils/constants"
 const SimpleMDE = dynamic(() => import('react-simplemde-editor'), {
@@ -34,11 +35,12 @@ const CommentInput = (props) => {
       questionId : props.questionId
     }
     let url = `${process.env.API}/api/create-comment`
-    let res = await axios.post(url,data)
+    let res = await httpAuth.post(url,data)
 
     if(res.data.success) {
         let createdCmt = res.data.data
-        Router.push('/exercise/[exerciseId]/[discussId]',`/exercise/${props.questionId}/${`discuss_${createdCmt['id']}`}`)
+        props.handelClickShow()
+        Router.push('/exercise/[exerciseId]/discuss',`/exercise/${props.questionId}/discuss`)
     }
     else {
       openNotificationWithIcon('error','',ERROR_MESSAGE_FROM_SERVER[res.data.error])
@@ -69,6 +71,10 @@ const CommentInput = (props) => {
                     options={{
                      autofocus: true,
                      spellChecker: false,
+                     hideIcons: ["image",'side-by-side'],
+                     onToggleFullScreen : false,
+                     sideBySideFullscreen : false,
+                     placeholder: "Type here...(Markdown is supported)",
                      status:false,
                      renderingConfig: {
                           singleLineBreaks: false,

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import {getCookie} from "../../utils/cookies"
 export const searchQuestion = (data)=> {
   const url = `${process.env.API}/api/search-exercise`;
   return dispatch => {
@@ -7,7 +8,7 @@ export const searchQuestion = (data)=> {
         method: 'post',
         url: url,
         data : data ,
-        //headers : { Authorization: `Bearer ${accessToken}` }
+   //     headers : { Authorization: `Bearer ${getCookie('access_token')}` }
       }) .then( res => {
         dispatch({
           type: 'SEARCH_QUESTION',
@@ -76,8 +77,8 @@ export const addToWishList = (questionId) => {
       axios({
         method: 'post',
         url: url,
-        data: {questionId : questionId}
-        //headers : { Authorization: `Bearer ${accessToken}` }
+        data: {questionId : questionId},
+        headers : { Authorization: `Bearer ${getCookie('access_token')}` }
       }) .then( res => {
         dispatch({
           type: 'ADD_TO_WISHLIST',
@@ -101,8 +102,8 @@ export const removeToWishList = (questionId ,typeWishList) => {
       axios({
         method: 'post',
         url: url,
-        data: {exerciseId : questionId , typeWishList :typeWishList }
-        //headers : { Authorization: `Bearer ${accessToken}` }
+        data: {exerciseId : questionId , typeWishList :typeWishList },
+        headers : { Authorization: `Bearer ${getCookie('access_token')}` }
       }) .then( res => {
         dispatch({
           type: 'REMOVE_TO_WISHLIST',
@@ -126,7 +127,7 @@ export const getWishList = () => {
       axios({
         method: 'get',
         url: url,
-        //headers : { Authorization: `Bearer ${accessToken}` }
+        headers : { Authorization: `Bearer ${getCookie('access_token')}` }
       }) .then( res => {
         dispatch({
           type: 'GET_TYPE_WISHLIST',
@@ -193,8 +194,8 @@ export const getWishListByType = (type) => {
   }
 }
 
-export const getExerciseOfUser = ()=> {
-  const url = `${process.env.API}/api/user/exercise`;
+export const getExerciseOfUser = (userId)=> {
+  const url = `${process.env.API}/api/user/exercise/${userId}`;
   return dispatch => {
     let promise = new Promise((resolve, reject) => {
       axios({

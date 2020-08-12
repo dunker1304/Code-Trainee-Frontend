@@ -4,6 +4,7 @@ import  {Table} from "antd"
 import axios from "axios"
 import { getExerciseOfUser} from "../store/problem/action"
 import {connect} from "react-redux"
+import Link from 'next/link'
 
 const columns = [
   {
@@ -20,6 +21,7 @@ const columns = [
     title: 'Status',
     dataIndex: 'status',
     key: 'status',
+    render: (text,record) => <Link href="/submission/[submissionId]" as={`/submission/${record['id']}`} ><span className="status-submisson" style={{background : "#d9534f"}}>{text}</span></Link>,
   },
   {
     title: 'Runtime',
@@ -61,9 +63,10 @@ const Process = (props) => {
   }, [fontSize2])
 
   const fetchData = async ()=> {
-    let url = `${process.env.API}/api/all-submission`
+    let userId  = props.userInfo ?props.userInfo['id']:null;
+    let url = `${process.env.API}/api/all-submission?userId=${userId} `
     let result =await  axios.get(url)
-    await props.getExerciseOfUser()
+    await props.getExerciseOfUser( userId)
     setDataSource(result.data.data)
   }
 
@@ -177,7 +180,8 @@ const Process = (props) => {
 
 function mapStateToProps(state, ownProps) {
   return {
-    exerciseOfUser : state.problem.exerciseOfUser
+    exerciseOfUser : state.problem.exerciseOfUser,
+    userInfo : state.auth.userInfo
   }
 }
 
