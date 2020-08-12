@@ -3,7 +3,7 @@ import { Editor } from '@tinymce/tinymce-react';
 import { useState, useEffect, ReactNode, useReducer, useRef } from 'react';
 import ExerciseTags from './ExerciseTags';
 import ExerciseLOC from './ExerciseLOC';
-import ExerciseContent from './ExerciseContent';
+import TinymceTextArea from '../TinymceTextArea';
 import axios from 'axios';
 
 const StepBasicInfos = ({
@@ -164,7 +164,7 @@ const StepBasicInfos = ({
           label='Content'
           name='content'
           rules={[validateRequire('Content')]}>
-          <ExerciseContent />
+          <TinymceTextArea />
         </Form.Item>
         <Form.Item name='level' label='Level'>
           <Select
@@ -179,7 +179,6 @@ const StepBasicInfos = ({
         <Form.Item
           name='points'
           label='LOC'
-          required={isCreate}
           rules={[validateRequire('LOC')]}>
           <ExerciseLOC min={rangeValue[0]} max={rangeValue[1]} />
         </Form.Item>

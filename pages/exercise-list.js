@@ -16,8 +16,12 @@ import {
   LoadingOutlined,
   EditTwoTone,
   DeleteTwoTone,
+  EyeOutlined,
+  EyeTwoTone,
+  EyeInvisibleFilled,
+  EyeInvisibleTwoTone,
 } from '@ant-design/icons';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -25,6 +29,7 @@ import Link from 'next/link';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import composedAuthHOC from 'hocs';
+import ExercisePreviewModal from '../components/exercise/ExercisePreviewModal';
 
 const ExerciseList = (props) => {
   let currUserId = props.userInfo.id || 0;
@@ -38,9 +43,16 @@ const ExerciseList = (props) => {
   // state button loading
   let [loadingButtonCreate, setLoadingButtonCreate] = useState(false);
 
-  useEffect(() => {
-    loadTable();
-  }, []);
+  // preview
+  let [visiblePreview, setVisiblePreview] = useState(false);
+  let [contentPreview, setContentPreview] = useState({
+    title: '',
+    level: '',
+    like: 0,
+    dislike: 0,
+    content: '',
+    points: 1,
+  });
 
   const loadTable = async () => {
     try {
@@ -110,6 +122,38 @@ const ExerciseList = (props) => {
     router.push(`/exercise?id=${record.key}`, '/exercise');
   };
 
+  const elementInColumnAction = (target) => {
+    if (target.tagName === 'TD') {
+      return target.cellIndex === 9;
+    } else if (target.className === 'ant-popover-inner-content') {
+      return true;
+    } else {
+      return elementInColumnAction(target.parentNode);
+    }
+  };
+
+  const handleSelfReview = (record) => {
+    setTableLoading(true);
+    router.push(`/review?id=${record.key}`, `/review`);
+  };
+
+  useEffect(() => {
+    loadTable();
+  }, []);
+
+  useEffect(() => {
+    if (!visiblePreview) {
+      setContentPreview({
+        title: '',
+        level: '',
+        like: 0,
+        dislike: 0,
+        content: '',
+        points: 1,
+      });
+    }
+  }, [visiblePreview]);
+
   return (
     <>
       <Head>
@@ -118,7 +162,9 @@ const ExerciseList = (props) => {
       <Header />
       <div
         style={{
-          marginTop: '50px',
+          width: '95%',
+          margin: '60px auto',
+          marginBottom: 0,
         }}>
         <Table
           loading={tableLoading}
@@ -128,7 +174,12 @@ const ExerciseList = (props) => {
                 display: 'flex',
                 justifyContent: 'space-between',
               }}>
-              <Col>Exercise List</Col>
+              <Col
+                style={{
+                  fontSize: '19px',
+                }}>
+                Exercise List
+              </Col>
               <Col>
                 <Button
                   type='primary'
@@ -140,7 +191,7 @@ const ExerciseList = (props) => {
             </Row>
           )}
           bordered
-          scroll={{ x: 1000 }}
+          scroll={{ x: 1100 }}
           columns={[
             {
               title: 'No.',
@@ -193,12 +244,24 @@ const ExerciseList = (props) => {
               key: 'content',
               ellipsis: true,
               width: '260px',
+              render: (text, record) => {
+                return (
+                  <div
+                    style={{
+                      width: '260px',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}>
+                    {record.content}
+                  </div>
+                );
+              },
             },
             {
               title: 'Approved',
               dataIndex: 'approved',
               key: 'approved',
-              width: '100px',
+              width: '130px',
               align: 'center',
               render: (text, record) => {
                 return (
@@ -219,19 +282,20 @@ const ExerciseList = (props) => {
               title: 'Last Modified',
               dataIndex: 'lastModified',
               key: 'lastModified',
-              width: '150px',
+              width: '200px',
               ellipsis: true,
             },
             {
               title: 'Action',
               key: 'action',
               fixed: 'right',
-              width: '120px',
+              width: '170px',
               render: (text, record) => (
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between'
-                }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                  }}>
                   <Tooltip placement='top' title={'Edit'}>
                     <Button
                       ghost
@@ -260,10 +324,52 @@ const ExerciseList = (props) => {
                       </Button>
                     </Popconfirm>
                   </Tooltip>
+                  <Tooltip placement='top' title={'Self-review'}>
+                    {!record.approved ? (
+                      <Button
+                        ghost
+                        type='link'
+                        style={{
+                          border: 'none',
+                        }}
+                        onClick={() => handleSelfReview(record)}>
+                        <EyeTwoTone style={{ fontSize: '16px' }} />
+                      </Button>
+                    ) : (
+                      <Button
+                        disabled
+                        ghost
+                        type='link'
+                        style={{
+                          border: 'none',
+                        }}>
+                        <EyeInvisibleTwoTone style={{ fontSize: '16px' }} />
+                      </Button>
+                    )}
+                  </Tooltip>
                 </div>
               ),
             },
           ]}
+          onRow={(record, rowIndex) => {
+            return {
+              onClick: (event) => {
+                if (elementInColumnAction(event.target)) {
+                  // this is column 'action', => do nothing
+                  return;
+                }
+                setVisiblePreview(true);
+                setContentPreview({
+                  content: record.content,
+                  dislike: record.dislike,
+                  like: record.like,
+                  title: record.title,
+                  level: record.level,
+                  points: record.points,
+                });
+              },
+            };
+          }}
           dataSource={tableData}
           pagination={{
             defaultPageSize: 10,
@@ -277,6 +383,13 @@ const ExerciseList = (props) => {
         />
       </div>
       <Footer />
+      <ExercisePreviewModal
+        title='Preview Exercise'
+        data={contentPreview}
+        raw={false}
+        visible={visiblePreview}
+        onCancel={() => setVisiblePreview(false)}
+      />
     </>
   );
 };

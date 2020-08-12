@@ -84,8 +84,8 @@ const WishList = (props)=> {
        <div className="right_wish_list">
          <div className="favorite-panel">
            <div className="panel-heading list-header-container">
-             <div class="list-header-left-pane">
-              <h3 class="panel-title list-name-header" title="Favorite">Favorite</h3>
+             <div className="list-header-left-pane">
+              <h3 className="panel-title list-name-header" title="Favorite">Favorite</h3>
              </div>                 
            </div>
            <div className="favorite-list">
