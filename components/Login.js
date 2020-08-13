@@ -5,6 +5,8 @@ import * as action from "../store/auth/action"
 import { displayLogin } from "../store/auth/action"
 import  Google  from "../static/images/icon-google.png"
 const CONSTANTS = require('../utils/constants')
+var popupTools = require('popup-tools');
+import  {openNotificationWithIcon } from "../components/Notification"
 
 const Login= (props) => {
 
@@ -41,6 +43,25 @@ const Login= (props) => {
 
   }
 
+  const googleLogin = (e)=> {
+    popupTools.popup(`${process.env.API}/oauth/google/${role}`, "Google Connect", {}, function (err, data) {
+      if (err) {
+        //openNotificationWithIcon('error','',err.message);
+        console.log(err)
+      } else {
+         if(!data.success) {
+           openNotificationWithIcon('error','',data.message)
+         }
+         else {
+            if(data.message) {
+              openNotificationWithIcon('success','',data.message)
+            }
+            window.location.reload();
+         }      
+      }
+  });     
+  }
+
 
     return (
       <div>
@@ -61,10 +82,11 @@ const Login= (props) => {
               <span className="login100-form-title p-b-20">
                 Login your { role == CONSTANTS.ROLE.ROLE_STUDENT ? ' STUDENT ': ' TEACHER '} account
               </span>
-              <a href={`${process.env.API}/oauth/google/${role}`} className="btn-google m-b-20">
+              {/* href={`${process.env.API}/oauth/google/${role}`} */}
+              <button  className="btn-google m-b-20" onClick= {(e)=> { googleLogin(e)}}>
                 <img src={Google} alt="GOOGLE" />
                 Google
-              </a>
+              </button>
               <p className='label-or'>OR</p>
               <div className="p-t-20 p-b-9">
                 <span className="txt1"> 

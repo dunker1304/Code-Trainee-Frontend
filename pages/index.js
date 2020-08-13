@@ -9,18 +9,19 @@ import Login from "../components/Login"
 import Register from "../components/Register"
 const CONSTANTS = require('../utils/constants')
 import { redirectRouter } from "../helpers/utils"
+import composedAuthHOC from 'hocs';
 
 
 class Index extends Component {
 
-  UNSAFE_componentWillReceiveProps(nextProps){
-    if(this.props.isAuthenticated != nextProps.isAuthenticated) {
-      if(nextProps.isAuthenticated == true) {
-        console.log(nextProps)
-        redirectRouter(nextProps.userInfo['role']['id'])
-      }
-    }
-  }
+  // UNSAFE_componentWillReceiveProps(nextProps){
+  //   if(this.props.isAuthenticated != nextProps.isAuthenticated) {
+  //     if(nextProps.isAuthenticated == true) {
+  //       console.log(nextProps)
+  //       redirectRouter(nextProps.userInfo['role']['id'])
+  //     }
+  //   }
+  // }
 
   render() {
     return (
@@ -229,4 +230,4 @@ function mapStateToProps(state) {
   }
 }
 
-export default connect(mapStateToProps,action)(Index)
+export default connect(mapStateToProps,action)(composedAuthHOC(Index))

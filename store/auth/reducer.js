@@ -26,7 +26,7 @@ export default (state = initState, action) => {
           draft.isAuthenticated = true
         }
         else {
-          draft.userInfo = action.payload.user
+          draft.userInfo = action.payload.user  ? action.payload.user : {}
           draft.isAuthenticated = false
         }
      

@@ -5,7 +5,7 @@ export const loadUserInfo = (accessToken) => {
   const url = `${process.env.API}/api/current_user`;
   return dispatch => {
     let promise = new Promise((resolve, reject) => {
-      httpAuth({
+      axios({
         method: 'get',
         withCredentials : true,
         url: url,
