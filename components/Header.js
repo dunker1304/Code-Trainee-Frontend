@@ -13,7 +13,9 @@ import classnames from "classnames"
 import  { displayLogin } from "../store/auth/action"
 import Login from "../components/Login"
 import Register from "../components/Register"
+import  { isEmptyObject} from "../helpers/utils"
 const CONSTANTS = require("../utils/constants")
+
 
 const Header = (props) => {
 
@@ -24,6 +26,9 @@ const Header = (props) => {
   },[])
 
   const fetchData = async ()=>{
+    if(isEmptyObject(props.userInfo)) {
+      return ;
+    }
     let url = `${process.env.API}/api/get-most-notification/${props.userInfo['id']}`
     let resData = await axios.get(url)
     if(resData.data.success) {

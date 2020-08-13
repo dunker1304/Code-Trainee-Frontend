@@ -16,7 +16,7 @@ import { openNotificationWithIcon } from "../components/Notification"
 import composedAuthHOC from 'hocs';
 import {compose} from "redux";
 import  classnames from 'classnames'
-import { validateDisplayName ,translateClassName ,getCookie } from "../helpers/utils"
+import { validateDisplayName ,translateClassName ,getCookie ,isEmptyObject } from "../helpers/utils"
 import Cookies from 'js-cookie'
  
 
@@ -488,7 +488,7 @@ Problems.getInitialProps = async (ctx) => {
   let data = { 'userId' : getState().auth.userInfo ?getState().auth.userInfo['id']:null }
   await dispatch(searchQuestion(data))
   await dispatch(getCategory())
-  await dispatch(getExerciseOfUser(getState().auth.userInfo ?getState().auth.userInfo['id']:null))
+  await dispatch(getExerciseOfUser(!isEmptyObject(getState().auth.userInfo) ? getState().auth.userInfo['id']:null))
 
 }
 

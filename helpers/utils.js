@@ -34,14 +34,11 @@ export const getQuery = (query)=> {
 export const redirectRouter = (roleId) => {
   switch(roleId) {
     case CONSTANTS.ROLE.ROLE_ADMIN : 
-        Router.push('/admin/accounts')
-        break;
+        return '/admin/accounts';
     case CONSTANTS.ROLE.ROLE_TEACHER :
-        Router.push('/exercise-list')
-        break;
+        return '/exercise-list';
     case CONSTANTS.ROLE.ROLE_STUDENT :
-        Router.push('/problem')
-        break        
+        return '/problem'; 
   }
 }
 
@@ -63,4 +60,9 @@ export const getCookie = (name) => {
    }
  
   return matches ? decodeURIComponent(matches[1]) : undefined;
+}
+
+export const isEmptyObject = (value)=> {
+  if(!value.obj) return true;
+  return Object.keys(value.obj).length === 0 && value.obj.constructor === Object
 }
