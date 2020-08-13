@@ -2,6 +2,7 @@ import { Row, Col } from 'antd'
 
 const TestCase = props => {
   const testCase = props.testCaseProps
+  console.log(testCase, 'teaser')
   return (
     testCase.isHidden ? 
     (<div className='test-case-wrapper'> Hidden </div>)

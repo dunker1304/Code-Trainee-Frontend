@@ -47,17 +47,20 @@ const Playground = props => {
   const [keyboardHandler, setKeyboardHandler] = useState("")
   const [gutter, setGutter] = useState(true)
   const [indexActive , setIndexActive] = useState("1")
+  const [indexLanguage , setIndexLanguage] = useState(0)
   const router = useRouter()
 
   useEffect(() => {
    let activeTab = router.query.tab ? router.query.tab : "1"
+   console.log(props, 'use effect')
+   setCode(props.language[indexLanguage].codeSnippets[0]?.sampleCode || "")
    if(activeTab == 4) {
     let questionId = router.query.questionID
     Router.push(`/exercise/[exerciseId]/discuss`,`/exercise/${questionId}/discuss`)
    }
    else
     setIndexActive(activeTab)
-  },[]);
+  },[props.language]);
   const [runCode, setRunCode] = useState(false)
   const [loading, setLoading] = useState(false)
   const [loadingAllPage, setLoadingAllPage] = useState(false)
@@ -103,7 +106,6 @@ const Playground = props => {
     }
     axios.post(`${process.env.API}/api/solution`, data)
       .then(res => {
-        console.log(res, 'add solution')
         setLoading(false)
         if (res.data.success) {
           notification.success({
@@ -143,7 +145,9 @@ const Playground = props => {
     //   .catch(error => {
     //     console.log(error)
     //   })
-    setLanguageID(value)
+    setRunCode(false);
+    setLanguageID(value);
+    setIndexLanguage(option.key);
     setCode(props.language[option.key].codeSnippets[0]?.sampleCode || "")
   }
 
@@ -285,6 +289,7 @@ const Playground = props => {
             fontSize={fontSize}
             tabSize={tabSize}
             keyboardHandler={keyboardHandler}
+            maxLines={Infinity}
             name="playground"
             showGutter={gutter}
             showPrintMargin={false}
@@ -350,6 +355,7 @@ Playground.getInitialProps = async function(ctx) {
   const questionResponse = await axios.get(urlExercise)
   const languageResponse = await axios.get(urlLanguage)
   const exerciseVote = await axios.get(urlVote)
+  console.log('get initial props')
   return { 
     question: questionResponse.data, 
     language: languageResponse.data.data,
