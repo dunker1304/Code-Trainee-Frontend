@@ -10,18 +10,20 @@ import Register from "../components/Register"
 const CONSTANTS = require('../utils/constants')
 import { redirectRouter } from "../helpers/utils"
 import composedAuthHOC from 'hocs';
+import Router from "next/router"
 
 
 class Index extends Component {
 
-  // UNSAFE_componentWillReceiveProps(nextProps){
-  //   if(this.props.isAuthenticated != nextProps.isAuthenticated) {
-  //     if(nextProps.isAuthenticated == true) {
-  //       console.log(nextProps)
-  //       redirectRouter(nextProps.userInfo['role']['id'])
-  //     }
-  //   }
-  // }
+  UNSAFE_componentWillReceiveProps(nextProps){
+    if(this.props.isAuthenticated != nextProps.isAuthenticated) {
+      if(nextProps.isAuthenticated == true) {
+        console.log(nextProps)
+        let url = redirectRouter(nextProps.userInfo['role']['id'])
+        Router.push(url)
+      }
+    }
+  }
 
   render() {
     return (

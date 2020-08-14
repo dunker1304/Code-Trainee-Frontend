@@ -3,7 +3,7 @@ import CommentListItem from "../components/CommentListItem"
 import CommentInput from "../components/CommentInput"
 import React, { useState } from 'react';
 import { connect } from 'react-redux'
-import { getDiscussByQuestionId } from "../store/discuss/action";
+import { getDiscussByQuestionId ,createACommentChildren} from "../store/discuss/action";
 const ListComment = (props) => {
   const [isShow, setIsShow] = useState(false);
   const [filterBy , setFilterBy ] = useState(0) /* 0 : DESC - 1 : ASC */
@@ -76,7 +76,7 @@ const ListComment = (props) => {
         </div>
       </div>
 
-     <CommentInput handelClickShow= {()=> handelClickShow()} isShow = {isShow} questionId = {props.questionId}/>
+     <CommentInput  creatComment={ (data)=> createACommentChildren(data)} handelClickShow= {()=> handelClickShow()} isShow = {isShow} questionId = {props.questionId}/>
     </div>
   )
 }
@@ -89,4 +89,4 @@ function mapStateToProps(state , ownProps) {
 }
 
 
-export default connect(mapStateToProps, {getDiscussByQuestionId})(ListComment);
+export default connect(mapStateToProps, {getDiscussByQuestionId,createACommentChildren})(ListComment);

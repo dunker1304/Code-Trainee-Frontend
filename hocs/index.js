@@ -91,7 +91,7 @@ const     ignoreRouter = (pathname , isAuthenticated ,userInfo) =>{
   // ignore router
   const routerIgnore = [ '/problem' , '/playground', '/accessDeny','/exercise/[exerciseId]/discuss']
 
-  if(pathname == '/') {
+  if(pathname == '/' || pathname.includes('admin/login')) {
     return {
       isIgnore: true,
       code : 0 //homepage

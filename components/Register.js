@@ -3,6 +3,8 @@ import { useState  ,useEffect} from "react"
 import { signUp , displayLogin } from "../store/auth/action"
 import {connect} from "react-redux"
 import  Google  from "../static/images/icon-google.png"
+var popupTools = require('popup-tools');
+import  {openNotificationWithIcon } from "../components/Notification"
 
 const CONSTANTS  = require("../utils/constants")
 const Register = (props)=> {
@@ -56,6 +58,27 @@ const Register = (props)=> {
     props.signUp(data);
  }
 
+ const googleLogin = (e)=> {
+  e.preventDefault()
+  popupTools.popup(`${process.env.API}/oauth/google/${role}`, "Google Connect", {}, function (err, data) {
+    if (err) {
+      //openNotificationWithIcon('error','',err.message);
+      console.log(err)
+    } else {
+       if(!data.success) {
+         openNotificationWithIcon('error','',data.message)
+       }
+       else {
+          if(data.message) {
+            openNotificationWithIcon('success','',data.message)
+          }
+          window.location.reload();
+       }      
+    }
+});     
+}
+
+
 
   return  (
     <div>
@@ -76,10 +99,10 @@ const Register = (props)=> {
               <span className="login100-form-title p-b-20">
                  Register new { role == CONSTANTS.ROLE.ROLE_STUDENT ? 'STUDENT' : 'TEACHER'} account
               </span>
-              <a href={`${process.env.API}/oauth/google/${role}`} className="btn-google m-b-20">
+              <button onClick= {(e)=>googleLogin(e)} className="btn-google m-b-20">
                 <img src={Google} alt="GOOGLE" />
                 Google
-              </a>
+              </button>
               <p className='label-or'>OR</p>
               <div className="p-t-20 p-b-9">
                 <span className="txt1">
@@ -136,9 +159,9 @@ const Register = (props)=> {
                 </button>
               </div>
               <div className="w-full text-center p-t-55">
-                <span className="txt2">
+                <a className="txt2" onClick= {()=> props.displayLogin(true,1)} style= {{cursor : "pointer", textDecoration:"underline"}}>
                   Already Registered ? 
-                </span>
+                </a>
                 {/* <a  className="txt2 bo1" onClick = {props.displayLogin(true,1)}>
                  Login now
                 </a> */}

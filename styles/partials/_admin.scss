@@ -14,6 +14,7 @@
       display: flex;
       justify-content: space-between;
       .button_action {
+         display: flex;
         .action_btn {
           margin: 0px 14px 14px 0px;
           padding: 10px 25px;
@@ -38,6 +39,7 @@
            color:#7367f0;
            background: transparent;
            border-radius: 5px;
+           height: 45px;
            .anticon-plus  {
             position: relative;
             top:-3px;

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import httpAuth from "../../utils/axios"
+import  {openNotificationWithIcon} from "../../components/Notification"
 
 export const loadUserInfo = (accessToken) => {
   const url = `${process.env.API}/api/current_user`;
@@ -87,6 +87,14 @@ export const loadUserInfo = (accessToken) => {
       return promise
    }
  }
+
+ export const signOut = ()=> {
+  return dispatch => {
+    dispatch({
+      type: 'SIGN_OUT'
+    })
+   }
+}
 
 
 
