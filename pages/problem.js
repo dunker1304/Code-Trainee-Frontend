@@ -1,7 +1,7 @@
 
 import { Input, Empty } from 'antd';
-import { Menu, Dropdown, Button, Select, Tag, Pagination ,Popover} from 'antd';
-import { DownOutlined, CheckOutlined, SwitcherOutlined } from '@ant-design/icons';
+import { Menu, Dropdown, Button, Select, Tag, Pagination ,Tooltip } from 'antd';
+import { DownOutlined, CheckOutlined, SwitcherOutlined ,HeartOutlined ,MessageOutlined ,HeartFilled } from '@ant-design/icons';
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux'
 import { searchQuestion, chooseTags, dropdownFilter, getCategory,addToWishList,removeToWishList,getExerciseOfUser } from "../store/problem/action"
@@ -362,7 +362,7 @@ const Problems = (props) => {
                     <th className="text-center">Difficulty</th>
                     <th className="text-center">LOC</th>
                     <th className="text-center">Author</th>
-                   
+                    <th className="text-center">Action</th>
                   </tr>
                 </thead>
               
@@ -387,6 +387,29 @@ const Problems = (props) => {
                           <Link href={{pathname : '/profile/[profileId]'}} as={`/profile/${value.author ? value.author['id'] : ''}`}>
                           <a title= {value.author ? value.author.displayName : ''}>{value.author ? validateDisplayName(value.author.displayName) : ''}</a>
                           </Link>
+                          
+                        </td>
+
+                        <td className="text-center created_by">
+                        <div>
+                            {value.isWishList ? 
+                              <Tooltip title={props.isAuthenticated ? 'Remove to WishList' : 'Login To Add WishList'}>
+                                <Button type="text" 
+                                        disabled = { !props.isAuthenticated} className="btn_icon" 
+                                        icon={<HeartFilled  style={{color: '#eb2f96'}}/>} 
+                                        onClick = {()=>props.removeToWishList(value.id) }
+                                />
+                              </Tooltip> :
+                            <Tooltip title={props.isAuthenticated ? 'Add to WishList' : 'Login To Add WishList'}>
+                                <Button type="text" 
+                                        disabled = { !props.isAuthenticated} 
+                                        className="btn_icon" 
+                                        icon={<HeartOutlined   style={{color: '#eb2f96'}}/>}
+                                        onClick = {()=>props.addToWishList(value.id) }
+                                />
+                            </Tooltip>
+                              }
+                          </div>
                           
                         </td>
                         

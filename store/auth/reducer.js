@@ -58,6 +58,11 @@ export default (state = initState, action) => {
           draft.signUpError = action.payload.message
           openNotificationWithIcon('warning','',action.payload.message)
           break 
+      
+      case 'SIGN_OUT':
+        // if(!action.payload.success){
+          draft.isAuthenticated = false
+          break     
      
     }
   })

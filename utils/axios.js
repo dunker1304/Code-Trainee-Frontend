@@ -8,7 +8,7 @@ const httpAuth = axios.create({
     // Add header or another config here
     headers: {
         'Accept': 'application/json',
-       // 'Authorization': 'Bearer ' +  getCookie('access_token')
+        'Authorization': 'Bearer ' +  getCookie('access_token')
     },
     withCredentials : true
 })

@@ -44,6 +44,7 @@ const Login= (props) => {
   }
 
   const googleLogin = (e)=> {
+    e.preventDefault()
     popupTools.popup(`${process.env.API}/oauth/google/${role}`, "Google Connect", {}, function (err, data) {
       if (err) {
         //openNotificationWithIcon('error','',err.message);
@@ -117,7 +118,7 @@ const Login= (props) => {
               </div>
               <div className="w-full text-center p-t-55">
                 <span className="txt2">
-                  Not a member?
+                  Not a member? {' '}
                 </span>
                 <a className="txt2 bo1" onClick= {()=> props.displayLogin(true,2)}>
                   Sign up now

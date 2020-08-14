@@ -10,7 +10,7 @@ import { connect } from "react-redux"
 import { useEffect ,useState } from "react"
 import  moment from "moment"
 import classnames from "classnames"
-import  { displayLogin } from "../store/auth/action"
+import  { displayLogin ,signOut } from "../store/auth/action"
 import Login from "../components/Login"
 import Register from "../components/Register"
 import  { isEmptyObject} from "../helpers/utils"
@@ -49,6 +49,7 @@ const Header = (props) => {
       //headers : { Authorization: `Bearer ${accessToken}` }
     }) 
     if(res.data.success) {
+      props.signOut()
       Router.push('/')
     }
     else {
@@ -79,9 +80,7 @@ const Header = (props) => {
                <a href="">My Profile</a>
               </Link>
             </Menu.Item>
-            <Menu.Item key="forum">
-              <a href="">Forum</a>
-            </Menu.Item>
+            
           </Menu>
           )
         case CONSTANTS.ROLE.ROLE_ADMIN : 
@@ -92,11 +91,7 @@ const Header = (props) => {
                 <a href="">Accounts</a>
               </Link>
             </Menu.Item>
-            <Menu.Item key="profile">
-              <Link href="/admin/approve-exercise" as="/admin/approve-exercise">
-               <a href="">Exercises</a>
-              </Link> 
-            </Menu.Item>
+            
           </Menu>
            ) 
          case  CONSTANTS.ROLE.ROLE_TEACHER:
@@ -112,9 +107,7 @@ const Header = (props) => {
                <a href="">My Profile</a>
               </Link>
             </Menu.Item>
-            <Menu.Item key="forum">
-              <a href="">Forum</a>
-            </Menu.Item>
+          
           </Menu>
            )
      }
@@ -361,4 +354,4 @@ function mapStateToProps(state, ownProps) {
   }
 }
 
-export default connect(mapStateToProps, {displayLogin})(Header)
+export default connect(mapStateToProps, {displayLogin,signOut})(Header)
