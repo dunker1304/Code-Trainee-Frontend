@@ -89,6 +89,9 @@ const TestCaseModal = ({
         output: '',
         isHidden: false,
       });
+    return () => {
+      form = null;
+    };
   }, [visible]);
 
   return (

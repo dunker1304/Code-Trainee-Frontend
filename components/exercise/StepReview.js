@@ -18,62 +18,22 @@ import {
 import axios from 'axios';
 
 const StepReview = ({
-  exerciseId = 0,
-  prev = () => {},
   listTeachers = [],
-  reviewers = [],
-  setReviewers = () => {},
+  selectedReviewers = [],
+  setSelectedReviewers,
 }) => {
   let [loading, setLoading] = useState(false);
-  let router = useRouter();
-  let [options, setOptions] = useState([]);
+  let [options, setOptions] = useState(() => {
+    return [...listTeachers]
+      .map((t) => t.emaiḷ)
+      .filter((t) => selectedReviewers.indexOf(t) === -1)
+      .map((t) => ({ value: t }));
+  });
   let [searchInput, setSearchInput] = useState('');
 
-  const handleNext = async () => {
-    setLoading(true);
-    try {
-      let reviewerIds = [...listTeachers]
-        .filter((t) => reviewers.indexOf(t.email) !== -1)
-        .map((t) => t.id);
-      console.log({ reviewerIds });
-      const res = await axios.post(`${process.env.API}/api/review/request`, {
-        exerciseId,
-        reviewerIds,
-      });
-      const res1 = await axios.post(
-        `${process.env.API}/api/notification/push`,
-        {
-          reviewerIds,
-          content: 'You have requested to review a exercise.',
-          linkAction: `/review?id=${exerciseId}`,
-        }
-      );
-      setLoading(false);
-      if (res.data.success) {
-        router.push({
-          pathname: '/exercise-list',
-          query: {},
-        });
-      } else {
-        throw new Error('');
-      }
-    } catch (e) {
-      notification.error({
-        message: 'Notification',
-        description: 'Something get wrong!',
-      });
-      console.log(e);
-      setLoading(false);
-    }
-  };
-
-  const handlePrevious = () => {
-    prev();
-  };
-
   const onSelectReviewer = (value) => {
-    if (value && reviewers.indexOf(value) === -1) {
-      setReviewers([...reviewers, value]);
+    if (value && selectedReviewers.indexOf(value) === -1) {
+      setSelectedReviewers([...selectedReviewers, value]);
     }
   };
 
@@ -81,7 +41,6 @@ const StepReview = ({
     let suggestedValues = [...listTeachers]
       .map((t) => t.email)
       .filter((t) => t.includes(value))
-      .filter((t) => reviewers.indexOf(value) === -1)
       .map((t) => ({ value: t }));
     setOptions([...suggestedValues]);
   };
@@ -91,18 +50,9 @@ const StepReview = ({
   };
 
   const removeReviewer = (removedReviewer) => {
-    console.log(removedReviewer);
-    let filtered = [...reviewers].filter((r) => r !== removedReviewer);
-    setReviewers(filtered);
+    let filtered = [...selectedReviewers].filter((r) => r !== removedReviewer);
+    setSelectedReviewers(filtered);
   };
-
-  useEffect(() => {
-    let convertOptions = [...listTeachers]
-      .map((t) => t.emaiḷ)
-      .filter((t) => reviewers.indexOf(t) === -1)
-      .map((t) => ({ value: t }));
-    setOptions(convertOptions);
-  }, []);
 
   return (
     <>
@@ -123,9 +73,9 @@ const StepReview = ({
             />
           </Form.Item>
           <Form.Item label='Chosen Reviewers'>
-            {reviewers.length ? (
+            {selectedReviewers.length ? (
               <ul>
-                {reviewers.map((reviewer, index) => (
+                {selectedReviewers.map((reviewer, index) => (
                   <li
                     key={index}
                     className='user'
@@ -154,33 +104,6 @@ const StepReview = ({
             )}
           </Form.Item>
         </Form>
-      </div>
-      <div
-        className='step-actions'
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          marginBottom: '50px',
-        }}>
-        <Button
-          onClick={handlePrevious}
-          type='primary'
-          size='large'
-          style={{
-            width: 100,
-          }}>
-          Previous
-        </Button>
-        <Button
-          onClick={handleNext}
-          loading={loading}
-          type='primary'
-          size='large'
-          style={{
-            width: 100,
-          }}>
-          Finish
-        </Button>
       </div>
       <style jsx>
         {`
