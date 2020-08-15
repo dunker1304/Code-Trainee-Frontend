@@ -32,8 +32,14 @@ const StepReview = ({
   let [searchInput, setSearchInput] = useState('');
 
   const onSelectReviewer = (value) => {
-    if (value && selectedReviewers.indexOf(value) === -1) {
-      setSelectedReviewers([...selectedReviewers, value]);
+    if (selectedReviewers.length <= 2) {
+      if (value && selectedReviewers.indexOf(value) === -1) {
+        setSelectedReviewers([...selectedReviewers, value]);
+      }
+    } else {
+      notification.warn({
+        message: `Maximum 3 reviewers are selected.`,
+      });
     }
   };
 

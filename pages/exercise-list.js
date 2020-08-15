@@ -8,6 +8,7 @@ import {
   Tag,
   notification,
   Tooltip,
+  Modal,
 } from 'antd';
 import {
   CheckCircleTwoTone,
@@ -20,6 +21,8 @@ import {
   EyeTwoTone,
   EyeInvisibleFilled,
   EyeInvisibleTwoTone,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
 } from '@ant-design/icons';
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
@@ -30,9 +33,16 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import composedAuthHOC from 'hocs';
 import ExercisePreviewModal from '../components/exercise/ExercisePreviewModal';
+import moment from 'moment';
 
-const ExerciseList = (props) => {
-  let currUserId = props.userInfo.id || 0;
+const STATUS = {
+  ACCEPTED: 'accepted',
+  REJECTED: 'rejected',
+  WAITING: 'waiting',
+};
+
+const ExerciseList = ({ userInfo }) => {
+  let currUserId = userInfo ? userInfo.id : 0;
   // table
   let [tableData, setTableData] = useState([]);
   let [currPageTable, setCurrPageTable] = useState(1);
@@ -77,8 +87,13 @@ const ExerciseList = (props) => {
           });
         });
         setTableData([...data]);
+      } else {
+        throw new Error();
       }
     } catch (e) {
+      notification.warn({
+        message: `Something is wrong.`,
+      });
       setTableLoading(false);
       console.log(e);
     }
@@ -98,43 +113,62 @@ const ExerciseList = (props) => {
       setTableLoading(false);
       if (res.data.success) {
         notification.info({
-          message: 'Notification',
-          description: 'Delete Success!',
+          message: 'Delete successfully.',
         });
         loadTable();
       } else {
-        notification.error({
-          message: 'Notification',
-          description: 'Delete Failed!',
-        });
+        throw new Error();
       }
     } catch (e) {
-      notification.error({
-        message: 'Notification',
-        description: 'Delete Failed!',
+      notification.warn({
+        message: 'Something is wrong.',
       });
       console.log(e);
+      setTableLoading(false);
     }
   };
 
   const handleButtonEditRecord = (record) => {
-    setTableLoading(true);
-    router.push(`/exercise?id=${record.key}`, '/exercise');
+    if (record.approved !== STATUS.ACCEPTED) {
+      notification.info({
+        message: `This exercise is waiting for review`,
+        description: 'You cannot edit exercise in this time',
+      });
+    } else {
+      setTableLoading(true);
+      router.push(`/exercise?id=${record.key}`, '/exercise');
+    }
   };
 
   const elementInColumnAction = (target) => {
-    if (target.tagName === 'TD') {
+    if (target && target.tagName === 'TD') {
       return target.cellIndex === 9;
-    } else if (target.className === 'ant-popover-inner-content') {
+    } else if (target && target.className === 'ant-popover-inner-content') {
       return true;
-    } else {
+    } else if (!target) {
       return elementInColumnAction(target.parentNode);
+    } else {
+      return true;
     }
   };
 
   const handleSelfReview = (record) => {
-    setTableLoading(true);
-    router.push(`/review?id=${record.key}`, `/review`);
+    let lastModified = moment(record.lastModified);
+    let timeCanStartSelfReview = moment(lastModified).add(5, 'm').toDate();
+    if (Date.now() >= timeCanStartSelfReview.getTime()) {
+      setTableLoading(true);
+      router.push(`/review?exerciseId=${record.key}`, `/review`);
+    } else if (record.approved !== STATUS.ACCEPTED) {
+      notification.info({
+        message: `This exercise is waiting for review`,
+        description: `You can self-review this exercise after ${timeCanStartSelfReview}`,
+      });
+    } else {
+      notification.info({
+        message: `This exercise is approved`,
+        description: `You cannot self-review this exercise.`,
+      });
+    }
   };
 
   useEffect(() => {
@@ -163,33 +197,32 @@ const ExerciseList = (props) => {
       <div
         style={{
           width: '95%',
-          margin: '60px auto',
+          margin: '30px auto',
           marginBottom: 0,
         }}>
+        <Row
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            marginBottom: 10,
+          }}>
+          <Col
+            style={{
+              fontSize: '19px',
+            }}>
+            Exercise List
+          </Col>
+          <Col>
+            <Button
+              type='primary'
+              onClick={handleButtonCreate}
+              loading={loadingButtonCreate}>
+              Create Exercise
+            </Button>
+          </Col>
+        </Row>
         <Table
           loading={tableLoading}
-          title={() => (
-            <Row
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-              }}>
-              <Col
-                style={{
-                  fontSize: '19px',
-                }}>
-                Exercise List
-              </Col>
-              <Col>
-                <Button
-                  type='primary'
-                  onClick={handleButtonCreate}
-                  loading={loadingButtonCreate}>
-                  Create Exercise
-                </Button>
-              </Col>
-            </Row>
-          )}
           bordered
           scroll={{ x: 1100 }}
           columns={[
@@ -266,13 +299,32 @@ const ExerciseList = (props) => {
               render: (text, record) => {
                 return (
                   <>
-                    {record.approved ? (
-                      <CheckCircleTwoTone
-                        twoToneColor='#52c41a'
-                        style={{ fontSize: '25px' }}
-                      />
-                    ) : (
-                      <span>Waiting...</span>
+                    {record.approved === STATUS.REJECTED && (
+                      <span>
+                        <CloseCircleOutlined
+                          color='red'
+                          style={{ fontSize: '22px' }}
+                        />
+                        rejected
+                      </span>
+                    )}
+                    {record.approved === STATUS.ACCEPTED && (
+                      <span>
+                        <CheckCircleOutlined
+                          color='green'
+                          style={{ fontSize: '22px' }}
+                        />
+                        accepted
+                      </span>
+                    )}
+                    {record.approved === STATUS.WAITING && (
+                      <span>
+                        <LoadingOutlined
+                          color='blue'
+                          style={{ fontSize: '22px' }}
+                        />
+                        waiting
+                      </span>
                     )}
                   </>
                 );
@@ -325,14 +377,14 @@ const ExerciseList = (props) => {
                     </Popconfirm>
                   </Tooltip>
                   <Tooltip placement='top' title={'Self-review'}>
-                    {!record.approved ? (
+                    {record.approved === STATUS.WAITING ? (
                       <Button
+                        onClick={() => handleSelfReview(record)}
                         ghost
                         type='link'
                         style={{
                           border: 'none',
-                        }}
-                        onClick={() => handleSelfReview(record)}>
+                        }}>
                         <EyeTwoTone style={{ fontSize: '16px' }} />
                       </Button>
                     ) : (

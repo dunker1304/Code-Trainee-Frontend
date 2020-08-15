@@ -283,7 +283,7 @@ Exercise.getInitialProps = async ({ query, store }) => {
       sampleCode: t.codeSnippets.length ? t.codeSnippets[0].sampleCode : '',
     }));
     let selectedReviewerIds = (
-      await axios.get(`${process.env.API}/api/review/request/${id}`)
+      await axios.get(`${process.env.API}/api/review/reviewers/${id}`)
     ).data.data[0].details.map((t) => t.reviewer);
     exerciseInfos.selectedReviewers = [...listTeachers]
       .filter((t) => selectedReviewerIds.indexOf(t.id) !== -1)
