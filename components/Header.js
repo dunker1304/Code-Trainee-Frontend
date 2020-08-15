@@ -1,7 +1,7 @@
 import { BellFilled , UserOutlined ,HeartOutlined,CheckOutlined,DeleteOutlined ,
   FileProtectOutlined,PieChartOutlined,UndoOutlined,EllipsisOutlined,LogoutOutlined,TeamOutlined ,SnippetsOutlined ,ContainerOutlined  ,CommentOutlined} from "@ant-design/icons"
 import Logo from "../static/images/codetrainee.png"
-import { Menu , Empty,Popover,Avatar ,Button , Modal} from 'antd';
+import { Menu , Empty,Popover,Avatar ,Button , Modal,Badge} from 'antd';
 import Link from 'next/link'
 import axios from "axios"
 import Router from "next/router"
@@ -20,6 +20,7 @@ const CONSTANTS = require("../utils/constants")
 const Header = (props) => {
 
   const [listNoti , setListNoti] = useState([])
+  const [notRead , setNotRead] = useState(0)
 
   useEffect(()=>{
      fetchData()
@@ -32,7 +33,8 @@ const Header = (props) => {
     let url = `${process.env.API}/api/get-most-notification/${props.userInfo['id']}`
     let resData = await axios.get(url)
     if(resData.data.success) {
-         setListNoti(resData.data.data)
+         setListNoti(resData.data.data.listNoti)
+         setNotRead(resData.data.data.notRead);
     }
     else {
       openNotificationWithIcon('error','','Load Data Fail!');
@@ -188,7 +190,7 @@ const Header = (props) => {
   const text2 = <h1 className="title_noti">Notifications</h1>;
   const contentAtionComment = (isRead,notiId)=>{
     return(
-      <div className="action_comment">
+      <div className="action_comment" style={{width:"150px"}}>
         <div style={{display:"flex"}}>
          <CheckOutlined style={{position:"relative", top:"8px",height:"fit-content",fontSize:"18px"}}/>
          <p onClick= {()=> markAsRead(notiId,isRead)}> {isRead ? 'Mark As Read' : 'Mark As Don\'t Read'} </p>
@@ -211,6 +213,11 @@ const Header = (props) => {
 
      let resResult = await axios.post(url,data);
      if(resResult.data.success) {
+        if(isRead) {
+          if(notRead > 0) setNotRead(notRead -1);
+        }
+        else 
+          setNotRead(notRead +1)
        let tmp = [...listNoti];
        tmp.forEach(element => {
          if(element['id'] == notiId){
@@ -307,7 +314,9 @@ const Header = (props) => {
                   overlayClassName="popover_noti"
                   getPopupContainer={() => document.getElementById('area_noti')}
                   >
+                  <Badge count={notRead}>
                    <BellFilled/>
+                   </Badge>
                 </Popover>
                 </div>
               </div>
