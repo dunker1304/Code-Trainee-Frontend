@@ -1,7 +1,16 @@
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import ConfirmModal from '../components/ConfirmModal';
-import { Form, Input, Button, Tabs, Descriptions, Row, Collapse } from 'antd';
+import {
+  Form,
+  Input,
+  Button,
+  Tabs,
+  Descriptions,
+  Row,
+  Collapse,
+  notification,
+} from 'antd';
 import { useForm } from 'antd/lib/form/util';
 import { useReducer, useRef, useEffect, useState } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
@@ -15,21 +24,15 @@ import { route } from 'next/dist/next-server/server/router';
 import Head from 'next/head';
 import composedAuthHOC from 'hocs';
 
-const ReviewExercise = ({ exerciseId, userInfo = {} }) => {
-  let currUserId = userInfo.id || 0;
-  let [exercise, setExercise] = useState({
-    tags: [],
-    codeSnippets: [],
-    testCases: [],
-    createdAt: '',
-    updatedAt: '',
-    points: 1,
-    level: '',
-    like: 0,
-    dislike: 0,
-    content: '',
-    title: '',
-  });
+const ReviewExercise = ({
+  exerciseId,
+  userInfo,
+  isSelfReview,
+  exerciseInfos,
+  requestId,
+}) => {
+  let currUserId = userInfo ? userInfo.id : 0;
+  let [exercise, setExercise] = useState(exerciseInfos);
   let router = useRouter();
   // show confirm modal
   let [confirm, setConfirm] = useState(false);
@@ -74,11 +77,17 @@ const ReviewExercise = ({ exerciseId, userInfo = {} }) => {
         isAccepted: false,
         exerciseId: exerciseId,
         userId: currUserId,
+        requestId: requestId,
       });
       if (res.data.success) {
         router.push('/exercise-list', '/exercise-list');
+      } else {
+        throw new Error();
       }
     } catch (e) {
+      notification.warn({
+        message: 'Something is wrong.',
+      });
       console.log(e);
     }
   };
@@ -90,44 +99,20 @@ const ReviewExercise = ({ exerciseId, userInfo = {} }) => {
         isAccepted: true,
         exerciseId: exerciseId,
         userId: currUserId,
+        requestId: requestId,
       });
       if (res.data.success) {
         router.push('/exercise-list', '/exercise-list');
-      }
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const getExercise = async () => {
-    try {
-      const res = await axios.get(
-        `${process.env.API}/api/exercise/review/${exerciseId}`
-      );
-      if (res.data.success) {
-        if (res.data.data) {
-          let tags = res.data.data.tags.map((t) => t.name);
-          let testCases = res.data.data.testCases.map((t) => ({
-            ...t,
-            key: t.id,
-          }));
-          setExercise({ ...res.data.data, tags, testCases });
-          console.log(exercise);
-        } else {
-          router.push('/error/404', router.pathname);
-        }
       } else {
-        throw new Error('');
+        throw new Error();
       }
     } catch (e) {
-      router.push('/error/500', router.pathname);
+      notification.warn({
+        message: 'Something is wrong.',
+      });
       console.log(e);
     }
   };
-
-  useEffect(() => {
-    getExercise();
-  }, []);
 
   return (
     <>
@@ -151,26 +136,26 @@ const ReviewExercise = ({ exerciseId, userInfo = {} }) => {
               style={{
                 display: 'flex',
                 justifyContent: 'space-between',
-                width: 210,
+                width: 270,
               }}>
               <Button
                 danger
                 type='dashed'
                 size='large'
                 style={{
-                  width: 100,
+                  width: 125,
                 }}
                 onClick={onReject}>
-                Reject
+                {isSelfReview ? 'Self-Reject' : 'Reject'}
               </Button>
               <Button
                 type='primary'
                 size='large'
                 style={{
-                  width: 100,
+                  width: 125,
                 }}
                 onClick={onAccept}>
-                Accept
+                {isSelfReview ? 'Self-Accept' : 'Accept'}
               </Button>
             </div>
           }>
@@ -215,9 +200,73 @@ const ReviewExercise = ({ exerciseId, userInfo = {} }) => {
   );
 };
 
-ReviewExercise.getInitialProps = (ctx) => {
-  let { id } = ctx.query;
-  return { exerciseId: id };
+ReviewExercise.getInitialProps = async ({ query }) => {
+  let { request: requestId, exerciseId } = query;
+  const isSelfReview = !!exerciseId;
+  let exerciseInfos = {
+    tags: [],
+    codeSnippets: [],
+    testCases: [],
+    createdAt: '',
+    updatedAt: '',
+    points: 1,
+    level: '',
+    like: 0,
+    dislike: 0,
+    content: '',
+    title: '',
+  };
+  if (isSelfReview) {
+    const res = await axios.get(
+      `${process.env.API}/api/review/exercise/${exerciseId}`
+    );
+    let tags = res.data.data.tags.map((t) => t.name);
+    let testCases = res.data.data.testCases.map((t) => ({
+      ...t,
+      output: t.expectedOutput,
+      key: t.id,
+    }));
+    let codeSnippets = res.data.data.codeSnippets.map((t) => ({
+      ...t,
+      key: t.id,
+    }));
+    exerciseInfos = {
+      ...res.data.data,
+      tags,
+      testCases,
+      codeSnippets,
+    };
+  } else {
+    const res = await axios.get(
+      `${process.env.API}/api/review/request/${requestId}`
+    );
+    if (res.data.success) {
+      let tags = res.data.data.exerciseInfos.tags.map((t) => t.name);
+      let testCases = res.data.data.exerciseInfos.testCases.map((t) => ({
+        ...t,
+        output: t.expectedOutput,
+        key: t.id,
+      }));
+      let codeSnippets = res.data.data.exerciseInfos.codeSnippets.map((t) => ({
+        ...t,
+        key: t.id,
+      }));
+      exerciseInfos = {
+        ...res.data.data.exerciseInfos,
+        tags,
+        testCases,
+        codeSnippets,
+      };
+    } else {
+      // redirect to error page here
+    }
+  }
+  return {
+    exerciseId: exerciseId,
+    isSelfReview: isSelfReview,
+    exerciseInfos: exerciseInfos,
+    requestId: requestId,
+  };
 };
 
 export default composedAuthHOC(ReviewExercise);

@@ -3,7 +3,7 @@ import { Tag, Input, Tooltip, AutoComplete, Space, notification } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
-const ExerciseTags = ({ value = [], onChange = (newValue) => {} }) => {
+const ExerciseTags = ({ value = [], onChange, allTags = [] }) => {
   // input new tag
   let [inputVisible, setInputVisible] = useState(false);
   let [inputValue, setInputValue] = useState('');
@@ -12,7 +12,6 @@ const ExerciseTags = ({ value = [], onChange = (newValue) => {} }) => {
   let [editInputValue, setEditInputValue] = useState('');
   // suggest tags
   let [suggestedValues, setSuggestedValues] = useState([]);
-  let [originalValues, setOriginalValues] = useState([]);
 
   let isUnMounted = useRef(false);
 
@@ -69,32 +68,11 @@ const ExerciseTags = ({ value = [], onChange = (newValue) => {} }) => {
   };
 
   const handleTriggerSelection = (value) => {
-    let suggestValues = [...originalValues]
+    let suggestValues = [...allTags]
       .filter((event) => event.toString().includes(value))
       .map((event) => ({ value: event }));
     setSuggestedValues([...suggestValues]);
   };
-
-  const loadOriginalValues = async () => {
-    try {
-      const res = await axios.get(`${process.env.API}/api/tags/all`);
-      if (res.data.success) {
-        !isUnMounted.current &&
-          setOriginalValues([...res.data.data.map((e) => e.name)]);
-      } else {
-        throw new Error('');
-      }
-    } catch (e) {
-      console.log('error', e);
-    }
-  };
-
-  useEffect(() => {
-    loadOriginalValues();
-    return () => {
-      isUnMounted.current = true;
-    };
-  }, []);
 
   return (
     <>
