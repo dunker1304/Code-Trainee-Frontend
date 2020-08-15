@@ -1,13 +1,14 @@
 import Header from "../../components/Header"
 import { useState , useEffect ,useRef} from "react"
 import Footer from "../../components/Footer"
-import { Menu, Dropdown, Button, Input, Table, DatePicker, Space, Drawer, Form, Col, Row, Select, Switch,Pagination } from 'antd';
-import { DownOutlined, PlusOutlined, DeleteOutlined, EditOutlined, UsergroupDeleteOutlined,CheckOutlined } from "@ant-design/icons"
+import { Menu, Dropdown, Button,Tooltip, Input, Table, DatePicker, Space, Drawer, Form, Col, Row, Select, Switch,Pagination } from 'antd';
+import { DownOutlined, PlusOutlined, DeleteOutlined, EditOutlined, UsergroupDeleteOutlined,CheckOutlined, FilterFilled } from "@ant-design/icons"
 import axios from "axios"
 import { openNotificationWithIcon} from "../../components/Notification"
 import moment from "moment"
-import _ from 'lodash'
+import _, { filter } from 'lodash'
 import composedAuthHOC from 'hocs';
+const CONSTANTS = require('../../utils/constants')
 
 
 const role = [
@@ -50,7 +51,7 @@ const Admin = (props) => {
   const [editDOB , setEditDOB] = useState('')
   const [editUserId , setEditUserId] = useState('')
   const [currentPage , setCurrentPage] = useState(1)
-  const [pageSize , setPageSize] = useState(1)
+  const [pageSize , setPageSize] = useState(20)
   const [pageTotal , setPageTotal] = useState(1)
   const formatDate = 'DD/MM/YYYY'
 
@@ -144,10 +145,11 @@ const Admin = (props) => {
       title: 'ACTION',
       key: 'action',
       render: (text, record) => (
-        <Space size="middle">
-          <EditOutlined onClick={()=>showDrawerEdit(record)} />
+        <Tooltip title = { !record['isDeleted'] ? 'Deactive Account' : 'Active Account'}>
+          {/* <EditOutlined onClick={()=>showDrawerEdit(record)} /> */}
           {/* <DeleteOutlined /> */}
-        </Space>
+          <Switch checked={record['isDeleted']} onChange ={(checked)=>deactiveAccount(record,checked)}/>
+        </Tooltip>
       ),
     },
   ];
@@ -181,6 +183,42 @@ const Admin = (props) => {
 
   }
 
+  const deactiveAccount = async (record,value)=> {
+    let type = 'active'
+    if(record['statusNumber'] == 0) {
+      type = 'confirm'
+    }
+    let data = {
+      value : value,
+      userId : record['id'],
+      key : type
+    }
+   
+    let urlUser = `${process.env.API}/api/admin/deactive-an-account`
+    const resUser = await axios.post(urlUser,data)
+    if(resUser.data.success) {
+      openNotificationWithIcon('success', '', resUser.data.message)
+      let listTmp = JSON.parse(JSON.stringify(listAccount));
+      listTmp.forEach(element => {
+        if(element['id'] == record['id'] && type == 'confirm') {
+          element['status'] = 'Active';
+          element['statusNumber'] = 1;
+        }
+
+        if(element['id'] == record['id'] && type == 'active') {
+          element['status'] = value ? 'Deactive' : 'Active';
+          element['isDeleted'] = value;
+        }
+
+      });
+      setListAccount(listTmp)
+    }
+    else {
+      openNotificationWithIcon('error', '', 'Edit Account Fail!')
+    }
+      
+  }
+
   const submitCreateAccount = async ()=>{
     let data = {
       username : editUsername ,
@@ -188,7 +226,7 @@ const Admin = (props) => {
       phone : editPhone ,
       dateOfBirth : editDOB,
       displayName : editDisplayName,
-      role : editRole,
+      role : CONSTANTS.ROLE.ROLE_ADMIN,
     }
 
     let urlUser = `${process.env.API}/api/admin/create-an-account`
@@ -266,9 +304,16 @@ const Admin = (props) => {
           <div className="vs-component">
             <header className="header-table-admin ">
               <div className="button_action">
-                <Dropdown overlay={menu} placement="bottomRight" trigger={['click']} visible = {dropDownVisible} onVisibleChange={onChange}>
+              <div style={{ position: 'relative' }} id="area_role_admin">
+                <Dropdown overlay={menu} placement="bottomRight"
+                 trigger={['click']} 
+                 visible = {dropDownVisible} 
+                 onVisibleChange={onChange}
+                 getPopupContainer={() => document.getElementById('area_role_admin')}
+                 >
                   <button className="action_btn">Role <DownOutlined /></button>
                 </Dropdown>
+                </div>
                 <button className="add_btn" onClick={showDrawer} > <PlusOutlined /> Add Account</button>
 
                 <Drawer
@@ -356,11 +401,7 @@ const Admin = (props) => {
                           label="Role"
                           rules={[{ required: true, message: 'Please enter your role' }]}
                         >
-                          <Select placeholder="Please select your role" onSelect = {(value)=> setEditRole(value)}>
-                            <Option value="3">Admin</Option>
-                            <Option value="4">Teacher</Option>
-                            <Option value="5">Student</Option>
-                          </Select>
+                            <Input  defaultValue='Admin' readOnly />
 
                         </Form.Item>
                       </Col>
@@ -382,7 +423,7 @@ const Admin = (props) => {
                     total={pageTotal}
                     showSizeChanger={false}
                     pageSize={pageSize}
-                    defaultPageSize={2} 
+                    defaultPageSize={20} 
                     onChange= {(pageNumber)=> {handleClickPagging(pageNumber)}}
                     />
               </div>

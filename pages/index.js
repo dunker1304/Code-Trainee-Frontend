@@ -6,9 +6,24 @@ import { UpCircleOutlined } from '@ant-design/icons'
 import CodeTrainee from 'hocs';
 import * as action from "../store/auth/action"
 import Login from "../components/Login"
+import Register from "../components/Register"
+const CONSTANTS = require('../utils/constants')
+import { redirectRouter } from "../helpers/utils"
+import composedAuthHOC from 'hocs';
+import Router from "next/router"
 
 
 class Index extends Component {
+
+  UNSAFE_componentWillReceiveProps(nextProps){
+    if(this.props.isAuthenticated != nextProps.isAuthenticated) {
+      if(nextProps.isAuthenticated == true) {
+        console.log(nextProps)
+        let url = redirectRouter(nextProps.userInfo['role']['id'])
+        Router.push(url)
+      }
+    }
+  }
 
   render() {
     return (
@@ -39,8 +54,11 @@ class Index extends Component {
                   wrapClassName = 'login-modal'
                   className="my-modal-class"
                 >
-      
-                 <Login  type = {this.props.isShowLogin.type ?this.props.isShowLogin.type:1 }></Login>
+                  {
+                    this.props.isShowLogin.type == 1 ?   <Login  type = "1"></Login>
+                    : <Register type = "2" ></Register>
+                  }
+               
                 </Modal>
                 <div className="col-sm-6 col-12">
                   <ul className='header-btn'>
@@ -57,7 +75,7 @@ class Index extends Component {
             <img className="img-fluid animated-figure animated-figure2" src="static/images/animated-figure2.png" alt="banner"/>
             <div className="container">
               <div className="preview-banner-content">
-                <h1>Trainee Code for ....</h1>
+                <h1>Trainee Code for FPT Students</h1>
                 <ul className="build-with">
                   <li>
                     <img className="img-fluid" src='../static/images/html.png'></img>
@@ -130,7 +148,7 @@ class Index extends Component {
                 <div className="col-lg-5 col-12">
                   <div className='item-content'>
                     <h3><span>Playground</span> for many languages & <span>Learn</span> about architecture</h3>
-                    <a className='fill-btn' href='#' target='_blank'>Purchase Now</a>
+                    <a className='fill-btn' href='/problem' target='_blank'>Do Exercise Now</a>
                   </div>
                 </div>
                 <div className='col-lg-7 col-12'>
@@ -208,8 +226,10 @@ class Index extends Component {
 function mapStateToProps(state) {
   return {
     errorMessage: state.auth.errorMessage,
-    isShowLogin : state.auth.isShowLogin
+    isShowLogin : state.auth.isShowLogin,
+    isAuthenticated : state.auth.isAuthenticated,
+    userInfo : state.auth.userInfo
   }
 }
 
-export default connect(mapStateToProps,action)(Index)
+export default connect(mapStateToProps,action)(composedAuthHOC(Index))

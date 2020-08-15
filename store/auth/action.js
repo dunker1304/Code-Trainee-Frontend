@@ -1,4 +1,5 @@
 import axios from 'axios';
+import  {openNotificationWithIcon} from "../../components/Notification"
 
 export const loadUserInfo = (accessToken) => {
   const url = `${process.env.API}/api/current_user`;
@@ -26,11 +27,11 @@ export const loadUserInfo = (accessToken) => {
 }
 
 
-  export const signIn = (email,password)=> {
+  export const signIn = (email,password,role)=> {
     const url = `${process.env.API}/signin`;
     
     const config = { headers: { 'Content-Type': 'application/json' } };
-    const data = {email : email , password : password}
+    const data = {email : email , password : password , role : role}
     return dispatch => {
       let promise = new Promise((resolve, reject) => {
         axios({
@@ -72,7 +73,6 @@ export const loadUserInfo = (accessToken) => {
           url: url,
           data :data
         }) .then( res => {
-          console.log(res)
           dispatch({
             type: 'SIGN_UP',
             payload: res.data
@@ -87,6 +87,14 @@ export const loadUserInfo = (accessToken) => {
       return promise
    }
  }
+
+ export const signOut = ()=> {
+  return dispatch => {
+    dispatch({
+      type: 'SIGN_OUT'
+    })
+   }
+}
 
 
 

@@ -57,7 +57,7 @@
      }
      .pull-right {
        display: flex;
-       justify-content: space-between;
+       justify-content: flex-end;
       .anticon-down {
         top: -3px;
         position: relative;
@@ -231,4 +231,34 @@
   background-color: #f8f8f8;
   min-height: 100vh;
 }
+.pagging_grid_layout {
+  .ant-pagination-prev a , .ant-pagination-next a{
+    border-radius: 1020px;
+    border :none;
+    box-shadow: 0 5px 15px 0 rgba(0, 0, 0, 0.08);
+  } 
+  .ant-pagination-item {
+    border-radius: 10px;
+    border :none;
+    box-shadow: 0 5px 15px 0 rgba(0, 0, 0, 0.08);
+  }
+  .ant-pagination {
+    margin-top: 30px;
+    margin-left: auto;
+    margin-right: auto;
+  
+     a {
+       color :#08c;
+     }
+     .ant-pagination-item-active {
+        a {
+         color: #fff !important;
+        }
+       background-color: #337ab7;
+       cursor: default;
+     }
+    }
+}
+
+
 

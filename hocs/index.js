@@ -7,7 +7,8 @@ import { loadUserInfo } from '../store/auth/action'
 import {getCookieFromReq} from '../helpers/utils'
 import { compose} from "redux"
 const CONSTANTS  = require('../utils/constants')
-
+import { redirectRouter } from "../helpers/utils"
+ 
  
 const AuthHOC = Page => {
   
@@ -23,7 +24,15 @@ const AuthHOC = Page => {
         if (accessToken) {
           await dispatch(loadUserInfo(accessToken))
           let isAuthenticated = getState().auth.isAuthenticated
+          let userInfo = getState().auth.userInfo
+
           let result = ignoreRouter(pathname,isAuthenticated,getState().auth.userInfo);
+            if(result['isIgnore'] && result['code'] == 0 && isAuthenticated && userInfo ) {
+              let url = redirectRouter(userInfo['role']['id'])
+              res.writeHead(302, { Location: url });
+              res.end();
+              return {}
+            }
             if(!result['isIgnore'] && result['code']  == 1) {
                  res.writeHead(302, { Location: '/' });
                  res.end();
@@ -80,7 +89,14 @@ const AuthHOC = Page => {
 const     ignoreRouter = (pathname , isAuthenticated ,userInfo) =>{
 
   // ignore router
-  const routerIgnore = [ '/problem' , '/playground', 'accessDeny']
+  const routerIgnore = [ '/problem' , '/playground', '/accessDeny','/exercise/[exerciseId]/discuss']
+
+  if(pathname == '/' || pathname.includes('admin/login')) {
+    return {
+      isIgnore: true,
+      code : 0 //homepage
+    }
+  }
   
   for(let i= 0 ; i < routerIgnore.length ; i++) {
      if(pathname.includes(routerIgnore[i])){

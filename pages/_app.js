@@ -10,6 +10,8 @@ import "simplemde/dist/simplemde.min.css";
 import 'highlight.js/styles/github.css';
 import 'react-calendar-heatmap/dist/styles.css';
 
+
+
 // function MyApp({ Component, pageProps }) {
 //   return <Component {...pageProps} />
 // }
@@ -28,6 +30,7 @@ import 'react-calendar-heatmap/dist/styles.css';
 
 class MyApp extends App {
   static async getInitialProps({ Component, ctx }) {
+    
     return {
       pageProps: Component.getInitialProps
         ? await Component.getInitialProps(ctx)

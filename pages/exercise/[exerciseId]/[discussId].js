@@ -16,7 +16,7 @@ DiscussDetail.getInitialProps = async (ctx) => {
   const { store: { dispatch }, pathname, req, res,query } = ctx
   let cmtId = query.discussId ? getQuery(query.discussId) : null
   let questionId = query.exerciseId ? query.exerciseId : null
-  await dispatch(getDiscussByCommentId(cmtId))
+  await dispatch(getDiscussByCommentId(cmtId,req))
   return { questionId }
 }
 

@@ -2,6 +2,7 @@ import produce from 'immer';
 import {openNotificationWithIcon} from '../../components/Notification'
 import Router , {useRouter} from 'next/router'
 import { redirectRouter } from "../../helpers/utils"
+const CONSTANTS  = require('../../utils/constants')
 
 
 const initState = {
@@ -9,11 +10,12 @@ const initState = {
   authMessage :'',
   isShowLogin: {
     isShow:false,
-    type:1
+    type : 1
   },
   isLoginSuccess :false,
   isAuthenticated : false
 }
+
 
 export default (state = initState, action) => {
   return produce(state, draft => {
@@ -24,7 +26,7 @@ export default (state = initState, action) => {
           draft.isAuthenticated = true
         }
         else {
-          draft.userInfo = action.payload.user
+          draft.userInfo = action.payload.user  ? action.payload.user : {}
           draft.isAuthenticated = false
         }
      
@@ -40,10 +42,11 @@ export default (state = initState, action) => {
           draft.authMessage = action.payload.message
           draft.isShowLogin = {
             isShow : false,
-            type: 1
+            type: CONSTANTS.ROLE.ROLE_STUDENT
           }
+          draft.isAuthenticated = true;
           openNotificationWithIcon('success','SUCCESS',action.payload.message)
-          redirectRouter(draft.userInfo['role']['id'])
+          //redirectRouter(draft.userInfo['role']['id'])
          }   
         break
 
@@ -55,6 +58,11 @@ export default (state = initState, action) => {
           draft.signUpError = action.payload.message
           openNotificationWithIcon('warning','',action.payload.message)
           break 
+      
+      case 'SIGN_OUT':
+        // if(!action.payload.success){
+          draft.isAuthenticated = false
+          break     
      
     }
   })

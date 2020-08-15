@@ -1,7 +1,7 @@
 
 import { Input, Empty } from 'antd';
-import { Menu, Dropdown, Button, Select, Tag, Pagination ,Popover} from 'antd';
-import { DownOutlined, CheckOutlined, SwitcherOutlined } from '@ant-design/icons';
+import { Menu, Dropdown, Button, Select, Tag, Pagination ,Tooltip } from 'antd';
+import { DownOutlined, CheckOutlined, SwitcherOutlined ,HeartOutlined ,MessageOutlined ,HeartFilled } from '@ant-design/icons';
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux'
 import { searchQuestion, chooseTags, dropdownFilter, getCategory,addToWishList,removeToWishList,getExerciseOfUser } from "../store/problem/action"
@@ -15,6 +15,10 @@ import  Router  from "next/router"
 import { openNotificationWithIcon } from "../components/Notification"
 import composedAuthHOC from 'hocs';
 import {compose} from "redux";
+import  classnames from 'classnames'
+import { validateDisplayName ,translateClassName ,getCookie ,isEmptyObject } from "../helpers/utils"
+import Cookies from 'js-cookie'
+ 
 
 
 const Level = [{ id: 1, name: 'Easy' }, { id: 2, name: 'Medium' }, { id: 3, name: 'Hard' }]
@@ -25,8 +29,12 @@ const Problems = (props) => {
   const [termSearch, setTermSearch] = useState('')
   const [tagSearch, setTagSearch] = useState({})
   const [isTable, setIsTable] = useState(true)
-  const [pageSize, setPageSize] = useState(10)
+  const [pageSize, setPageSize] = useState(20)
   const [pageNumber, setPageNumber] = useState(1)
+
+  // useEffect(()=> {
+  //   console.log(getCookie('access_token'))
+  // }, [])
   const onSearchDropDown = (e) => {
     props.dropdownFilter(e.target.value)
   }
@@ -49,7 +57,7 @@ const Problems = (props) => {
         findTagArr = tagSearch['tag'].filter((element) => {
           return element.id != value.id
         });
-        findArray = { ...findArraySearch, 'tag': [...findTagArr] ,'page':1}
+        findArray = { ...findArraySearch, 'tag': [...findTagArr] ,'page':1, 'userId' : props.userInfo ? props.userInfo['id']:null}
         setTagSearch(findArray)
         setPageNumber(1)
         searchQuestion(findArray)
@@ -57,7 +65,7 @@ const Problems = (props) => {
         return;
       }
       else {
-        findArray = { ...findArraySearch, 'tag': [...findArraySearch['tag'], value],'page':1 }
+        findArray = { ...findArraySearch, 'tag': [...findArraySearch['tag'], value],'page':1 ,'userId' : props.userInfo ? props.userInfo['id']:null}
         setTagSearch(findArray)
         setPageNumber(1)
         searchQuestion(findArray)
@@ -65,7 +73,7 @@ const Problems = (props) => {
       }
     }
     else {
-      findArray = { ...findArraySearch, 'tag': [value],'page':1 }
+      findArray = { ...findArraySearch, 'tag': [value],'page':1,'userId' : props.userInfo ? props.userInfo['id']:null }
       setTagSearch(findArray)
       setPageNumber(1)
       searchQuestion(findArray)
@@ -98,7 +106,7 @@ const Problems = (props) => {
   const selectLevel = ({ item, key }) => {
     {
       let levelSelected = Level.find(element => element.id == key);
-      let tags = { ...tagSearch, 'level': levelSelected ,'page':1}
+      let tags = { ...tagSearch, 'level': levelSelected ,'page':1 ,'userId' : props.userInfo ? props.userInfo['id']:null}
       setTagSearch(tags)
       setPageNumber(1)
       searchQuestion(tags)
@@ -108,7 +116,7 @@ const Problems = (props) => {
   const selectStatus = ({ item, key }) => {
     {
       let statusSelected = Status.find(element => element.id == key);
-      let tags = { ...tagSearch, 'status': statusSelected ,'page':1}
+      let tags = { ...tagSearch, 'status': statusSelected ,'page':1 ,'userId' : props.userInfo ? props.userInfo['id']:null}
       setTagSearch(tags)
       setPageNumber(1)
       searchQuestion(tags)
@@ -150,20 +158,9 @@ const Problems = (props) => {
     )
   }
 
-  const translateClassName = (level) => {
-    let key = level.toUpperCase();
-    switch (key) {
-      case 'EASY':
-        return 'success';
-      case 'MEDIUM':
-        return 'warning';
-      case 'HARD':
-        return 'danger';
-    }
-  }
 
   const onCloseLevel = async (e) => {
-    let level = { ...tagSearch ,'page' :1}
+    let level = { ...tagSearch ,'page' :1 , 'userId' : props.userInfo ? props.userInfo['id']:null}
     delete level.level
     setTagSearch(level)
     setPageNumber(1)
@@ -171,7 +168,7 @@ const Problems = (props) => {
   }
 
   const onCloseStatus = (e) => {
-    let status = { ...tagSearch ,'page' :1}
+    let status = { ...tagSearch ,'page' :1 ,'userId' : props.userInfo ? props.userInfo['id']:null}
     delete status.status
     setTagSearch(status)
     setPageNumber(1)
@@ -179,7 +176,7 @@ const Problems = (props) => {
   }
 
   const onCloseTerm = (e) => {
-    let term = { ...tagSearch ,'page' :1}
+    let term = { ...tagSearch ,'page' :1 ,'userId' : props.userInfo ? props.userInfo['id']:null}
     delete term.term
     setTagSearch(term)
     setPageNumber(1)
@@ -192,8 +189,9 @@ const Problems = (props) => {
     let filterTags = tags.filter(value => {
       return value.id != removedTag.id
     })
-    tags = { ...tagSearch, 'tag': filterTags,'page' :1 }
+    tags = { ...tagSearch, 'tag': filterTags,'page' :1 ,'userId' : props.userInfo ? props.userInfo['id']:null}
     setTagSearch(tags)
+    console.log(tags)
     setPageNumber(1)
     searchQuestion(tags)
     props.chooseTags(removedTag.id)
@@ -201,7 +199,7 @@ const Problems = (props) => {
 
   const submitTermSearch = (e) => {
     if (e.keyCode === 13) {
-      let term = { ...tagSearch }
+      let term = { ...tagSearch}
       term['term'] = { name: termSearch }
       setTagSearch(term)
       setPageNumber(1)
@@ -275,7 +273,7 @@ const Problems = (props) => {
     <div className="container container-content list-question-container">
 
       <div className="row" >
-        <div className="col-md-9">
+        <div className={classnames( props.isAuthenticated ? 'col-md-9':'col-md-11')} style={{ margin : '0 auto'}}>
           <div className="assess-bar">
           <div id="welcome" className="col-md-4 col-sm-12 question-solved">
           
@@ -306,17 +304,18 @@ const Problems = (props) => {
                   <Input placeholder="Search question title, discription" value={termSearch} onChange={textChange} onKeyUp={submitTermSearch}></Input>
                 </div>
                 <div className="pull-right col-sm-6 col-lg-5">
-                <div style={{ position: 'relative' }} id="area_level">
+                  <div style={{display:"flex"}}>
+                <div style={{ position: 'relative', marginRight : "10px" }} id="area_level">
                   <Dropdown overlay={menuTag(Level)} placement="bottomRight" trigger="['click']" overlayClassName="my_dropdown" getPopupContainer={() => document.getElementById('area_level')}>
                     <Button>Difficulty <DownOutlined /></Button>
                   </Dropdown>
                 </div>
-                <div style={{ position: 'relative' }} id="area_status">
+                <div style={{ position: 'relative',marginRight : "10px", display : props.isAuthenticated ? 'block': 'none' }} id="area_status">
                   <Dropdown overlay={menuStatus(Status)} placement="bottomRight" trigger="['click']" overlayClassName="my_dropdown"  getPopupContainer={() => document.getElementById('area_status')}>
                     <Button>Status <DownOutlined /></Button>
                   </Dropdown>
                 </div>
-                <div style={{ position: 'relative' }} id="area_tags">
+                <div style={{ position: 'relative' , marginRight : "10px"  }} id="area_tags">
                   <Dropdown overlay={select(props.dropdownCategorySearch)}
                     placement="bottomRight"
                     overlayClassName="my_dropdown"
@@ -328,33 +327,27 @@ const Problems = (props) => {
                     <Button>Tags <DownOutlined /></Button>
                   </Dropdown>
                   </div>
+                  </div>
                   <SwitcherOutlined onClick = {()=> setIsTable(!isTable)} title = {`${isTable ? 'Grid Layout':'Table Layout'}`}style={{ fontSize: '16px', color: '#08c' }}/>
 
 
                 </div>
               </div>
               <div className="filter-selected-tags col-xs-12">
-                {/* <Tag key = "green" onClose = {(e)=> {console.log(e.target.key)}}color="#87d068" closable={true}>green</Tag>
-                <Tag key = "blue" color="#87d068"  closable={true} >blue</Tag> */}
+            
                 {
-                  Object.keys(tagSearch).map((value, index) => {
-                    if (value == 'level' || value == 'status' || value == 'term') {
-                      return (
-                        <Tag key={index} color="#87d068" closable={true} onClose={value == 'level' ? onCloseLevel : value == 'status' ? onCloseStatus : onCloseTerm} >{tagSearch[value]['name']}</Tag>
-                      )
-                    }
-                    else {
-                      if (value == 'tag') {
-                        let listTag = tagSearch[value].map((s, index) => {
-                          console.log(s)
-                          return (<Tag key={index} color="#87d068" onClose={() => onCloseTags(s)} closable={true} >{s['name']}</Tag>)
-                        })
-                        return listTag;
-                      }
-
-                    }
-                  })
-
+                  tagSearch['level'] ?  <Tag  color="#87d068" closable={true} onClose={ ()=>onCloseLevel (tagSearch['level'])} >{tagSearch['level']['name']}</Tag>:''
+                }
+                {
+                  tagSearch['status'] ?  <Tag  color="#87d068" closable={true} onClose={ ()=>onCloseStatus (tagSearch['status'])} >{tagSearch['status']['name']}</Tag>:''
+                }
+                {
+                  tagSearch['term'] ?  <Tag  color="#87d068" closable={true} onClose={ ()=>onCloseTerm (tagSearch['term'])} >{tagSearch['term']['name']}</Tag>:''
+                }
+                {
+                  tagSearch['tag'] ? tagSearch['tag'].map((value,index) => (
+                    <Tag key={value['id']} color="#87d068" onClose={() => onCloseTags(value)} closable={true} >{value['name']}</Tag>
+                  )) : ''
                 }
 
               </div>
@@ -369,7 +362,7 @@ const Problems = (props) => {
                     <th className="text-center">Difficulty</th>
                     <th className="text-center">LOC</th>
                     <th className="text-center">Author</th>
-                   
+                    <th className="text-center">Action</th>
                   </tr>
                 </thead>
               
@@ -380,7 +373,7 @@ const Problems = (props) => {
                         <td className="text-center text-muted" >#{index + 1}</td>
                         <td className="text-center title-question">
                           <Link href={{pathname : '/playground', query : { questionID : value['id']}}} as={`/playground?questionID=${value['id']}`}>
-                          <a>{value.title}</a>
+                          <a title = {value.title}>{ validateDisplayName(value.title)}</a>
                           </Link>
                         </td>
                         <td className="text-center">
@@ -392,8 +385,31 @@ const Problems = (props) => {
 
                         <td className="text-center created_by">
                           <Link href={{pathname : '/profile/[profileId]'}} as={`/profile/${value.author ? value.author['id'] : ''}`}>
-                          <a>{value.author ? value.author.displayName : ''}</a>
+                          <a title= {value.author ? value.author.displayName : ''}>{value.author ? validateDisplayName(value.author.displayName) : ''}</a>
                           </Link>
+                          
+                        </td>
+
+                        <td className="text-center created_by">
+                        <div>
+                            {value.isWishList ? 
+                              <Tooltip title={props.isAuthenticated ? 'Remove to WishList' : 'Login To Add WishList'}>
+                                <Button type="text" 
+                                        disabled = { !props.isAuthenticated} className="btn_icon" 
+                                        icon={<HeartFilled  style={{color: '#eb2f96'}}/>} 
+                                        onClick = {()=>props.removeToWishList(value.id) }
+                                />
+                              </Tooltip> :
+                            <Tooltip title={props.isAuthenticated ? 'Add to WishList' : 'Login To Add WishList'}>
+                                <Button type="text" 
+                                        disabled = { !props.isAuthenticated} 
+                                        className="btn_icon" 
+                                        icon={<HeartOutlined   style={{color: '#eb2f96'}}/>}
+                                        onClick = {()=>props.addToWishList(value.id) }
+                                />
+                            </Tooltip>
+                              }
+                          </div>
                           
                         </td>
                         
@@ -401,7 +417,7 @@ const Problems = (props) => {
                       </tr>
                     )): 
                     <tr style={{boxShadow:"none"}}>
-                      <td colSpan="4" style={{backgroundColor:"#fff"}}>
+                      <td colSpan="5" style={{backgroundColor:"#fff"}}>
                         <Empty/>
                       </td>
                     </tr>
@@ -413,10 +429,10 @@ const Problems = (props) => {
                   <tr>
                     <td colSpan="7">
                       <span className="row-selector">
-                        <Select defaultValue="1" className="selectPaging" onSelect= {(value)=>{changePageSize(value)}}>
-                          <Option value="1">20</Option>
-                          <Option value="2">50</Option>
-                          <Option value="3">100</Option>
+                        <Select defaultValue="20" className="selectPaging" onSelect= {(value)=>{changePageSize(value)}}>
+                          <Option value="20">20</Option>
+                          <Option value="50">50</Option>
+                          <Option value="100">100</Option>
                         </Select>
                         rows per page.
                       </span>
@@ -442,11 +458,32 @@ const Problems = (props) => {
             </div>
             {/* End Table  */}
             {/* Grid View */}
-            <div className="row" style={{ display: isTable ? 'none' : 'flex' }} >
+            <div style={{ display: isTable ? 'none' : 'block' }}>
+            <div className="row"  >
                { props.question.map((value,index)=> (
-                  <QuestionItem question={value} key={index} addToWishList= {()=>props.addToWishList(value['id'])} removeToWishList = {()=> props.removeToWishList(value.id)}/>
+                  <QuestionItem 
+                     question={value} 
+                     key={index} 
+                     addToWishList= {()=>props.addToWishList(value['id'])} 
+                     removeToWishList = {()=> props.removeToWishList(value.id)}
+                     isAuthenticated = {props.isAuthenticated}
+                  />
                  
                ))}
+            </div>
+            <div className="row pagging_grid_layout">
+            <Pagination
+                        defaultCurrent={pageNumber}
+                        current= {pageNumber}
+                        total={props.totalQuestion}
+                        showSizeChanger={false}
+                        pageSize={pageSize}
+                        defaultPageSize={pageSize}
+                        onChange= {(pageNumber,pageSize)=> {pagingQuestion(pageNumber,pageSize)}}
+
+
+                      />
+            </div>
             </div>
             {/*End Grid View */}
 
@@ -454,7 +491,7 @@ const Problems = (props) => {
           </div>
 
         </div>
-        <div className="col-md-3">
+        <div className="col-md-3" style={{display : props.isAuthenticated ? 'block' : 'none'}}>
           <YourProcess exerciseOfUser = {props.exerciseOfUser}/>
         </div>
       </div>
@@ -470,11 +507,11 @@ const Problems = (props) => {
 }
 
 Problems.getInitialProps = async (ctx) => {
-  console.log('action')
-  const { store: { dispatch }, pathname, req, res } = ctx
-  await dispatch(searchQuestion())
+  const { store: { dispatch,getState }, pathname, req, res } = ctx
+  let data = { 'userId' : getState().auth.userInfo ?getState().auth.userInfo['id']:null }
+  await dispatch(searchQuestion(data))
   await dispatch(getCategory())
-  await dispatch(getExerciseOfUser())
+  await dispatch(getExerciseOfUser(!isEmptyObject(getState().auth.userInfo) ? getState().auth.userInfo['id']:null))
 
 }
 
@@ -484,7 +521,9 @@ function mapStateToProps(state, ownProps) {
     question: state.problem.question,
     totalQuestion : state.problem.totalQuestion,
     dropdownCategorySearch : state.problem.dropdownCategorySearch,
-    exerciseOfUser : state.problem.exerciseOfUser
+    exerciseOfUser : state.problem.exerciseOfUser,
+    isAuthenticated : state.auth.isAuthenticated,
+    userInfo : state.auth.userInfo
 
   }
 }

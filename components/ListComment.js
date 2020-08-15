@@ -3,7 +3,7 @@ import CommentListItem from "../components/CommentListItem"
 import CommentInput from "../components/CommentInput"
 import React, { useState } from 'react';
 import { connect } from 'react-redux'
-import { getDiscussByQuestionId } from "../store/discuss/action";
+import { getDiscussByQuestionId ,createACommentChildren} from "../store/discuss/action";
 const ListComment = (props) => {
   const [isShow, setIsShow] = useState(false);
   const [filterBy , setFilterBy ] = useState(0) /* 0 : DESC - 1 : ASC */
@@ -46,7 +46,7 @@ const ListComment = (props) => {
                  <span onClick= {()=> handleClickFilter(1)} className = {`${filterBy == 1 ? 'filter_active' :''}`} >Oldest to Newest</span>
               </div>
               <div className = "sub_header_right">
-                 <Button onClick = {()=>handelClickShow()}>New + </Button>
+                 <Button onClick = {()=>handelClickShow()} disabled = { !props.isAuthenticated} title={ !props.isAuthenticated ? 'Login To Discuss':''}>New + </Button>
               </div>
            </div>
         </div>
@@ -54,7 +54,7 @@ const ListComment = (props) => {
 
           { props.discuss.length > 0 ?
             props.discuss.map((value,key) => (
-              <CommentListItem key= {value['id']} comment={value}/>
+              <CommentListItem key= {value['id']} comment={value} isAuthenticated={props.isAuthenticated}/>
             )) : <Empty/>
           }
            {
@@ -65,8 +65,8 @@ const ListComment = (props) => {
                 current= {currentPage}
                 total={props.totalDiscuss}
                 showSizeChanger={false}
-                pageSize={2}
-                defaultPageSize={2}
+                pageSize={20}
+                defaultPageSize={20}
                 onChange= {(pageNumber,pageSize)=> {pagingQuestion(pageNumber,pageSize)}}
                 />
             </div>
@@ -76,11 +76,17 @@ const ListComment = (props) => {
         </div>
       </div>
 
-     <CommentInput handelClickShow= {()=> handelClickShow()} isShow = {isShow} questionId = {props.questionId}/>
+     <CommentInput  creatComment={ (data)=> createACommentChildren(data)} handelClickShow= {()=> handelClickShow()} isShow = {isShow} questionId = {props.questionId}/>
     </div>
   )
 }
 
+function mapStateToProps(state , ownProps) {
+  return {
+    isAuthenticated : state.auth.isAuthenticated,
+   
+  }
+}
 
 
-export default connect(null, {getDiscussByQuestionId})(ListComment);
+export default connect(mapStateToProps, {getDiscussByQuestionId,createACommentChildren})(ListComment);

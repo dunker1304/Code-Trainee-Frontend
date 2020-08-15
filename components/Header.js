@@ -1,7 +1,7 @@
 import { BellFilled , UserOutlined ,HeartOutlined,CheckOutlined,DeleteOutlined ,
   FileProtectOutlined,PieChartOutlined,UndoOutlined,EllipsisOutlined,LogoutOutlined,TeamOutlined ,SnippetsOutlined ,ContainerOutlined  ,CommentOutlined} from "@ant-design/icons"
 import Logo from "../static/images/codetrainee.png"
-import { Menu , Empty,Popover,Avatar} from 'antd';
+import { Menu , Empty,Popover,Avatar ,Button , Modal,Badge} from 'antd';
 import Link from 'next/link'
 import axios from "axios"
 import Router from "next/router"
@@ -10,21 +10,31 @@ import { connect } from "react-redux"
 import { useEffect ,useState } from "react"
 import  moment from "moment"
 import classnames from "classnames"
+import  { displayLogin ,signOut } from "../store/auth/action"
+import Login from "../components/Login"
+import Register from "../components/Register"
+import  { isEmptyObject} from "../helpers/utils"
 const CONSTANTS = require("../utils/constants")
+
 
 const Header = (props) => {
 
   const [listNoti , setListNoti] = useState([])
+  const [notRead , setNotRead] = useState(0)
 
   useEffect(()=>{
      fetchData()
   },[])
 
   const fetchData = async ()=>{
-    let url = `${process.env.API}/api/get-most-notification`
+    if(isEmptyObject(props.userInfo)) {
+      return ;
+    }
+    let url = `${process.env.API}/api/get-most-notification/${props.userInfo['id']}`
     let resData = await axios.get(url)
     if(resData.data.success) {
-         setListNoti(resData.data.data)
+         setListNoti(resData.data.data.listNoti)
+         setNotRead(resData.data.data.notRead);
     }
     else {
       openNotificationWithIcon('error','','Load Data Fail!');
@@ -41,6 +51,7 @@ const Header = (props) => {
       //headers : { Authorization: `Bearer ${accessToken}` }
     }) 
     if(res.data.success) {
+      props.signOut()
       Router.push('/')
     }
     else {
@@ -71,9 +82,7 @@ const Header = (props) => {
                <a href="">My Profile</a>
               </Link>
             </Menu.Item>
-            <Menu.Item key="forum">
-              <a href="">Forum</a>
-            </Menu.Item>
+            
           </Menu>
           )
         case CONSTANTS.ROLE.ROLE_ADMIN : 
@@ -84,11 +93,7 @@ const Header = (props) => {
                 <a href="">Accounts</a>
               </Link>
             </Menu.Item>
-            <Menu.Item key="profile">
-              <Link href="/admin/approve-exercise" as="/admin/approve-exercise">
-               <a href="">Exercises</a>
-              </Link> 
-            </Menu.Item>
+            
           </Menu>
            ) 
          case  CONSTANTS.ROLE.ROLE_TEACHER:
@@ -104,9 +109,7 @@ const Header = (props) => {
                <a href="">My Profile</a>
               </Link>
             </Menu.Item>
-            <Menu.Item key="forum">
-              <a href="">Forum</a>
-            </Menu.Item>
+          
           </Menu>
            )
      }
@@ -187,14 +190,14 @@ const Header = (props) => {
   const text2 = <h1 className="title_noti">Notifications</h1>;
   const contentAtionComment = (isRead,notiId)=>{
     return(
-      <div className="action_comment">
+      <div className="action_comment" style={{width:"150px"}}>
         <div style={{display:"flex"}}>
          <CheckOutlined style={{position:"relative", top:"8px",height:"fit-content",fontSize:"18px"}}/>
          <p onClick= {()=> markAsRead(notiId,isRead)}> {isRead ? 'Mark As Read' : 'Mark As Don\'t Read'} </p>
          </div>
          <div style={{display:"flex"}}>
          <DeleteOutlined style={{position:"relative", top:"8px",height:"fit-content",fontSize:"18px"}} />
-          <p onClick = {()=>removeNoti(notiId)}>Remove This Notification</p>
+          <p onClick = {()=>removeNoti(notiId)}>Remove </p>
           </div>
     </div>
     )
@@ -204,11 +207,17 @@ const Header = (props) => {
      let url = `${process.env.API}/api/mark-as-read`
      let data = {
       notificationId : notiId,
-      isRead : isRead
+      isRead : isRead,
+      userId : props.userInfo['id'] ? props.userInfo['id']:null
      }
 
      let resResult = await axios.post(url,data);
      if(resResult.data.success) {
+        if(isRead) {
+          if(notRead > 0) setNotRead(notRead -1);
+        }
+        else 
+          setNotRead(notRead +1)
        let tmp = [...listNoti];
        tmp.forEach(element => {
          if(element['id'] == notiId){
@@ -225,7 +234,8 @@ const Header = (props) => {
   const removeNoti = async ( notiId)=> {
     let url = `${process.env.API}/api/remove-notification`
     let data = {
-      notificationId : notiId
+      notificationId : notiId,
+      userId : props.userInfo['id'] ? props.userInfo['id']:null
     }
 
     let resResult = await axios.post(url,data);
@@ -294,7 +304,7 @@ const Header = (props) => {
            <div className="header-left">
                 {props.userInfo && props.userInfo.role ? renderNavForRole(props.userInfo.role['id']) : ''}
            </div>
-           <div className="header-right">
+           <div className="header-right" style= {{ display : props.isAuthenticated ? 'flex' : 'none'}}>
               <div className="header-ring">
               <div style={{ position: 'relative' }} id="area_noti">
                
@@ -304,7 +314,9 @@ const Header = (props) => {
                   overlayClassName="popover_noti"
                   getPopupContainer={() => document.getElementById('area_noti')}
                   >
+                  <Badge count={notRead}>
                    <BellFilled/>
+                   </Badge>
                 </Popover>
                 </div>
               </div>
@@ -315,6 +327,27 @@ const Header = (props) => {
                 
               </div>
            </div>
+      
+            <div className="header-right" style= {{ display : props.isAuthenticated ? 'none' : 'flex'}}>
+               <Button className ="header_button" onClick={()=>props.displayLogin(true,1)}>Sign In</Button>
+               <Button className ="header_button" onClick={()=>props.displayLogin(true,2)}>Sign Up</Button>
+               <Modal
+                  style={{ top: 20 }}
+                  closable = {false}
+                  visible={props.isShowLogin.isShow}
+                  footer = {null}
+                  onOk={()=> props.displayLogin(false,1)}
+                  onCancel={()=> props.displayLogin(false,1)}
+                  wrapClassName = 'login-modal'
+                  className="my-modal-class"
+                >
+                  {
+                    props.isShowLogin.type == 1 ?   <Login  type = "1"></Login>
+                    : <Register type = "2" ></Register>
+                  }
+               
+                </Modal>
+            </div> 
         </div>
       </div>
 
@@ -324,8 +357,10 @@ const Header = (props) => {
 
 function mapStateToProps(state, ownProps) {
   return {
-    userInfo : state.auth.userInfo
+    userInfo : state.auth.userInfo,
+    isAuthenticated : state.auth.isAuthenticated,
+    isShowLogin : state.auth.isShowLogin
   }
 }
 
-export default connect(mapStateToProps,null)(Header)
+export default connect(mapStateToProps, {displayLogin,signOut})(Header)

@@ -1,88 +1,77 @@
-import React, { Component } from 'react';
+import React, { useState , useEffect} from 'react';
 import classNames from 'classnames'
 import {connect} from 'react-redux'
 import * as action from "../store/auth/action"
-import { Radio } from 'antd'
-import {openNotificationWithIcon} from '../components/Notification'
-import axios from 'axios';
-class Login extends Component {
+import { displayLogin } from "../store/auth/action"
+import  Google  from "../static/images/icon-google.png"
+const CONSTANTS = require('../utils/constants')
+var popupTools = require('popup-tools');
+import  {openNotificationWithIcon } from "../components/Notification"
 
-  constructor(props, context) {
-    super(props, context);
-    this.state = {
-      email:'',
-      password:'',
-      role:'',
-      username:'',
-      listRole : []
-     // isLogin : props.type == 1
-    }
-    
-  }
+const Login= (props) => {
 
-  componentDidMount(){
-    this.fetchRole()
-  }
 
-  fetchRole = async function(){
-    let url = `${process.env.API}/api/user/role`
-    let data = { ignoreAdmin : true}
-    let listRole = await axios.post(url, data)
-    this.setState({listRole : listRole.data.data})
+  const [ email , setEmail ] = useState('');
+  const [ password , setPassword ] = useState('');
+  const [ role , setRole ] = useState(CONSTANTS.ROLE.ROLE_STUDENT);
+  const [ username, setUsername ] = useState('');
 
-  }
+  useEffect(() => {
+    setEmail('')
+    setUsername('');
+    setPassword('')
+    console.log("!23")
+  }, [role]); // Only re-run the effect if count changes
 
-  //state = { isLogin: true, email:'',password:'',role:'',username:'' };
-
-  changeTab = function(type) {
-    this.props.displayLogin(true,type)
+  const changeEmail = function(value){
+    setEmail(value)
   }
-  changeEmail = function(value){
-    this.setState({email : value})
+  const changePassword = function(value){
+    setPassword(value)
   }
-  changePassword = function(value){
-    this.setState({password:value})
+  const changeUsername = function(value){
+    setUsername(username)
   }
-  changeUsername = function(value){
-    this.setState({username:value})
-  }
-  changeRole = function(value){
-    this.setState({role:value})
+  const changeRole = function(value){
+    setRole(value)
   }
 
-  submitSignIn = function(e) {
+  const submitSignIn = function(e) {
     e.preventDefault();
    
-    this.props.signIn(this.state.email,this.state.password)
+    props.signIn(email,password, role)
 
   }
 
-  submitSignUp = function(e) {
-     e.preventDefault();
-     let data = {
-       'email' : this.state.email,
-       'username': this.state.username,
-       'role':this.state.role,
-       'password': this.state.password
-     }
-     this.props.signUp(data);
+  const googleLogin = (e)=> {
+    e.preventDefault()
+    popupTools.popup(`${process.env.API}/oauth/google/${role}`, "Google Connect", {}, function (err, data) {
+      if (err) {
+        //openNotificationWithIcon('error','',err.message);
+        console.log(err)
+      } else {
+         if(!data.success) {
+           openNotificationWithIcon('error','',data.message)
+         }
+         else {
+            if(data.message) {
+              openNotificationWithIcon('success','',data.message)
+            }
+            window.location.reload();
+         }      
+      }
+  });     
   }
 
-  onClickATag = function(e){
-    if(!this.state.role) {
-      e.preventDefault()
-      openNotificationWithIcon('warning','Warning','Please choose your role')
-    } 
-  }
-  render() {
+
     return (
       <div>
       <ul className="nav nav-tabs nav-fill" role="tablist">
-        <li role="presentation" className = {classNames('nav-item',{'active': this.props.type == 1})} onClick= {()=>this.changeTab(1)}>
-          <a className="nav-link" data-target="#login" aria-controls="login" role="tab" data-toggle="tab" aria-expanded="false">Login</a>
+        <li role="presentation" className = {classNames('nav-item',{'active': role == CONSTANTS.ROLE.ROLE_STUDENT})} onClick= {()=>changeRole(CONSTANTS.ROLE.ROLE_STUDENT)}>
+          <a className="nav-link" data-target="#login" aria-controls="login" role="tab" data-toggle="tab" aria-expanded="false">Student</a>
         </li>
-        <li role="presentation" className = {classNames('nav-item',{'active': this.props.type  == 2})} onClick= {()=>this.changeTab(2)}>
-          <a className="nav-link" data-target="#signup" aria-controls="signup" role="tab" data-toggle="tab"  aria-expanded="true">Register</a>
+        <li role="presentation" className = {classNames('nav-item',{'active': role  == CONSTANTS.ROLE.ROLE_TEACHER})} onClick= {()=>changeRole(CONSTANTS.ROLE.ROLE_TEACHER)}>
+          <a className="nav-link" data-target="#signup" aria-controls="signup" role="tab" data-toggle="tab"  aria-expanded="true">Teacher</a>
         </li>
       </ul>
       <div className="tab-content">
@@ -90,14 +79,15 @@ class Login extends Component {
         <div className="container-login100" >
           <div className="wrap-login100 ">
             {/* Login */}
-            <form  onSubmit = {(e)=> this.submitSignIn(e)} className="login100-form validate-form" style={{display: this.props.type == 1 ? 'block' : 'none' }}>
+            <form  onSubmit = {(e)=> submitSignIn(e)} className="login100-form validate-form" >
               <span className="login100-form-title p-b-20">
-                Login your account
+                Login your { role == CONSTANTS.ROLE.ROLE_STUDENT ? ' STUDENT ': ' TEACHER '} account
               </span>
-              <a href={`${process.env.API}/oauth/google`} className="btn-google m-b-20">
-                <img src="../static/images/icon-google.png" alt="GOOGLE" />
+              {/* href={`${process.env.API}/oauth/google/${role}`} */}
+              <button  className="btn-google m-b-20" onClick= {(e)=> { googleLogin(e)}}>
+                <img src={Google} alt="GOOGLE" />
                 Google
-              </a>
+              </button>
               <p className='label-or'>OR</p>
               <div className="p-t-20 p-b-9">
                 <span className="txt1"> 
@@ -105,25 +95,22 @@ class Login extends Component {
                 </span>
               </div>
               <div className="wrap-input100 validate-input" data-validate="Username is required">
-                <input className="input100" type="text" required name="email" onChange = {(e)=>this.changeEmail(e.target.value)}/>
+                <input className="input100" type="text" required name="email" onChange = {(e)=>changeEmail(e.target.value)} value={email}/>
                 <span className="focus-input100" />
               </div>
               <div className="p-t-13 p-b-9">
                 <span className="txt1">
                   Password
                 </span>
-                <a href="#" className="txt2 bo1 m-l-5">
+                {/* <a href="#" className="txt2 bo1 m-l-5">
                   Forgot?
-                </a>
+                </a> */}
               </div>
               <div className="wrap-input100 validate-input" data-validate="Password is required">
-                <input className="input100" type="password"  required name="password"  onChange = {(e)=>this.changePassword(e.target.value)} />
+                <input className="input100" type="password"  required name="password"  onChange = {(e)=>changePassword(e.target.value)} value={password}/>
                 <span className="focus-input100" />
               </div>
-              {/* <div className='login_error'>
-                {this.props.loginError}
-              </div> */}
-
+            
               <div className="container-login100-form-btn m-t-17">
                 <button type="submit" className="login100-form-btn" >
                   Sign In
@@ -131,79 +118,16 @@ class Login extends Component {
               </div>
               <div className="w-full text-center p-t-55">
                 <span className="txt2">
-                  Not a member?
+                  Not a member? {' '}
                 </span>
-                <a href="#" className="txt2 bo1">
+                <a className="txt2 bo1" onClick= {()=> props.displayLogin(true,2)}>
                   Sign up now
                 </a>
               </div>
             </form>
             {/* End Login */}
 
-            {/* Register */}
-            <form onSubmit = {(e)=> this.submitSignUp(e)} className="login100-form validate-form" style={{display: this.props.type == 2 ? 'block' : 'none' }}>
-              <span className="login100-form-title p-b-20">
-                Register new account
-              </span>
-              <a href={`${process.env.API}/oauth/google?role=1`} onClick = {(e)=>this.onClickATag(e)}className="btn-google m-b-20">
-                <img src="../static/images/icon-google.png" alt="GOOGLE" />
-                Google
-              </a>
-              <p className='label-or'>OR</p>
-              <div className="p-t-20 p-b-9">
-                <span className="txt1">
-                  Username
-                </span>
-              </div>
-              <div className="wrap-input100 validate-input" data-validate="Username is required">
-                <input className="input100" type="text" name="username" onChange= {(e)=>this.changeUsername(e.target.value)} required />
-                <span className="focus-input100" />
-              </div>
-              <div className="p-t-13 p-b-9">
-                <span className="txt1">
-                  Email
-                </span>
-              </div>
-              <div className="wrap-input100 validate-input" data-validate="Email is required">
-                <input className="input100" type="email" name="email" aria-required="true"  onChange= {(e)=>this.changeEmail(e.target.value)} required/>
-                <span className="focus-input100" />
-              </div>
-              <div className="p-t-13 p-b-9">
-                <span className="txt1">
-                  Password
-                </span>
-              </div>
-              <div className="wrap-input100 validate-input"  onChange= {(e)=>this.changePassword(e.target.value)}>
-                <input className="input100" type="password" name="password" required   />
-                <span className="focus-input100" />
-              </div>
-              <Radio.Group name="role"  className ="role_radio"  onChange= {(e)=>this.changeRole(e.target.value)} >
-                {
-                   this.state.listRole && this.state.listRole.length > 0 ? this.state.listRole.map((value,index)=> (
-                    <Radio key = {index}value={value['id']} required>{value['name']}</Radio>
-                  )) : ''
-                }
-            
-
-              </Radio.Group>
-              {/* <div className='login_error'>
-                {this.props.signUpError}
-              </div> */}
-              <div className="container-login100-form-btn m-t-17">
-                <button type="submit" className="login100-form-btn">
-                  Sign Up
-                </button>
-              </div>
-              <div className="w-full text-center p-t-55">
-                <span className="txt2">
-                  Already Registered ? 
-                </span>
-                <a href="#" className="txt2 bo1">
-                 Login now
-                </a>
-              </div>
-            </form>
-            {/* End Register */}
+        
           </div>
         </div>
       </div>
@@ -211,7 +135,7 @@ class Login extends Component {
       </div>
     </div>
     );
-  }
+
 }
 
 function mapStateToProps(state,ownProps) {
