@@ -21,10 +21,10 @@ const QuestionItem = (props)=> {
             </Tooltip> :
            <Tooltip title={props.isAuthenticated ? '' : 'Login To Add WishList'}>
                <Button type="text" 
-                       disabled = { !props.isAuthenticated} 
+                    //   disabled = { !props.isAuthenticated} 
                        className="btn_icon" 
                        icon={<HeartOutlined   style={{color: '#eb2f96'}}/>}
-                       onClick = {()=>props.addToWishList(props.question.id) }
+                     //  onClick = {()=>props.addToWishList(props.question.id) }
                />
            </Tooltip>
             }

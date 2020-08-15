@@ -20,6 +20,9 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      .ant-badge {
+        font-size: 20px;
+      }
 
       .header-right {
         display: flex;

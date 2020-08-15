@@ -63,6 +63,6 @@ export const getCookie = (name) => {
 }
 
 export const isEmptyObject = (value)=> {
-  if(!value.obj) return true;
-  return Object.keys(value.obj).length === 0 && value.obj.constructor === Object
+  if(!value) return true;
+  return Object.keys(value).length === 0 && value.constructor === Object
 }

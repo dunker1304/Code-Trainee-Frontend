@@ -20,11 +20,13 @@ import {
   EyeTwoTone,
   EyeInvisibleFilled,
   EyeInvisibleTwoTone,
+  BarChartOutlined ,
+  LineChartOutlined 
 } from '@ant-design/icons';
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
+import Router ,{ useRouter }  from 'next/router';
 import Link from 'next/link';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
@@ -289,7 +291,7 @@ const ExerciseList = (props) => {
               title: 'Action',
               key: 'action',
               fixed: 'right',
-              width: '170px',
+              width: '200px',
               render: (text, record) => (
                 <div
                   style={{
@@ -346,6 +348,14 @@ const ExerciseList = (props) => {
                         <EyeInvisibleTwoTone style={{ fontSize: '16px' }} />
                       </Button>
                     )}
+                  </Tooltip>
+                  <Tooltip placement='top' title={record.approved ? 'Statistics': 'Exercise hasn\'t approved'}>
+                      <Button type="text" 
+                       disabled = { !record.approved} 
+                       className="btn_icon" 
+                       icon={<LineChartOutlined  style={{ fontSize: '16px', color: '#1890ff' }}/>}
+                       onClick = {()=> { Router.push('/exercise/[exerciseId]/statistic',`/exercise/${record['key']}/statistic`)} }
+                    />
                   </Tooltip>
                 </div>
               ),
