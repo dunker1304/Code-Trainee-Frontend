@@ -25,6 +25,7 @@ import {
   CloseCircleOutlined,
   BarChartOutlined,
   LineChartOutlined,
+  CloseCircleTwoTone,
 } from '@ant-design/icons';
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
@@ -302,31 +303,28 @@ const ExerciseList = ({ userInfo }) => {
                 return (
                   <>
                     {record.approved === STATUS.REJECTED && (
-                      <span>
-                        <CloseCircleOutlined
-                          color='red'
+                      <Tooltip placement='top' title={'Rejected'}>
+                        <CloseCircleTwoTone
+                          twoToneColor='#eb2f96'
                           style={{ fontSize: '22px' }}
                         />
-                        rejected
-                      </span>
+                      </Tooltip>
                     )}
                     {record.approved === STATUS.ACCEPTED && (
-                      <span>
-                        <CheckCircleOutlined
-                          color='green'
+                      <Tooltip placement='top' title={'Approved'}>
+                        <CheckCircleTwoTone
+                          twoToneColor='#52c41a'
                           style={{ fontSize: '22px' }}
                         />
-                        accepted
-                      </span>
+                      </Tooltip>
                     )}
                     {record.approved === STATUS.WAITING && (
-                      <span>
+                      <Tooltip placement='top' title={'Waiting'}>
                         <LoadingOutlined
                           color='blue'
                           style={{ fontSize: '22px' }}
                         />
-                        waiting
-                      </span>
+                      </Tooltip>
                     )}
                   </>
                 );
