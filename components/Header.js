@@ -147,13 +147,8 @@ const Header = (props) => {
                   <TeamOutlined style={{color : "#d05451",fontSize :"20px"}} className="icon_prover_header"/>Accounts 
                  </li>
             </Link>
-            <Link href="/admin/approve-exercise" as="/admin/approve-exercise">
-              <li>
-                <SnippetsOutlined style={{color : "#1da09c" ,fontSize :"20px"}} className="icon_prover_header"/> Exercises 
-              </li>
-            </Link> 
-           
-            <li> <UndoOutlined style={{color : "#ffdf00" ,fontSize :"20px"}} className="icon_prover_header"/> Change Password</li>
+          
+            {/* <li> <UndoOutlined style={{color : "#ffdf00" ,fontSize :"20px"}} className="icon_prover_header"/> Change Password</li> */}
             <li  onClick= {()=>hanleSignOut()} > <LogoutOutlined style={{color : "#fea116",fontSize :"20px"}} className="icon_prover_header"/> Sign out</li>
           </ul>
           ) 
