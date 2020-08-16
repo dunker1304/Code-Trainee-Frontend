@@ -36,8 +36,7 @@ const TestCaseModal = ({
       return true;
     } catch (e) {
       notification.info({
-        message: 'Warning',
-        description: 'Check your input again!',
+        message: 'Check your input again!',
       });
       return false;
     }
@@ -89,6 +88,9 @@ const TestCaseModal = ({
         output: '',
         isHidden: false,
       });
+    return () => {
+      form = null;
+    };
   }, [visible]);
 
   return (

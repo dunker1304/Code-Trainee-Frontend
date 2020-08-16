@@ -75,7 +75,7 @@ class Index extends Component {
             <img className="img-fluid animated-figure animated-figure2" src="static/images/animated-figure2.png" alt="banner"/>
             <div className="container">
               <div className="preview-banner-content">
-                <h1>Trainee Code for ....</h1>
+                <h1>Trainee Code for FPT Students</h1>
                 <ul className="build-with">
                   <li>
                     <img className="img-fluid" src='../static/images/html.png'></img>
@@ -148,7 +148,7 @@ class Index extends Component {
                 <div className="col-lg-5 col-12">
                   <div className='item-content'>
                     <h3><span>Playground</span> for many languages & <span>Learn</span> about architecture</h3>
-                    <a className='fill-btn' href='#' target='_blank'>Purchase Now</a>
+                    <a className='fill-btn' href='/problem' target='_blank'>Do Exercise Now</a>
                   </div>
                 </div>
                 <div className='col-lg-7 col-12'>

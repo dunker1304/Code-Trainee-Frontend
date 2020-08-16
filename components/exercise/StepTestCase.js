@@ -1,6 +1,6 @@
 import { Table, Button, Space, Popconfirm, notification, Tooltip } from 'antd';
 import TestCaseModal from './TestCaseModal';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   CloseOutlined,
   CheckOutlined,
@@ -8,127 +8,53 @@ import {
   DeleteTwoTone,
 } from '@ant-design/icons';
 import axios from 'axios';
-import next from 'next';
-import { previewImage } from 'antd/lib/upload/utils';
 
-const StepTestCases = ({ exerciseId, next = () => {}, prev = () => {} }) => {
+const StepTestCases = ({ testcases = [], setTestCases }) => {
   // modal
   let [showAddModal, setShowAddModal] = useState(false);
   let [showEditModal, setShowEditModal] = useState(false);
   // table
   let [loading, setLoading] = useState(false);
-  let [tableData, setTableData] = useState([]);
   let [currPageTable, setCurrPageTable] = useState(1);
   let [currPageSize, setCurrPageSize] = useState(10);
   let [currRecord, setCurrRecord] = useState({});
+  // keep 'key' for record
+  let count = useRef(-1);
 
-  const handleNext = () => {
-    next();
+  const onEditRecord = (data) => {
+    const key = currRecord.key;
+    const afterEdited = [...testcases].map((t) => {
+      if (t.key === key) {
+        return {
+          input: data.input,
+          output: data.output,
+          isHidden: data.isHidden,
+          id: currRecord.id,
+          key: key,
+        };
+      }
+      return t;
+    });
+    setTestCases(afterEdited);
   };
 
-  const handlePrevious = () => {
-    prev();
+  const onDeleteRecord = (key) => {
+    const afterDeleted = [...testcases].filter((t) => t.key !== key);
+    setTestCases(afterDeleted);
   };
 
-  const handleEditRecord = async (data) => {
-    try {
-      const res = await axios.post(`${process.env.API}/api/testcase/update`, {
-        isHidden: data.isHidden,
+  const onAddRecord = (data) => {
+    count.current = count.current - 1;
+    setTestCases([
+      ...testcases,
+      {
         input: data.input,
         output: data.output,
-        id: currRecord.key,
-      });
-      if (res.data.success) {
-        setCurrRecord({});
-        loadTable();
-      } else {
-        throw new Error('');
-      }
-    } catch (e) {
-      notification.error({
-        message: 'Notification',
-        description: 'Something get wrong!',
-      });
-      console.log(e);
-    }
-  };
-
-  const handleDeleteRecord = async (id) => {
-    try {
-      const res = await axios.post(`${process.env.API}/api/testcase/delete`, {
-        id: id,
-      });
-      if (res.data.success) {
-        loadTable();
-      } else {
-        throw new Error('');
-      }
-    } catch (e) {
-      notification.error({
-        message: 'Notification',
-        description: 'Something get wrong!',
-      });
-      console.log(e);
-    }
-  };
-
-  const handleAddRecord = async (data) => {
-    try {
-      const res = await axios.post(`${process.env.API}/api/testcase/create`, {
         isHidden: data.isHidden,
-        dataInput: data.input,
-        expectedOutput: data.output,
-        exerciseId: exerciseId,
-      });
-      if (res.data.success) {
-        loadTable();
-      } else {
-        throw new Error('');
-      }
-    } catch (e) {
-      notification.error({
-        message: 'Notification',
-        description: 'Something get wrong!',
-      });
-      console.log(e);
-    }
+        key: count.current,
+      },
+    ]);
   };
-
-  const loadTable = async () => {
-    setLoading(true);
-    try {
-      const res = await axios.get(
-        `${process.env.API}/api/testcase/exercise/${exerciseId}`
-      );
-      if (res.data.success) {
-        let testcases = [];
-        res.data.data.result.forEach((e) => {
-          testcases.push({
-            key: e.id,
-            input: e.input,
-            output: e.expectedOutput,
-            hidden: e.isHidden,
-            createdAt: e.createdAt,
-            updatedAt: e.updatedAt,
-          });
-        });
-        setTableData(testcases);
-      } else {
-        throw new Error('');
-      }
-    } catch (e) {
-      notification.error({
-        message: 'Notification',
-        description: 'Something get wrong!',
-      });
-      console.log(e);
-    }
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    loadTable();
-  }, []);
 
   return (
     <div>
@@ -154,7 +80,7 @@ const StepTestCases = ({ exerciseId, next = () => {}, prev = () => {} }) => {
         cancelText='Cancel'
         onCancel={() => setShowAddModal(false)}
         onCancelX={() => setShowAddModal(false)}
-        onOK={handleAddRecord}
+        onOK={onAddRecord}
         visible={showAddModal}
       />
       <TestCaseModal
@@ -164,10 +90,10 @@ const StepTestCases = ({ exerciseId, next = () => {}, prev = () => {} }) => {
         isCreate={false}
         onCancel={() => setShowEditModal(false)}
         onCancelX={() => setShowEditModal(false)}
-        onOK={handleEditRecord}
+        onOK={onEditRecord}
         input={currRecord.input}
         output={currRecord.output}
-        isHidden={currRecord.hidden}
+        isHidden={currRecord.isHidden}
       />
       <div style={{ minHeight: '350px' }}>
         <Table
@@ -199,8 +125,8 @@ const StepTestCases = ({ exerciseId, next = () => {}, prev = () => {} }) => {
             },
             {
               title: 'Hidden',
-              dataIndex: 'hidden',
-              key: 'hidden',
+              dataIndex: 'isHidden',
+              key: 'isHidden',
               width: '100px',
               render: (hidden) => {
                 if (hidden) {
@@ -239,7 +165,7 @@ const StepTestCases = ({ exerciseId, next = () => {}, prev = () => {} }) => {
                     <Popconfirm
                       title='Are you sure delete this test case?'
                       okText='Yes'
-                      onConfirm={() => handleDeleteRecord(record.key)}
+                      onConfirm={() => onDeleteRecord(record.key)}
                       cancelText='No'
                       placement='left'>
                       <Button
@@ -256,7 +182,7 @@ const StepTestCases = ({ exerciseId, next = () => {}, prev = () => {} }) => {
               ),
             },
           ]}
-          dataSource={tableData}
+          dataSource={testcases}
           pagination={{
             defaultPageSize: 10,
             showSizeChanger: true,
@@ -267,33 +193,6 @@ const StepTestCases = ({ exerciseId, next = () => {}, prev = () => {} }) => {
             setCurrPageTable(pagination.current);
           }}
         />
-      </div>
-      <div
-        className='step-actions'
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          marginBottom: '50px',
-        }}>
-        <Button
-          onClick={handlePrevious}
-          type='primary'
-          size='large'
-          style={{
-            width: 100,
-          }}>
-          Previous
-        </Button>
-        <Button
-          onClick={handleNext}
-          loading={loading}
-          type='primary'
-          size='large'
-          style={{
-            width: 100,
-          }}>
-          Next
-        </Button>
       </div>
     </div>
   );

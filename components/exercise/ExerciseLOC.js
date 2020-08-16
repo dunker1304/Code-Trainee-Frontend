@@ -2,13 +2,9 @@ import { Space, Slider, Row, Col, InputNumber, notification } from 'antd';
 import { InfoCircleFilled } from '@ant-design/icons';
 import { useState, useEffect, useRef } from 'react';
 
-const ExerciseLOC = ({
-  value = 0,
-  onChange = (value) => {},
-  min = 0,
-  max = 100,
-}) => {
+const ExerciseLOC = ({ value, onChange, min, max }) => {
   let [sliderValue, setSliderValue] = useState(value);
+  let inputRef = useRef();
 
   const onSliderValueChange = (value) => {
     if (value <= max && value >= min) {
@@ -35,10 +31,12 @@ const ExerciseLOC = ({
         alignItems: 'flex-start',
       }}>
       <InputNumber
+        ref={inputRef}
         value={sliderValue}
         min={min}
         max={max}
         onChange={onInputValueChange}
+        onPressEnter={() => inputRef.current.blur()}
         style={{
           width: '15%',
           display: 'inline-block',
