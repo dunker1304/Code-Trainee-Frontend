@@ -52,15 +52,15 @@ const Playground = props => {
 
   useEffect(() => {
    let activeTab = router.query.tab ? router.query.tab : "1"
-   console.log(props, 'use effect')
    setCode(props.language[indexLanguage].codeSnippets[0]?.sampleCode || "")
+   setTestCaseProps(props.question.testCases)
    if(activeTab == 4) {
     let questionId = router.query.questionID
     Router.push(`/exercise/[exerciseId]/discuss`,`/exercise/${questionId}/discuss`)
    }
    else
     setIndexActive(activeTab)
-  },[props.language]);
+  },[props.language, props.question]);
   const [runCode, setRunCode] = useState(false)
   const [loading, setLoading] = useState(false)
   const [loadingAllPage, setLoadingAllPage] = useState(false)
@@ -127,7 +127,6 @@ const Playground = props => {
   }
 
   const handleSubmitCode = () => {
-    console.log(runCode, 'submit code')
     setLoading(true)
     if (!runCode) {
       handleRunCode(addSolution)
@@ -268,7 +267,7 @@ const Playground = props => {
           <div className="playground-action">
             <Select defaultValue={props.language[0].code} style={{ width: 120 }} onSelect={handleChangeLanguage}>
               {props.language && props.language.map((lang, key) => (
-                <Option key={key} value={lang.code}>{lang.name}</Option>
+                lang.codeSnippets.length > 0 ? <Option key={key} value={lang.code}>{lang.name}</Option> : null
               ))}
             </Select>
 
@@ -355,7 +354,7 @@ Playground.getInitialProps = async function(ctx) {
   const questionResponse = await axios.get(urlExercise)
   const languageResponse = await axios.get(urlLanguage)
   const exerciseVote = await axios.get(urlVote)
-  console.log('get initial props')
+  console.log(languageResponse.data.data[0].codeSnippets.length > 0, 'get initial props')
   return { 
     question: questionResponse.data, 
     language: languageResponse.data.data,
