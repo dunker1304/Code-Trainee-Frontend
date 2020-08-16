@@ -10,6 +10,7 @@ import Footer from '../components/Footer';
 import composedAuthHOC from 'hocs';
 import axios from 'axios';
 import { Router, useRouter } from 'next/router';
+import ConfirmModal from '../components/ConfirmModal';
 
 const StepTitles = [
   { key: 0, title: 'Basic Informations' },
@@ -46,6 +47,8 @@ const Exercise = ({
   let [nextLoading, setNextLoading] = useState(false);
   let [prevLoading, setPrevLoading] = useState(false);
   let [finishLoading, setFinishLoading] = useState(false);
+  // visible confirm modal
+  let [confirm, setConfirm] = useState(false);
 
   const validateStepBasicInfos = async () => {
     try {
@@ -126,48 +129,47 @@ const Exercise = ({
   };
 
   const onFinish = async () => {
-    const sendApi = async () => {
-      try {
-        let { content, title, points, level, tags } = basicInfos;
-        let res = await axios.post(
-          `${process.env.API}/api/exercise/${isCreate ? 'create' : 'update'}`,
-          {
-            id: id,
-            content: content,
-            title: title,
-            points: points,
-            level: level,
-            tags: tags,
-            testcases: testcases,
-            languages: languages,
-            reviewerIds: listTeachers
-              .filter((t) => selectedReviewers.indexOf(t.email) !== -1)
-              .map((t) => t.id),
-            createdBy: currUserId,
-          }
-        );
-        if (res.data.success) {
-          router.push('/exercise-list', '/exercise-list');
-        } else {
-          throw new Error();
+    try {
+      let { content, title, points, level, tags } = basicInfos;
+      let res = await axios.post(
+        `${process.env.API}/api/exercise/${isCreate ? 'create' : 'update'}`,
+        {
+          id: id,
+          content: content,
+          title: title,
+          points: points,
+          level: level,
+          tags: tags,
+          testcases: testcases,
+          languages: languages,
+          reviewerIds: listTeachers
+            .filter((t) => selectedReviewers.indexOf(t.email) !== -1)
+            .map((t) => t.id),
+          createdBy: currUserId,
         }
-      } catch (e) {
-        notification.warn({
-          message: 'Something is wrong.',
-        });
-        console.log(e);
+      );
+      if (res.data.success) {
+        router.push('/exercise-list');
+      } else {
+        throw new Error();
       }
-    };
+    } catch (e) {
+      notification.warn({
+        message: 'Something is wrong.',
+      });
+      console.log(e);
+    }
+  };
+
+  const onBeforeFinish = async () => {
     setFinishLoading(true);
     (await validateStepBasicInfos()) &&
       validateStepCodeStubs() &&
       validateStepTestcases() &&
       validateStepReview() &&
-      (await sendApi());
+      setConfirm(true);
     setFinishLoading(false);
   };
-
-  const finishOnEdit = async () => {};
 
   return (
     <React.Fragment>
@@ -260,11 +262,11 @@ const Exercise = ({
                 Next
               </Button>
             )}
-            {!isCreate && (
+            {(!isCreate || currStep === StepTitles.length - 1) && (
               <Button
                 disabled={nextLoading || prevLoading}
                 loading={finishLoading}
-                onClick={onFinish}
+                onClick={onBeforeFinish}
                 type='primary'
                 size='large'
                 style={{
@@ -277,6 +279,24 @@ const Exercise = ({
           </div>
         </div>
       </div>
+      <ConfirmModal
+        visible={confirm}
+        content={
+          <>
+            <p>This exercise will be reviewed by other teachers.</p>
+            <p>
+              After 24h, you can self-review this exercise if it was not
+              reviewed yet.
+            </p>
+          </>
+        }
+        onCancelX={() => setConfirm(false)}
+        onCancel={() => setConfirm(false)}
+        title='Notification'
+        onOk={onFinish}
+        okText='OK'
+        cancelText='Cancel'
+      />
       <Footer />
     </React.Fragment>
   );
