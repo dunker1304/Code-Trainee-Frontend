@@ -10,7 +10,7 @@ import {
   Popconfirm,
 } from 'antd';
 import React, { useState, useEffect, Row, useRef } from 'react';
-import { InboxOutlined } from '@ant-design/icons';
+import { InboxOutlined, UploadOutlined } from '@ant-design/icons';
 import axios from 'axios';
 
 const TestCaseModal = ({
@@ -29,6 +29,9 @@ const TestCaseModal = ({
   let [loading, setLoading] = useState(false);
   let [form] = Form.useForm();
   let firstRun = useRef(true);
+
+  let [inputType, setInputType] = useState('editor');
+  let [outputType, setOutputType] = useState('editor');
 
   const runValidate = async () => {
     try {
@@ -59,20 +62,16 @@ const TestCaseModal = ({
     onCancel();
   };
 
-  const validateRequire = (label) => ({
-    validator(rule, value) {
-      return !value
-        ? Promise.reject(`'${label}' is required!`)
-        : Promise.resolve();
-    },
-  });
-
   const onReset = () => {
     form.setFieldsValue({
       input: input,
       output: output,
       isHidden: isHidden,
     });
+  };
+
+  const onUpload = (file) => {
+    console.log({ file });
   };
 
   useEffect(() => {
@@ -144,6 +143,9 @@ const TestCaseModal = ({
         }>
         <Form form={form} layout='vertical'>
           <Form.Item
+            style={{
+              minHeight: 120,
+            }}
             required={isCreate}
             name='input'
             label={
@@ -167,10 +169,20 @@ const TestCaseModal = ({
               </div>
             }
             initialValue={input}
-            rules={[validateRequire('Data Input')]}>
+            rules={[
+              { required: true, message: `'Data Input' is required!` },
+              {
+                type: 'string',
+                max: 1000,
+                message: `'Data Input' cannot be longer than 1000 characters`,
+              },
+            ]}>
             <Input.TextArea rows='3' />
           </Form.Item>
           <Form.Item
+            style={{
+              minHeight: 120,
+            }}
             required={isCreate}
             name='output'
             label={
@@ -194,7 +206,14 @@ const TestCaseModal = ({
               </div>
             }
             initialValue={output}
-            rules={[validateRequire('Expected Output')]}>
+            rules={[
+              { required: true, message: `'Expected Output' is required!` },
+              {
+                type: 'string',
+                max: 1000,
+                message: `'Expected Output' cannot be longer than 1000 characters`,
+              },
+            ]}>
             <Input.TextArea rows='3' />
           </Form.Item>
           <Form.Item

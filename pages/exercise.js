@@ -28,6 +28,7 @@ const Exercise = ({
 }) => {
   let router = useRouter();
   let currUserId = userInfo ? userInfo.id : 0;
+  let isCreate = !id;
   // steps
   let [currStep, setCurrStep] = useState(0);
   // step basic infos
@@ -106,7 +107,7 @@ const Exercise = ({
 
   const onPrevious = () => {
     setPrevLoading(true);
-    if (!id) {
+    if (isCreate) {
       setCurrStep(currStep - 1);
     } else {
       switch (currStep) {
@@ -125,12 +126,11 @@ const Exercise = ({
   };
 
   const onFinish = async () => {
-    setFinishLoading(true);
     const sendApi = async () => {
       try {
         let { content, title, points, level, tags } = basicInfos;
         let res = await axios.post(
-          `${process.env.API}/api/exercise/${!id ? 'create' : 'update'}`,
+          `${process.env.API}/api/exercise/${isCreate ? 'create' : 'update'}`,
           {
             id: id,
             content: content,
@@ -146,7 +146,6 @@ const Exercise = ({
             createdBy: currUserId,
           }
         );
-        setFinishLoading(false);
         if (res.data.success) {
           router.push('/exercise-list', '/exercise-list');
         } else {
@@ -157,14 +156,15 @@ const Exercise = ({
           message: 'Something is wrong.',
         });
         console.log(e);
-        setFinishLoading(false);
       }
     };
-    validateStepBasicInfos() &&
+    setFinishLoading(true);
+    (await validateStepBasicInfos()) &&
       validateStepCodeStubs() &&
       validateStepTestcases() &&
       validateStepReview() &&
       (await sendApi());
+    setFinishLoading(false);
   };
 
   const finishOnEdit = async () => {};
@@ -172,7 +172,7 @@ const Exercise = ({
   return (
     <React.Fragment>
       <Head>
-        <title>{!id ? 'Create Exercise' : 'Update Exercise'}</title>
+        <title>{isCreate ? 'Create Exercise' : 'Update Exercise'}</title>
       </Head>
       <Header />
       <div
@@ -202,7 +202,7 @@ const Exercise = ({
           }}>
           {currStep === 0 && (
             <StepBasic
-              isCreate={!id}
+              isCreate={isCreate}
               allTags={listTags}
               formRef={formRef}
               setBasicInfos={setBasicInfos}
@@ -260,7 +260,7 @@ const Exercise = ({
                 Next
               </Button>
             )}
-            {!!id && (
+            {!isCreate && (
               <Button
                 disabled={nextLoading || prevLoading}
                 loading={finishLoading}
