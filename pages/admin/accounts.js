@@ -232,7 +232,7 @@ const Admin = (props) => {
     let urlUser = `${process.env.API}/api/admin/create-an-account`
     const resUser = await axios.post(urlUser,data)
     if(resUser.data.success) {
-      openNotificationWithIcon('success', '', 'Create Account Successfully!')
+      openNotificationWithIcon('success', '', resUser.data.message)
       fetchData(currentPage,roleActive)
       onClose()
     }
