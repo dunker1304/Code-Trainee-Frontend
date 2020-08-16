@@ -132,7 +132,7 @@ const ExerciseList = ({ userInfo }) => {
   };
 
   const handleButtonEditRecord = (record) => {
-    if (record.approved !== STATUS.ACCEPTED) {
+    if (record.approved === STATUS.WAITING) {
       notification.info({
         message: `This exercise is waiting for review`,
         description: 'You cannot edit exercise in this time',
@@ -294,7 +294,7 @@ const ExerciseList = ({ userInfo }) => {
               },
             },
             {
-              title: 'Approved',
+              title: 'Status',
               dataIndex: 'approved',
               key: 'approved',
               width: '130px',
