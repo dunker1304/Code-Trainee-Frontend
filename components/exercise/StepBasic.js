@@ -83,6 +83,11 @@ const StepBasicInfos = ({
               max: 150,
               message: `'Title' cannot be longer than 150 characters`,
             },
+            {
+              type: 'string',
+              min: 3,
+              message: `'Title' must be at least 3 characters`,
+            },
           ]}>
           <Input />
         </Form.Item>
