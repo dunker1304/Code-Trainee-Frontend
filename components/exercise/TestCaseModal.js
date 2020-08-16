@@ -108,6 +108,8 @@ const TestCaseModal = ({
               justifyContent: 'space-between',
             }}>
             <Button
+              type='primary'
+              ghost
               style={{
                 width: '100px',
               }}
