@@ -44,6 +44,7 @@ const Exercise = ({
   // loading
   let [nextLoading, setNextLoading] = useState(false);
   let [prevLoading, setPrevLoading] = useState(false);
+  let [finishLoading, setFinishLoading] = useState(false);
 
   const validateStepBasicInfos = async () => {
     try {
@@ -88,59 +89,85 @@ const Exercise = ({
   };
 
   const onNext = async () => {
+    setNextLoading(true);
     switch (currStep) {
       case 0:
-        return (await validateStepBasicInfos()) && setCurrStep(1);
+        (await validateStepBasicInfos()) && setCurrStep(1);
+        break;
       case 1:
-        return validateStepCodeStubs() && setCurrStep(2);
+        validateStepCodeStubs() && setCurrStep(2);
+        break;
       case 2:
-        return validateStepTestcases() && setCurrStep(3);
-      case 3:
-        return validateStepReview() && (await onFinish());
+        validateStepTestcases() && setCurrStep(3);
+        break;
     }
+    setNextLoading(false);
   };
 
   const onPrevious = () => {
     setPrevLoading(true);
-    setCurrStep(currStep - 1);
+    if (!id) {
+      setCurrStep(currStep - 1);
+    } else {
+      switch (currStep) {
+        case 1:
+          validateStepCodeStubs() && setCurrStep(0);
+          break;
+        case 2:
+          validateStepTestcases() && setCurrStep(1);
+          break;
+        case 3:
+          validateStepReview() && setCurrStep(2);
+          break;
+      }
+    }
     setPrevLoading(false);
   };
 
   const onFinish = async () => {
-    setNextLoading(true);
-    try {
-      let { content, title, points, level, tags } = basicInfos;
-      let res = await axios.post(
-        `${process.env.API}/api/exercise/${!id ? 'create' : 'update'}`,
-        {
-          id: id,
-          content: content,
-          title: title,
-          points: points,
-          level: level,
-          tags: tags,
-          testcases: testcases,
-          languages: languages,
-          reviewerIds: listTeachers
-            .filter((t) => selectedReviewers.indexOf(t.email) !== -1)
-            .map((t) => t.id),
-          createdBy: currUserId,
+    setFinishLoading(true);
+    const sendApi = async () => {
+      try {
+        let { content, title, points, level, tags } = basicInfos;
+        let res = await axios.post(
+          `${process.env.API}/api/exercise/${!id ? 'create' : 'update'}`,
+          {
+            id: id,
+            content: content,
+            title: title,
+            points: points,
+            level: level,
+            tags: tags,
+            testcases: testcases,
+            languages: languages,
+            reviewerIds: listTeachers
+              .filter((t) => selectedReviewers.indexOf(t.email) !== -1)
+              .map((t) => t.id),
+            createdBy: currUserId,
+          }
+        );
+        setFinishLoading(false);
+        if (res.data.success) {
+          router.push('/exercise-list', '/exercise-list');
+        } else {
+          throw new Error();
         }
-      );
-      setNextLoading(false);
-      if (res.data.success) {
-        router.push('/exercise-list', '/exercise-list');
-      } else {
-        throw new Error();
+      } catch (e) {
+        notification.warn({
+          message: 'Something is wrong.',
+        });
+        console.log(e);
+        setFinishLoading(false);
       }
-    } catch (e) {
-      notification.warn({
-        message: 'Something is wrong.',
-      });
-      console.log(e);
-      setNextLoading(false);
-    }
+    };
+    validateStepBasicInfos() &&
+      validateStepCodeStubs() &&
+      validateStepTestcases() &&
+      validateStepReview() &&
+      (await sendApi());
   };
+
+  const finishOnEdit = async () => {};
 
   return (
     <React.Fragment>
@@ -215,16 +242,39 @@ const Exercise = ({
               Previous
             </Button>
           )}
-          <Button
-            loading={nextLoading}
-            onClick={onNext}
-            type='primary'
-            size='large'
+          <div
             style={{
-              width: 100,
+              display: 'flex',
+              width: 210,
+              justifyContent: 'flex-end',
             }}>
-            {currStep === StepTitles.length - 1 ? 'Finish' : 'Next'}
-          </Button>
+            {currStep !== StepTitles.length - 1 && (
+              <Button
+                loading={nextLoading}
+                onClick={onNext}
+                type='primary'
+                size='large'
+                style={{
+                  width: 100,
+                }}>
+                Next
+              </Button>
+            )}
+            {!!id && (
+              <Button
+                disabled={nextLoading || prevLoading}
+                loading={finishLoading}
+                onClick={onFinish}
+                type='primary'
+                size='large'
+                style={{
+                  width: 100,
+                  marginLeft: 10,
+                }}>
+                Finish
+              </Button>
+            )}
+          </div>
         </div>
       </div>
       <Footer />
