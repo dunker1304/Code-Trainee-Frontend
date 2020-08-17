@@ -1,14 +1,25 @@
-import  { ContactsOutlined ,PhoneOutlined , EnvironmentOutlined  ,ScheduleOutlined ,SketchOutlined } from '@ant-design/icons'
+import  { ContactsOutlined ,PhoneOutlined , EnvironmentOutlined  ,ScheduleOutlined ,SketchOutlined,EditOutlined } from '@ant-design/icons'
 import { Menu } from "antd"
 import CalendarHeatmap from 'react-calendar-heatmap';
-import { Table, Tag, Space } from 'antd';
+import { Table, Tag, Button , Drawer, Form, Col, Row, Input,DatePicker,Tooltip} from 'antd';
 import ReactTooltip from 'react-tooltip';
 import axios from "axios"
-import { useEffect } from "react"
+import { useEffect,useState } from "react"
 import Header from "../../components/Header"
 import Footer from "../../components/Footer"
 import composedAuthHOC from 'hocs';
+import moment from "moment"
+import { openNotificationWithIcon } from "../../components/Notification"
 const Profile = (props)=> {
+
+  const [visible, setVisible] = useState(false)
+  const [editUsername , setEditUsername] = useState('')
+  const [editEmail , setEditEmail] = useState('')
+  const [editDisplayName , setEditDisplayName] = useState('')
+  const [editPhone , setEditPhone] = useState('')
+  const [editDOB , setEditDOB] = useState('')
+  const [isChange , setIsChange] = useState(false)
+  const formatDate = 'DD/MM/YYYY'
   const today = new Date();
   const columns = [
     {
@@ -36,11 +47,48 @@ const Profile = (props)=> {
   return newDate;
  }
 
+ const showDrawer = () => {
+  setVisible(true)
+};
+
+const onClose = () => {
+  setVisible(false)
+};
+
+const submitEditAccount = async ()=> {
+  let data = {
+    userId : props.profile['id'],
+    phone : editPhone ,
+    dateOfBirth : editDOB,
+    displayName : editDisplayName,
+    role : 4,
+    key : 'self-edit'
+  }
+ 
+  let urlUser = `${process.env.API}/api/admin/edit-an-account`
+  const resUser = await axios.post(urlUser,data)
+  if(resUser.data.success) {
+   
+    openNotificationWithIcon('success', '', 'Change information Successfully!')
+    onClose()
+    window.location.reload();
+  }
+  else {
+    openNotificationWithIcon('error', '', resUser.data.data.message ?  resUser.data.data.message : 'Change information fail!')
+  }
+
+}
+
+
 useEffect(()=>{
  console.log(props)
+ setEditEmail(props.profile['email'])
+ setEditUsername(props.profile['username'])
+ setEditPhone(props.profile['phone'])
+ setEditDisplayName(props.profile['displayName'])
+ setEditDOB( props.profile['dateOfBirth'] ? moment(props.profile['dateOfBirth']).format(formatDate) : null)
 },[])
 
-const randomValues = [ { date: '2020-06-20', count: 1 }, { date: '2020-07-07', count: 2 } ]
   return (
     <div>
     <Header/>
@@ -63,21 +111,109 @@ const randomValues = [ { date: '2020-06-20', count: 1 }, { date: '2020-07-07', c
              <div className="separator-op"></div>
           </div>
           <div className="information">
-              <h3>Information</h3>
+            <div style={{display : "flex" , justifyContent:"space-between"}}>
+            <h3>Information </h3>
+            <Tooltip title={'Change your information'}>
+            <EditOutlined style={{cursor : "pointer"}} onClick={()=> showDrawer()}/>
+            </Tooltip>
+            </div>
               <Menu mode="vertical-right">
                 <Menu.Item key="exercises">
   <span> <ContactsOutlined className = "customer-icon"/> {props.profile.email}</span>
                 </Menu.Item>
                 <Menu.Item key="profile">
-                  <span> <PhoneOutlined className = "customer-icon"/> {props.profile.phone ? props.profile.phone :"-" } </span>
+                  <span> <PhoneOutlined className = "customer-icon"/> {editPhone ? editPhone :"-" } </span>
                 </Menu.Item>
-                <Menu.Item key="address">
+                {/* <Menu.Item key="address">
                   <span ><EnvironmentOutlined className = "customer-icon" /> {props.profile.address ? props.profile.address :"-" } </span>
-                </Menu.Item>
+                </Menu.Item> */}
                 <Menu.Item key="dob">
-                  <span ><ScheduleOutlined className = "customer-icon"/> {props.profile.dob ? props.profile.dob :"12 - 01 - 1998" } </span>
+                  <span ><ScheduleOutlined className = "customer-icon"/> {editDOB ? editDOB :"12 - 01 - 1998" } </span>
                 </Menu.Item>
               </Menu>
+
+              <Drawer
+        title="Change Your Information"
+        width={520}
+        onClose={()=>onClose()}
+        visible={visible}
+        bodyStyle={{ paddingBottom: 80 }}
+        footer={
+          <div
+            style={{
+              textAlign: 'right',
+            }}
+          >
+            <Button onClick={onClose} style={{ marginRight: 8 }}>
+              Cancel
+                      </Button>
+            <Button  type="primary" onClick={submitEditAccount} disabled = {!isChange}>
+              Submit
+                      </Button>
+          </div>
+        }
+      >
+        <Form layout="vertical" hideRequiredMark>
+          <Row gutter={16}>
+            <Col span={16}>
+              <Form.Item
+                name="username"
+                label="Username"
+                rules={[{ required: true, message: 'Please enter user name' }]}
+              > <Input   value={editUsername}  disabled/>              
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+
+            <Col span={16}>
+              <Form.Item
+                name="email"
+                label="Email"
+                rules={[{ required: true, message: 'Please enter email' }]}
+              > <Input   value={editEmail} disabled />
+                
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={16}>
+              <Form.Item
+                name="displayName"
+                label="Display Name"
+                rules={[{ required: true, message: 'Please enter your display name' }]}
+              > <Input placeholder="Please enter your display name" value={editDisplayName} onChange= {(e)=> {setIsChange(true) ;setEditDisplayName(e.target.value)}}/>
+
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={16}>
+              <Form.Item
+                name="dob"
+                label="DOB"
+              > {
+                editDOB ?   <DatePicker value = {moment(editDOB, formatDate) } format={formatDate} allowClear = {false} onChange={(date,dateString)=> setEditDOB(dateString)} /> :
+                <DatePicker  format={formatDate} allowClear = {false}onChange={(date,dateString)=> { setIsChange(true) ; setEditDOB(dateString) }} /> 
+              }
+            
+            
+
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={16}>
+              <Form.Item
+                name="phone"
+                label="Phone"
+              > <Input placeholder="Please enter phone" value={editPhone}  onChange= {(e)=> {setIsChange(true) ;setEditPhone(e.target.value)}}/>
+              </Form.Item>
+            </Col>
+          </Row>
+              
+        </Form>
+      </Drawer>
           </div>
          
          

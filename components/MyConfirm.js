@@ -6,9 +6,9 @@ const ConfirmModal = (handleOk)=>{
 
   return (
     confirm({
-      title: 'Do you Want to delete these items?',
+      title: 'Do you want to delete this items?',
       icon: <ExclamationCircleOutlined />,
-      content: 'Some descriptions',
+      content: '',
       onOk() {
         handleOk()
       },

@@ -14,6 +14,9 @@
     font-weight: bold;
     text-align: center;
   }
+  .question-title:hover {
+    text-decoration: underline;
+  }
   .question-category {
     display: flex;
     margin: 10px auto;
