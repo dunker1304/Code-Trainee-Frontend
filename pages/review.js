@@ -20,7 +20,6 @@ import ReviewStepSnippet from '../components/review/ReviewStepSnippet';
 import ReviewStepTestcase from '../components/review/ReviewStepTestcase';
 import axios from 'axios';
 import { useRouter } from 'next/router';
-import { route } from 'next/dist/next-server/server/router';
 import Head from 'next/head';
 import composedAuthHOC from 'hocs';
 
@@ -30,6 +29,7 @@ const ReviewExercise = ({
   isSelfReview,
   exerciseInfos,
   requestId,
+  errorCode,
 }) => {
   let currUserId = userInfo ? userInfo.id : 0;
   let [exercise, setExercise] = useState(exerciseInfos);
@@ -44,11 +44,20 @@ const ReviewExercise = ({
     onOk: () => {},
   });
   // comment of reviewer
-  let [comment, setComment] = useState('');
+  let [form] = useForm();
+
+  // if (errorCode) {
+  //   console.log({
+  //     pathName: router.pathname,
+  //     rout: router.route,
+  //     query: router.query,
+  //   });
+  //   router.push('/error/404', '/review');
+  //   return null;
+  // }
 
   // click on button reject
   const onReject = () => {
-    setComment('');
     setModal({
       title: 'Reject this exercise?',
       okText: 'Reject',
@@ -60,7 +69,6 @@ const ReviewExercise = ({
 
   // click on button accept
   const onAccept = () => {
-    setComment('');
     setModal({
       title: 'Accept this exercise?',
       okText: 'Accept',
@@ -71,6 +79,7 @@ const ReviewExercise = ({
   };
 
   const onOkReject = async () => {
+    let comment = form.getFieldValue('comment');
     try {
       const res = await axios.post(`${process.env.API}/api/review`, {
         comment: comment,
@@ -80,7 +89,7 @@ const ReviewExercise = ({
         requestId: requestId,
       });
       if (res.data.success) {
-        router.push('/exercise-list', '/exercise-list');
+        router.push('/exercise-list');
       } else {
         throw new Error();
       }
@@ -93,6 +102,7 @@ const ReviewExercise = ({
   };
 
   const onOkAccept = async () => {
+    let comment = form.getFieldValue('comment');
     try {
       const res = await axios.post(`${process.env.API}/api/review`, {
         comment: comment,
@@ -102,7 +112,7 @@ const ReviewExercise = ({
         requestId: requestId,
       });
       if (res.data.success) {
-        router.push('/exercise-list', '/exercise-list');
+        router.push('/exercise-list');
       } else {
         throw new Error();
       }
@@ -113,6 +123,10 @@ const ReviewExercise = ({
       console.log(e);
     }
   };
+
+  useEffect(() => {
+    confirm && form.setFieldsValue({ comment: '' });
+  }, [confirm]);
 
   return (
     <>
@@ -183,10 +197,21 @@ const ReviewExercise = ({
       <ConfirmModal
         visible={confirm}
         content={
-          <>
-            <h2>Leave a comment.</h2>
-            <TinymceTextArea value={comment} onChange={setComment} />
-          </>
+          <Form layout='vertical' form={form} initialValues={{ comment: '' }}>
+            <Form.Item
+              required={false}
+              name='comment'
+              label='Leave a comment'
+              rules={[
+                {
+                  type: 'string',
+                  max: 500,
+                  message: `'Comment' cannot be longer than 500 characters.`,
+                },
+              ]}>
+              <Input.TextArea rows={3} />
+            </Form.Item>
+          </Form>
         }
         onCancelX={() => setConfirm(false)}
         onCancel={() => setConfirm(false)}
