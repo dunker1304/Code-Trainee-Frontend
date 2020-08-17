@@ -139,7 +139,7 @@ const ExerciseList = ({ userInfo }) => {
       });
     } else {
       setTableLoading(true);
-      router.push(`/exercise?id=${record.key}`, '/exercise');
+      router.push(`/exercise?id=${record.key}`);
     }
   };
 
@@ -171,7 +171,7 @@ const ExerciseList = ({ userInfo }) => {
     } else {
       if (Date.now() >= timeCanStartSelfReview.getTime()) {
         setTableLoading(true);
-        router.push(`/review?exerciseId=${record.key}`, `/review`);
+        router.push(`/review?exerciseId=${record.key}&self-review`);
       } else {
         notification.info({
           message: `This exercise is waiting for review`,

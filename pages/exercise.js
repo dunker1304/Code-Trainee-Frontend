@@ -11,6 +11,8 @@ import composedAuthHOC from 'hocs';
 import axios from 'axios';
 import { Router, useRouter } from 'next/router';
 import ConfirmModal from '../components/ConfirmModal';
+import Error404 from './error/404';
+import Error500 from './error/500';
 
 const StepTitles = [
   { key: 0, title: 'Basic Informations' },
@@ -26,6 +28,7 @@ const Exercise = ({
   listTags,
   listLanguages,
   listTeachers,
+  errorCode,
 }) => {
   let router = useRouter();
   let currUserId = userInfo ? userInfo.id : 0;
@@ -49,6 +52,12 @@ const Exercise = ({
   let [finishLoading, setFinishLoading] = useState(false);
   // visible confirm modal
   let [confirm, setConfirm] = useState(false);
+
+  if (errorCode === 404) {
+    return <Error404 />;
+  } else if (errorCode === 500) {
+    return <Error500 />;
+  }
 
   const validateStepBasicInfos = async () => {
     try {
@@ -304,6 +313,7 @@ const Exercise = ({
 
 Exercise.getInitialProps = async ({ query, store }) => {
   let { id } = query;
+  let errorCode;
   let exerciseInfos = {
     basicInfos: {
       title: '',
@@ -315,66 +325,85 @@ Exercise.getInitialProps = async ({ query, store }) => {
     testcases: [],
     selectedReviewers: [],
   };
-  let listTags = (
-    await axios.get(`${process.env.API}/api/tags/all`)
-  ).data.data.map((t) => t.name);
+  let listTags = [];
   let listLanguages = [];
-  let listTeachers = (
-    await axios.get(`${process.env.API}/api/user/teacher/all`)
-  ).data.data;
-  // have 'id' mean edit page is access, get old data
-  if (id) {
-    let basicInfos = (
-      await axios.get(`${process.env.API}/api/exercise/basic-info/${id}`)
-    ).data.data;
-    exerciseInfos.basicInfos = {
-      ...basicInfos,
-      tags: [
-        '#',
-        ...basicInfos.tags.map((t) => t.name).filter((t) => t !== '#'),
-      ],
-    };
-    exerciseInfos.testcases = (
-      await axios.get(`${process.env.API}/api/testcase/exercise/${id}`)
-    ).data.data.result.map((t) => ({
-      key: t.id,
-      id: t.id,
-      input: t.input,
-      output: t.expectedOutput,
-      isHidden: t.isHidden,
-    }));
-    listLanguages = (
-      await axios.get(`${process.env.API}/api/language/exercise/${id}`)
-    ).data.data.map((t) => ({
-      key: t.id,
-      id: t.id,
-      language: t.name,
-      isActive: t.codeSnippets.length ? t.codeSnippets[0].isActive : false,
-      sampleCode: t.codeSnippets.length ? t.codeSnippets[0].sampleCode : '',
-    }));
-    let selectedReviewerIds = (
-      await axios.get(`${process.env.API}/api/review/reviewers/${id}`)
-    ).data.data[0].details.map((t) => t.reviewer);
-    exerciseInfos.selectedReviewers = [...listTeachers]
-      .filter((t) => selectedReviewerIds.indexOf(t.id) !== -1)
-      .map((t) => t.email);
-  } else {
-    listLanguages = (
-      await axios.get(`${process.env.API}/api/language/all`)
-    ).data.data.map((t, index) => ({
-      key: t.id,
-      id: t.id,
-      language: t.name,
-      isActive: index === 0 ? true : false,
-      sampleCode: '',
-    }));
+  let listTeachers = [];
+  if (Number.isNaN(Number(id))) {
+    errorCode = 404;
   }
+  try {
+    listTags = (
+      await axios.get(`${process.env.API}/api/tags/all`)
+    ).data.data.map((t) => t.name);
+    listTeachers = (await axios.get(`${process.env.API}/api/user/teacher/all`))
+      .data.data;
+    // have 'id' mean edit page is access, get old data
+    if (id) {
+      let basicInfoResponse = await axios.get(
+        `${process.env.API}/api/exercise/basic-info/${id}`
+      );
+      if (basicInfoResponse.data.success) {
+        let basicInfos = basicInfoResponse.data.data;
+        exerciseInfos.basicInfos = {
+          ...basicInfos,
+          tags: [
+            '#',
+            ...basicInfos.tags.map((t) => t.name).filter((t) => t !== '#'),
+          ],
+        };
+        exerciseInfos.testcases = (
+          await axios.get(`${process.env.API}/api/testcase/exercise/${id}`)
+        ).data.data.result.map((t) => ({
+          key: t.id,
+          id: t.id,
+          input: t.input,
+          output: t.expectedOutput,
+          isHidden: t.isHidden,
+        }));
+        listLanguages = (
+          await axios.get(`${process.env.API}/api/language/exercise/${id}`)
+        ).data.data.map((t) => ({
+          key: t.id,
+          id: t.id,
+          language: t.name,
+          isActive: t.codeSnippets.length ? t.codeSnippets[0].isActive : false,
+          sampleCode: t.codeSnippets.length ? t.codeSnippets[0].sampleCode : '',
+        }));
+        let selectedReviewerIds = (
+          await axios.get(`${process.env.API}/api/review/reviewers/${id}`)
+        ).data.data[0].details.map((t) => t.reviewer);
+        exerciseInfos.selectedReviewers = [...listTeachers]
+          .filter((t) => selectedReviewerIds.indexOf(t.id) !== -1)
+          .map((t) => t.email);
+      } else {
+        if (basicInfoResponse.data.code === 500) {
+          errorCode = 500;
+        } else {
+          errorCode = 404;
+        }
+      }
+    } else {
+      listLanguages = (
+        await axios.get(`${process.env.API}/api/language/all`)
+      ).data.data.map((t, index) => ({
+        key: t.id,
+        id: t.id,
+        language: t.name,
+        isActive: index === 0 ? true : false,
+        sampleCode: '',
+      }));
+    }
+  } catch (e) {
+    errorCode = 500;
+  }
+
   return {
     id: id,
     exerciseInfos,
     listTags,
     listLanguages,
     listTeachers,
+    errorCode: errorCode,
   };
 };
 
