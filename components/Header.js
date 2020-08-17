@@ -61,7 +61,7 @@ const Header = (props) => {
     return ;
   }
   const text = 
-    <span>
+    <span style={{padding : "10px 0px", display : "inline-block"}}>
        <Avatar size="small" icon={<UserOutlined />} /><b className="user_name">{props.userInfo ? props.userInfo['displayName']: ''}</b>
     </span>;
 
@@ -78,8 +78,8 @@ const Header = (props) => {
               </Link>
             </Menu.Item>
             <Menu.Item key="profile">
-              <Link href="/profile/[profileId]" as={`/profile/${props.userInfo ? props.userInfo['id']: 7}`}>
-               <a href="">My Profile</a>
+              <Link href="/list" as={`/list`}>
+               <a href="">My List</a>
               </Link>
             </Menu.Item>
             
@@ -105,8 +105,8 @@ const Header = (props) => {
               </Link>
             </Menu.Item>
             <Menu.Item key="profile">
-              <Link href="/profile/[profileId]" as={`/profile/${props.userInfo ? props.userInfo['id']: 7}`}>
-               <a href="">My Profile</a>
+              <Link href="/exercise-list" as={`/exercise-list`}>
+               <a href="">My Created Exercise</a>
               </Link>
             </Menu.Item>
           
@@ -251,7 +251,9 @@ const Header = (props) => {
       <div className="noti-content">
          {listNoti.length > 0 ? listNoti.map((value,index)=> (
            <div className="noti_wrapper">
-            <div className = {classnames('item_noti', value.isRead ? 'item-noti-readed':'')} key={index} onClick = {()=> Router.push(value['linkAction'])}>
+            <div className = {classnames('item_noti', value.isRead ? 'item-noti-readed':'')}
+             key={index} onClick = {()=> { markAsRead(value['id'],!value.isRead);Router.push(value['linkAction'])}}
+             >
               <div className="item_left">
                 <CommentOutlined />
               </div>

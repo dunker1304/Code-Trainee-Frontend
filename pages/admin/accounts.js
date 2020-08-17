@@ -15,19 +15,19 @@ const role = [
   
   {
     id : 3 ,
-    name : 'admin'
+    name : 'Admin'
   },
   {
     id : 4 ,
-    name : 'teacher'
+    name : 'Teacher'
   },
   {
     id : 5 ,
-    name : 'student'
+    name : 'Student'
   },
   {
     id : -1 ,
-    name : 'all'
+    name : 'All'
   },
 
 ]
