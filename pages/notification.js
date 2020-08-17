@@ -76,7 +76,7 @@ class Notification extends React.Component {
                     <span>{moment(item.createdAt).fromNow()}</span>
                 </div>
                 </div>
-                <button className="action_button" onClick= {()=>Router.push('/exercise/[exerciseId]/discuss',item['linkAction'])}>View Detail</button>
+                <button className="action_button" onClick= {()=>Router.push(`${item.type == 1 ? '/exercise/[exerciseId]/discuss': '/review'}`,item['linkAction'])}>View Detail</button>
               </List.Item>
             )}
           >
