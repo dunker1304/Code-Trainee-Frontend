@@ -108,6 +108,8 @@ const TestCaseModal = ({
               justifyContent: 'space-between',
             }}>
             <Button
+              type='primary'
+              ghost
               style={{
                 width: '100px',
               }}
@@ -174,7 +176,7 @@ const TestCaseModal = ({
               {
                 type: 'string',
                 max: 1000,
-                message: `'Data Input' cannot be longer than 1000 characters`,
+                message: `'Data Input' cannot be longer than 1000 characters.`,
               },
             ]}>
             <Input.TextArea rows='3' />
@@ -211,7 +213,7 @@ const TestCaseModal = ({
               {
                 type: 'string',
                 max: 1000,
-                message: `'Expected Output' cannot be longer than 1000 characters`,
+                message: `'Expected Output' cannot be longer than 1000 characters.`,
               },
             ]}>
             <Input.TextArea rows='3' />

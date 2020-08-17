@@ -19,7 +19,7 @@ const ConfirmModal = ({
   let [loading, setLoading] = useState(false);
   const handleOk = async () => {
     setLoading(true);
-    onOk();
+    await onOk();
     setLoading(false);
   };
   return (
@@ -33,10 +33,19 @@ const ConfirmModal = ({
         onCancel={onCancelX}
         footer={
           <React.Fragment>
-            <Button type='primary' danger onClick={onCancel} disabled={loading}>
+            <Button
+              type='primary'
+              danger
+              onClick={onCancel}
+              disabled={loading}
+              style={{ width: 100 }}>
               {cancelText}
             </Button>
-            <Button type={okType} onClick={handleOk} loading={loading}>
+            <Button
+              type={okType}
+              onClick={handleOk}
+              loading={loading}
+              style={{ width: 100 }}>
               {okText}
             </Button>
           </React.Fragment>

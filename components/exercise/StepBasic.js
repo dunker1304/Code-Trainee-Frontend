@@ -81,7 +81,12 @@ const StepBasicInfos = ({
             {
               type: 'string',
               max: 150,
-              message: `'Title' cannot be longer than 150 characters`,
+              message: `'Title' cannot be longer than 150 characters.`,
+            },
+            {
+              type: 'string',
+              min: 3,
+              message: `'Title' must be at least 3 characters.`,
             },
           ]}>
           <Input />
@@ -95,7 +100,7 @@ const StepBasicInfos = ({
             {
               type: 'string',
               max: 5000,
-              message: `'Content' cannot be longer than 5000 characters`,
+              message: `'Content' cannot be longer than 5000 characters.`,
             },
           ]}>
           <TinymceTextArea />
