@@ -1,19 +1,46 @@
-import { useEffect, useRef } from 'react';
-import { Modal, Button } from 'antd';
+import { useEffect, useRef, useState } from 'react';
+import { Modal, Button, Radio } from 'antd';
 import { LikeOutlined, DislikeOutlined } from '@ant-design/icons';
+import PreviewSection from './PreviewSection';
+import CommentsSection from './CommentsSection';
 
 const ExercisePreviewModal = ({
-  data = { title: '', level: '', like: 0, dislike: 0, content: '', points: 1 },
-  raw = false,
+  exerciseInfos = {
+    title: '',
+    level: '',
+    like: 0,
+    dislike: 0,
+    content: '',
+    points: 1,
+    approved: 'waiting',
+  },
+  commentInfos = [],
   visible = false,
-  onCancel = () => {},
-  title = '',
+  onCancel,
 }) => {
+  let [curTab, setCurTab] = useState(0);
+  const onTabChange = (e) => {
+    setCurTab(e.target.value);
+  };
+
   return (
     <>
       <Modal
         className='preview-exercise-modal'
-        title={title}
+        title={
+          <Radio.Group
+            onChange={onTabChange}
+            value={curTab}
+            buttonStyle='solid'
+            size='large'>
+            <Radio.Button value={0} style={{ width: 120, textAlign: 'center' }}>
+              Preview
+            </Radio.Button>
+            <Radio.Button value={1} style={{ width: 120, textAlign: 'center' }}>
+              Comments
+            </Radio.Button>
+          </Radio.Group>
+        }
         visible={visible}
         width={700}
         maskClosable={false}
@@ -34,40 +61,16 @@ const ExercisePreviewModal = ({
           </div>
         }>
         <div
-          className='question-desc-wrapper'
-          style={{ margin: 0, padding: 0 }}>
-          <h4 className='question-title'>Title: {data.title}</h4>
-          <div className='question-info'>
-            <div
-              className='question-level'
-              style={{
-                display: 'inline-block',
-              }}>
-              {data.level}
-            </div>
-            <button className='question-reaction' disabled>
-              <LikeOutlined />
-              <span>{data.like}</span>
-            </button>
-            <button className='question-reaction' disabled>
-              <DislikeOutlined />
-              <span>{data.dislike}</span>
-            </button>
-            <div
-              className='question-point'
-              style={{
-                display: 'inline-block',
-              }}>
-              LOC: {data.points}
-            </div>
-          </div>
-          <div
-            className='question-description'
-            dangerouslySetInnerHTML={{ __html: data.content }}
-            style={{
-              overflow: 'auto',
-              maxHeight: '280px',
-            }}></div>
+          style={{
+            height: 340,
+          }}>
+          {curTab === 0 && <PreviewSection exerciseInfos={exerciseInfos} />}
+          {curTab === 1 && (
+            <CommentsSection
+              approved={exerciseInfos.approved}
+              commentInfos={commentInfos}
+            />
+          )}
         </div>
       </Modal>
     </>
