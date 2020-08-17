@@ -58,7 +58,7 @@ const ExerciseStatistic = (props)=> {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
-      render: (text,record) => <a>{record['user']['name']}</a>,
+      render: (text,record) => <Link href='/profile/[profileId]' as={`/profile/${record['user']['id']}`}><a className="_author_link">{record['user']['name']}</a></Link>,
     },
     {
       title: 'Language',
@@ -76,7 +76,13 @@ const ExerciseStatistic = (props)=> {
       key: 'status',
       dataIndex: 'status',
       render:  (text,record) => <Link href='/submission/[submissionId]' as={`/submission/${record['id']}`} ><span className="status-submission">{text}</span></Link>
-    }
+    },
+    {
+      title: 'Time',
+      key: 'time',
+      dataIndex: 'createdAt',
+      render:  (text,record) => <span >{text}</span>
+    },
   ];
  return (
    <div>
@@ -86,7 +92,7 @@ const ExerciseStatistic = (props)=> {
         <div className="row">
           <div className="col-md-12">
             <h4 className="inline-wrap_title" >
-              <Link href='/playground' as={`/playground?questionID=${exercise ? exercise['id'] : 0}`}>
+              <Link href={{pathname : '/playground', query : { questionID : exercise ? exercise['id']:1}}} as={`/playground?questionID=${exercise ?exercise['id']:1 }`}>
                <a className="inline-wrap" >
                   {exercise ? exercise['title'] : ''}
                </a>

@@ -402,13 +402,13 @@ const ExerciseList = ({ userInfo }) => {
                   <Tooltip
                     placement='top'
                     title={
-                      record.approved
+                      record.approved == 'accepted'
                         ? 'Statistics'
                         : "Exercise hasn't approved"
                     }>
                     <Button
                       type='text'
-                      disabled={!record.approved}
+                      disabled={! (record.approved == 'accepted')}
                       className='btn_icon'
                       icon={
                         <LineChartOutlined

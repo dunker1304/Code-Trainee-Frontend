@@ -17,6 +17,12 @@
     text-decoration: underline;
     color: #cccccc;
   }
+  ._author_link :hover {
+    cursor: pointer;
+    text-decoration: underline;
+    color: #cccccc;
+  }
+
   .data-pagging {
     display: flex;
     justify-content: flex-end;
