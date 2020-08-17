@@ -1,15 +1,56 @@
-import { Menu ,Modal ,Input ,Empty} from "antd"
+import { Menu ,Modal ,Table ,Empty} from "antd"
 import { PlusCircleOutlined ,DeleteOutlined } from "@ant-design/icons"
 import { useState , useEffect } from "react"
 import {connect } from "react-redux"
 import { getWishList , addTypeWishList , getWishListByType ,removeToWishList} from "../store/problem/action"
 import ConfirmModal from "../components/MyConfirm"
+import { translateClassName } from "../helpers/utils"
 
 const WishList = (props)=> {
 
   const [isShowModalAdd ,setIsShowModelAdd]  = useState(false)
   const [nameWL , setNameWL] = useState('')
   const [activeIndex , setActiveIndex ] = useState(0)
+  const [dataSource , setDataSource] = useState([])
+
+  const columns = [
+    {
+    title: 'Index',
+    dataIndex: 'index',
+    key: 'index',
+    align : 'center'
+    },
+    {
+      title: 'Title',
+      dataIndex: 'title',
+      key: 'title',
+      align : 'center',
+      render: (text,record) => <span className="status-submission">{record['exercise']['title']}</span>,
+    },
+    {
+      title: 'Level',
+      dataIndex: 'level',
+      key: 'level',
+      align : 'center',
+      render: (text,record) => <span className={`badge badge-pill badge-${translateClassName(record['exercise']['level'])}`}>{record['exercise']['level'].toUpperCase()}</span>,
+    },
+    {
+      title: 'LOC',
+      dataIndex: 'loc',
+      key: 'loc',
+      align : 'center',
+      render: (text,record) => <span className="status-submission">{record['exercise']['loc']}</span>,
+    },
+    {
+      title: 'Action',
+      dataIndex: 'action',
+      key: 'action',
+      align : 'center',
+      render: (text,record) => <DeleteOutlined style={{color : "#d05451"}} onClick= {()=>ConfirmModal(()=>hanleOke(record['exercise']['id']))}/>
+    },
+
+  
+  ]
  
   const  setModelAddVisible = (value) =>{
     setIsShowModelAdd(value)
@@ -24,11 +65,11 @@ const WishList = (props)=> {
     props.getWishList();
   },[])
 
-  // useEffect(()=>{
-  //   if(props.typeWishList.length > 0 ){
-  //     props.getWishListByType(props.typeWishList[0]['id'])
-  //   }
-  // },[props.typeWishList])
+  useEffect(()=> {
+    setDataSource(props.wishList)
+  },[props.wishList])
+
+  
 
   const hanleOke = (questionId)=> {
   
@@ -47,40 +88,6 @@ const WishList = (props)=> {
     <div className="wish_list">
       <div className="container panel_main">
 
-     
-       {/* <div className="left_wish_list">
-          <div className="panel-heading all-lists-header">
-            <h3 class="panel-title">My List</h3>
-            <button type="button" class="add-list-btn">
-               <PlusCircleOutlined onClick = {()=> setModelAddVisible(true)}/>
-            </button>
-            <Modal
-              title="Create New List"
-              centered
-              visible={isShowModalAdd}
-              onOk={() => submitAddTypeWL()}
-              onCancel={() =>setIsShowModelAdd(false)}
-              className="add-favo-modal"
-            >
-              <Input name="favorite" 
-              placeholder="Enter a name for your list" 
-              className="input-favo"
-              onChange= { (e)=> {  setNameWL(e.target.value)}}
-              value = {nameWL}
-              />
-          </Modal>
-          </div> 
-          <div className = "all_item_wish_list">
-              <Menu  mode="vertical" selectedKeys= {[`${activeIndex}`]} onClick={({key})=> { handleClickMenu(key)}}>
-                {props.typeWishList.length > 0 ? props.typeWishList.map((value,index)=> (
-                   <Menu.Item key= {index}  >
-                      {value.name}
-                  </Menu.Item> 
-                )) : <Empty/>}
-              </Menu>
-          </div> 
-       </div> */}
-
        <div className="right_wish_list">
          <div className="favorite-panel">
            <div className="panel-heading list-header-container">
@@ -89,7 +96,7 @@ const WishList = (props)=> {
              </div>                 
            </div>
            <div className="favorite-list">
-               <Menu  mode="vertical">
+               {/* <Menu  mode="vertical">
                  {
                    props.wishList.length > 0 ? props.wishList.map((value,index)=> (
                     <Menu.Item key={index} >
@@ -103,7 +110,8 @@ const WishList = (props)=> {
                    <Empty/>
                  }
                
-                </Menu>
+                </Menu> */}
+                  <Table columns={columns} dataSource={dataSource} pagination={false} align={'center'}/>
            </div>
          </div>
          
