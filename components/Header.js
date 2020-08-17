@@ -142,12 +142,12 @@ const Header = (props) => {
        case CONSTANTS.ROLE.ROLE_ADMIN : 
           return (
             <ul className = "prover_ul">
-            <Link href="/list" as="/list">
+            {/* <Link href="/admin/accounts" as="/admin/accounts">
                  <li>
                   <TeamOutlined style={{color : "#d05451",fontSize :"20px"}} className="icon_prover_header"/>Accounts 
                  </li>
             </Link>
-          
+           */}
             {/* <li> <UndoOutlined style={{color : "#ffdf00" ,fontSize :"20px"}} className="icon_prover_header"/> Change Password</li> */}
             <li  onClick= {()=>hanleSignOut()} > <LogoutOutlined style={{color : "#fea116",fontSize :"20px"}} className="icon_prover_header"/> Sign out</li>
           </ul>
@@ -252,7 +252,13 @@ const Header = (props) => {
          {listNoti.length > 0 ? listNoti.map((value,index)=> (
            <div className="noti_wrapper">
             <div className = {classnames('item_noti', value.isRead ? 'item-noti-readed':'')}
-             key={index} onClick = {()=> { markAsRead(value['id'],!value.isRead);Router.push(value['linkAction'])}}
+             key={index} onClick = {()=> {
+                if(!value.isRead) {
+                  markAsRead(value['id'],!value.isRead);
+                }
+                if(!value.type != 3 ) {
+                  Router.push(value['linkAction'])}}
+                }
              >
               <div className="item_left">
                 <CommentOutlined />

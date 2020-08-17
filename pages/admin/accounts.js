@@ -227,7 +227,8 @@ const Admin = (props) => {
       dateOfBirth : editDOB,
       displayName : editDisplayName,
       role : CONSTANTS.ROLE.ROLE_ADMIN,
-    }
+      key : 'admin-edit'
+     }
 
     let urlUser = `${process.env.API}/api/admin/create-an-account`
     const resUser = await axios.post(urlUser,data)
@@ -269,7 +270,7 @@ const Admin = (props) => {
   }
 
   const fetchKeySearchDate = async (keySearch,role)=> {
-    if(keySearch) {
+    if(keySearch.trim()) {
       let urlUser = `${process.env.API}/api/admin/search-fuzzy-account`
       let data = { role : role , keySearch : keySearch}
       const resUser = await axios.post(urlUser,data)
@@ -282,9 +283,14 @@ const Admin = (props) => {
       }
     }
     else {
-      fetchData(1)
+      fetchData(1,roleActive)
     }
    
+  }
+
+  const disabledDate = (current) => {
+    // Can not select days before today and today
+    return current && current.valueOf() >  Date.now();
   }
  
 
@@ -386,10 +392,15 @@ const Admin = (props) => {
                       <Col span={16}>
                         <Form.Item
                           name="dob"
-                          label="DOB"
+                          label="Date of birth"
                          
                         >
-                           <DatePicker value = {moment(editDOB, formatDate) } format={formatDate} allowClear = {false}onChange={(date,dateString)=> setEditDOB(dateString)} /> 
+                           <DatePicker value = {moment(editDOB, formatDate) } 
+                           format={formatDate}
+                           allowClear = {false}
+                           onChange={(date,dateString)=> setEditDOB(dateString)} 
+                           disabledDate = { disabledDate}
+                           /> 
                         </Form.Item>
                       </Col>
                     </Row>
