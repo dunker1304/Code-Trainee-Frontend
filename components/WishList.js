@@ -5,6 +5,7 @@ import {connect } from "react-redux"
 import { getWishList , addTypeWishList , getWishListByType ,removeToWishList} from "../store/problem/action"
 import ConfirmModal from "../components/MyConfirm"
 import { translateClassName } from "../helpers/utils"
+import Link from "next/link"
 
 const WishList = (props)=> {
 
@@ -25,7 +26,7 @@ const WishList = (props)=> {
       dataIndex: 'title',
       key: 'title',
       align : 'center',
-      render: (text,record) => <span className="status-submission">{record['exercise']['title']}</span>,
+      render: (text,record) => <Link href={{pathname : '/playground', query : { questionID : record['exercise']['id']}}} as={`/playground?questionID=${record['exercise']['id']}`}><a className="status-submission">{record['exercise']['title']}</a></Link>,
     },
     {
       title: 'Level',
