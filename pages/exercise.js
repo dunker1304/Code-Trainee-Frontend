@@ -328,7 +328,7 @@ Exercise.getInitialProps = async ({ query, store }) => {
   let listTags = [];
   let listLanguages = [];
   let listTeachers = [];
-  if (Number.isNaN(Number(id))) {
+  if (id === '' || (id !== undefined && Number.isNaN(Number(id)))) {
     errorCode = 404;
   }
   try {
