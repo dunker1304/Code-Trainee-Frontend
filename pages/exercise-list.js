@@ -158,19 +158,46 @@ const ExerciseList = ({ userInfo }) => {
   const handleSelfReview = (record) => {
     let lastModified = moment(record.lastModified);
     let timeCanStartSelfReview = moment(lastModified).add(5, 'm').toDate();
-    if (Date.now() >= timeCanStartSelfReview.getTime()) {
-      setTableLoading(true);
-      router.push(`/review?exerciseId=${record.key}`, `/review`);
-    } else if (record.approved !== STATUS.ACCEPTED) {
+    if (record.approved === STATUS.REJECTED) {
       notification.info({
-        message: `This exercise is waiting for review`,
-        description: `You can self-review this exercise after ${timeCanStartSelfReview}`,
+        message: `This exercise is rejected`,
+        description: `You cannot self-review this exercise in this time.`,
+      });
+    } else if (record.approved === STATUS.ACCEPTED) {
+      notification.info({
+        message: `This exercise is accepted`,
+        description: `You cannot self-review this exercise in this time.`,
       });
     } else {
+      if (Date.now() >= timeCanStartSelfReview.getTime()) {
+        setTableLoading(true);
+        router.push(`/review?exerciseId=${record.key}`, `/review`);
+      } else {
+        notification.info({
+          message: `This exercise is waiting for review`,
+          description: `You can self-review this exercise after ${timeCanStartSelfReview}`,
+        });
+      }
+    }
+  };
+
+  const handleStatistics = (record) => {
+    if (record.approved === STATUS.REJECTED) {
       notification.info({
-        message: `This exercise is approved`,
-        description: `You cannot self-review this exercise.`,
+        message: `This exercise is rejected`,
+        description: `You cannot view statistics in this time.`,
       });
+    } else if (record.approved === STATUS.WAITING) {
+      notification.info({
+        message: `This exercise is waiting for review`,
+        description: `You cannot view statistics in this time.`,
+      });
+    } else {
+      setTableLoading(true);
+      Router.push(
+        '/exercise/[exerciseId]/statistic',
+        `/exercise/${record['key']}/statistic`
+      );
     }
   };
 
@@ -217,6 +244,7 @@ const ExerciseList = ({ userInfo }) => {
           </Col>
           <Col>
             <Button
+              disabled={tableLoading}
               type='primary'
               onClick={handleButtonCreate}
               loading={loadingButtonCreate}>
@@ -377,50 +405,30 @@ const ExerciseList = ({ userInfo }) => {
                     </Popconfirm>
                   </Tooltip>
                   <Tooltip placement='top' title={'Self-review'}>
-                    {record.approved === STATUS.WAITING ? (
-                      <Button
-                        onClick={() => handleSelfReview(record)}
-                        ghost
-                        type='link'
-                        style={{
-                          border: 'none',
-                        }}>
+                    <Button
+                      onClick={() => handleSelfReview(record)}
+                      ghost
+                      type='link'
+                      style={{
+                        border: 'none',
+                      }}>
+                      {record.approved === STATUS.WAITING ? (
                         <EyeTwoTone style={{ fontSize: '16px' }} />
-                      </Button>
-                    ) : (
-                      <Button
-                        disabled
-                        ghost
-                        type='link'
-                        style={{
-                          border: 'none',
-                        }}>
+                      ) : (
                         <EyeInvisibleTwoTone style={{ fontSize: '16px' }} />
-                      </Button>
-                    )}
+                      )}
+                    </Button>
                   </Tooltip>
-                  <Tooltip
-                    placement='top'
-                    title={
-                      record.approved == 'accepted'
-                        ? 'Statistics'
-                        : "Exercise hasn't approved"
-                    }>
+                  <Tooltip placement='top' title='Statistics'>
                     <Button
                       type='text'
-                      disabled={! (record.approved == 'accepted')}
                       className='btn_icon'
                       icon={
                         <LineChartOutlined
                           style={{ fontSize: '16px', color: '#1890ff' }}
                         />
                       }
-                      onClick={() => {
-                        Router.push(
-                          '/exercise/[exerciseId]/statistic',
-                          `/exercise/${record['key']}/statistic`
-                        );
-                      }}
+                      onClick={() => handleStatistics(record)}
                     />
                   </Tooltip>
                 </div>
