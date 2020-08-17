@@ -22,6 +22,8 @@ import axios from 'axios';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import composedAuthHOC from 'hocs';
+import Error404 from './error/404';
+import Error500 from './error/500';
 
 const ReviewExercise = ({
   exerciseId,
@@ -46,15 +48,11 @@ const ReviewExercise = ({
   // comment of reviewer
   let [form] = useForm();
 
-  // if (errorCode) {
-  //   console.log({
-  //     pathName: router.pathname,
-  //     rout: router.route,
-  //     query: router.query,
-  //   });
-  //   router.push('/error/404', '/review');
-  //   return null;
-  // }
+  if (errorCode === 404) {
+    return <Error404 />;
+  } else if (errorCode === 500) {
+    return <Error500 />;
+  }
 
   // click on button reject
   const onReject = () => {
@@ -241,6 +239,7 @@ ReviewExercise.getInitialProps = async ({ query }) => {
     content: '',
     title: '',
   };
+  let errorCode;
   if (isSelfReview) {
     const res = await axios.get(
       `${process.env.API}/api/review/exercise/${exerciseId}`
@@ -283,7 +282,11 @@ ReviewExercise.getInitialProps = async ({ query }) => {
         codeSnippets,
       };
     } else {
-      // redirect to error page here
+      if (res.data.code === 500) {
+        errorCode = 500;
+      } else {
+        errorCode = 404;
+      }
     }
   }
   return {
@@ -291,6 +294,7 @@ ReviewExercise.getInitialProps = async ({ query }) => {
     isSelfReview: isSelfReview,
     exerciseInfos: exerciseInfos,
     requestId: requestId,
+    errorCode: errorCode,
   };
 };
 
