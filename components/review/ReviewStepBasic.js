@@ -1,6 +1,7 @@
-import { Descriptions, Row, Button, Tag } from 'antd';
+import { Descriptions, Row, Button, Tag, Modal } from 'antd';
 import ExercisePreviewModal from '../exercise/ExercisePreviewModal';
 import { useState } from 'react';
+import PreviewSection from '../exercise/PreviewSection';
 
 const ReviewStepBasic = ({
   title = '',
@@ -14,10 +15,19 @@ const ReviewStepBasic = ({
   createdAt = '',
 }) => {
   const [visiblePreview, setVisiblePreview] = useState(false);
+
+  const onCancelPreview = () => {
+    setVisiblePreview(false);
+  };
+
+  const onOpenPreview = () => {
+    setVisiblePreview(true);
+  };
+
   return (
     <>
       <Row style={{ marginBottom: 10 }}>
-        <Button type='primary' onClick={() => setVisiblePreview(true)}>
+        <Button type='primary' onClick={onOpenPreview}>
           Preview
         </Button>
       </Row>
@@ -65,13 +75,37 @@ const ReviewStepBasic = ({
           {updatedAt}
         </Descriptions.Item>
       </Descriptions>
-      <ExercisePreviewModal
+      <Modal
+        className='preview-exercise-modal'
         title='Preview Exercise'
-        data={{ content, like, dislike, level, points, title }}
-        raw={false}
         visible={visiblePreview}
-        onCancel={() => setVisiblePreview(false)}
-      />
+        width={700}
+        maskClosable={false}
+        destroyOnClose={true}
+        onCancel={onCancelPreview}
+        footer={
+          <div>
+            <Button
+              style={{
+                width: '100px',
+              }}
+              type='primary'
+              size='large'
+              danger
+              onClick={onCancelPreview}>
+              Cancel
+            </Button>
+          </div>
+        }>
+        <div
+          style={{
+            height: 340,
+          }}>
+          <PreviewSection
+            exerciseInfos={{ content, like, dislike, level, points, title }}
+          />
+        </div>
+      </Modal>
     </>
   );
 };

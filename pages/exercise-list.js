@@ -3,27 +3,18 @@ import {
   Row,
   Col,
   Button,
-  Space,
   Popconfirm,
   Tag,
   notification,
   Tooltip,
-  Modal,
 } from 'antd';
 import {
   CheckCircleTwoTone,
-  EditOutlined,
-  DeleteOutlined,
   LoadingOutlined,
   EditTwoTone,
   DeleteTwoTone,
-  EyeOutlined,
   EyeTwoTone,
-  EyeInvisibleFilled,
   EyeInvisibleTwoTone,
-  CheckCircleOutlined,
-  CloseCircleOutlined,
-  BarChartOutlined,
   LineChartOutlined,
   CloseCircleTwoTone,
 } from '@ant-design/icons';
@@ -65,6 +56,8 @@ const ExerciseList = ({ userInfo }) => {
     dislike: 0,
     content: '',
     points: 1,
+    approved: STATUS.WAITING,
+    lastRequestReview: {},
   });
 
   const loadTable = async () => {
@@ -87,6 +80,7 @@ const ExerciseList = ({ userInfo }) => {
             content: e.content,
             approved: e.isApproved,
             lastModified: e.updatedAt,
+            lastRequestReview: e.lastRequestReview,
           });
         });
         setTableData([...data]);
@@ -214,6 +208,8 @@ const ExerciseList = ({ userInfo }) => {
         dislike: 0,
         content: '',
         points: 1,
+        approved: STATUS.WAITING,
+        lastRequestReview: {},
       });
     }
   }, [visiblePreview]);
@@ -450,6 +446,8 @@ const ExerciseList = ({ userInfo }) => {
                   title: record.title,
                   level: record.level,
                   points: record.points,
+                  approved: record.approved,
+                  lastRequestReview: record.lastRequestReview,
                 });
               },
             };
@@ -468,9 +466,8 @@ const ExerciseList = ({ userInfo }) => {
       </div>
       <Footer />
       <ExercisePreviewModal
-        title='Preview Exercise'
-        data={contentPreview}
-        raw={false}
+        userInfo={userInfo}
+        exerciseInfos={contentPreview}
         visible={visiblePreview}
         onCancel={() => setVisiblePreview(false)}
       />
