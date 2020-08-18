@@ -13,15 +13,19 @@ const ExercisePreviewModal = ({
     content: '',
     points: 1,
     approved: 'waiting',
+    lastRequestReview: {},
   },
-  commentInfos = [],
   visible = false,
   onCancel,
+  userInfo,
 }) => {
   let [curTab, setCurTab] = useState(0);
   const onTabChange = (e) => {
     setCurTab(e.target.value);
   };
+  useEffect(() => {
+    visible && setCurTab(0);
+  }, [visible]);
 
   return (
     <>
@@ -46,6 +50,9 @@ const ExercisePreviewModal = ({
         maskClosable={false}
         destroyOnClose={true}
         onCancel={onCancel}
+        bodyStyle={{
+          marginTop: -15,
+        }}
         footer={
           <div>
             <Button
@@ -68,7 +75,8 @@ const ExercisePreviewModal = ({
           {curTab === 1 && (
             <CommentsSection
               approved={exerciseInfos.approved}
-              commentInfos={commentInfos}
+              reviewInfos={exerciseInfos.lastRequestReview}
+              userInfo={userInfo}
             />
           )}
         </div>
