@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import Head from 'next/head'
 import { connect } from 'react-redux'
 import { Button, Upload, message, Modal } from 'antd'
+import { useEffect } from "react"
 import { UpCircleOutlined } from '@ant-design/icons'
 import CodeTrainee from 'hocs';
 import * as action from "../store/auth/action"
@@ -14,6 +15,9 @@ import Router from "next/router"
 
 
 class Index extends Component {
+  constructor(props) {
+    super(props);
+  }
 
   UNSAFE_componentWillReceiveProps(nextProps){
     if(this.props.isAuthenticated != nextProps.isAuthenticated) {
@@ -22,6 +26,25 @@ class Index extends Component {
         let url = redirectRouter(nextProps.userInfo['role']['id'])
         Router.push(url)
       }
+    }
+  }
+
+  componentDidMount() {
+    console.log('componentDidMount')
+    document.body.addEventListener('scroll', this.handleScroll)
+  }
+
+  componentWillUnmount() {
+    //window.removeEventListener('scroll', this.handleScroll);
+  }
+
+  handleScroll() {
+    let header = document.getElementById("header-menu")
+    let scrollTop = document.body.scrollTop
+    if (scrollTop > 50) {
+      if (header) header.classList.add("header-sticky")
+    } else {
+      if (header) header.classList.remove("header-sticky")
     }
   }
 
@@ -37,7 +60,7 @@ class Index extends Component {
           <title>Code Trainee</title>
         </Head>
         <div className='wrapper-index-page'>
-          <div className='header-menu'>
+          <div className='header-menu' id='header-menu'>
             <div className='container'>
               <div className='row'>
                 <div className="col-sm-6 col-12 logo-wrapper">
@@ -71,11 +94,11 @@ class Index extends Component {
           </div>
 
           <div className='preview-banner-area' style={{backgroundImage: `url('static/images/banner1.jpg')`}}>
-            <img className="img-fluid animated-figure animated-figure1" src="static/images/animated-figure1.png" alt="banner"/>
-            <img className="img-fluid animated-figure animated-figure2" src="static/images/animated-figure2.png" alt="banner"/>
+            <img className="img-fluid animated-figure animated-figure1" src="static/images/codetrainee-figure1.png" alt="banner"/>
+            <img className="img-fluid animated-figure animated-figure2" src="static/images/codetrainee-figure1.png" alt="banner"/>
             <div className="container">
               <div className="preview-banner-content">
-                <h1>Trainee Code for FPT Students</h1>
+                <h1>Code Trainee for FPT Students</h1>
                 <ul className="build-with">
                   <li>
                     <img className="img-fluid" src='../static/images/html.png'></img>
@@ -104,7 +127,7 @@ class Index extends Component {
                       <div><a href='#'>Home 01</a></div>
                     </div>
                     <div className='product-box-img'>
-                      <img className='img-responsive' src='../static/images/home1.jpg'></img>
+                      <img className='img-responsive' src='../static/images/codetrainee1.png'></img>
                     </div>
                   </div>
                 </div>
@@ -114,7 +137,7 @@ class Index extends Component {
                       <div><a href='#'>Home 02</a></div>
                     </div>
                     <div className='product-box-img'>
-                      <img className='img-responsive' src='../static/images/home1.jpg'></img>
+                      <img className='img-responsive' src='../static/images/codetrainee2.png'></img>
                     </div>
                   </div>
                 </div>
@@ -124,7 +147,7 @@ class Index extends Component {
                       <div><a href='#'>Home 03</a></div>
                     </div>
                     <div className='product-box-img'>
-                      <img className='img-responsive' src='../static/images/home1.jpg'></img>
+                      <img className='img-responsive' src='../static/images/codetrainee3.png'></img>
                     </div>
                   </div>
                 </div>
@@ -134,7 +157,7 @@ class Index extends Component {
                       <div><a href='#'>Home 04</a></div>
                     </div>
                     <div className='product-box-img'>
-                      <img className='img-responsive' src='../static/images/home1.jpg'></img>
+                      <img className='img-responsive' src='../static/images/codetrainee4.png'></img>
                     </div>
                   </div>
                 </div>
