@@ -13,6 +13,7 @@ import { Router, useRouter } from 'next/router';
 import ConfirmModal from '../components/ConfirmModal';
 import Error404 from './error/404';
 import Error500 from './error/500';
+import Error403 from './error/403';
 
 const StepTitles = [
   { key: 0, title: 'Basic Information' },
@@ -57,6 +58,8 @@ const Exercise = ({
     return <Error404 />;
   } else if (errorCode === 500) {
     return <Error500 />;
+  } else if (errorCode === 403) {
+    return <Error403 />;
   }
 
   const validateStepBasicInfos = async () => {
@@ -330,6 +333,7 @@ Exercise.getInitialProps = async ({ query, store }) => {
   let listTeachers = [];
   if (id === '' || (id !== undefined && Number.isNaN(Number(id)))) {
     errorCode = 404;
+    id = null;
   }
   try {
     listTags = (
@@ -339,8 +343,12 @@ Exercise.getInitialProps = async ({ query, store }) => {
       .data.data;
     // have 'id' mean edit page is access, get old data
     if (id) {
+      let userInfo = store.getState().auth.userInfo;
+      let userId = userInfo ? userInfo.id : 0;
+      userId = userId || 0;
+      console.log({ userId: userId });
       let basicInfoResponse = await axios.get(
-        `${process.env.API}/api/exercise/basic-info/${id}`
+        `${process.env.API}/api/exercise/basic-info/${id}?userId=${userId}`
       );
       if (basicInfoResponse.data.success) {
         let basicInfos = basicInfoResponse.data.data;
@@ -378,6 +386,8 @@ Exercise.getInitialProps = async ({ query, store }) => {
       } else {
         if (basicInfoResponse.data.code === 500) {
           errorCode = 500;
+        } else if (basicInfoResponse.data.code === 403) {
+          errorCode = 403;
         } else {
           errorCode = 404;
         }
