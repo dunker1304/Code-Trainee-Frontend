@@ -15,7 +15,7 @@ import Error404 from './error/404';
 import Error500 from './error/500';
 
 const StepTitles = [
-  { key: 0, title: 'Basic Informations' },
+  { key: 0, title: 'Basic Information' },
   { key: 1, title: 'Code Stubs' },
   { key: 2, title: 'Testcases' },
   { key: 3, title: 'Review' },

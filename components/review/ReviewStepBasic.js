@@ -2,6 +2,8 @@ import { Descriptions, Row, Button, Tag, Modal } from 'antd';
 import ExercisePreviewModal from '../exercise/ExercisePreviewModal';
 import { useState } from 'react';
 import PreviewSection from '../exercise/PreviewSection';
+import moment from 'moment';
+import { formatDate } from '../../helpers/utils';
 
 const ReviewStepBasic = ({
   title = '',
@@ -11,8 +13,8 @@ const ReviewStepBasic = ({
   content = '',
   like = 0,
   dislike = 0,
-  updatedAt = '',
-  createdAt = '',
+  updatedAt = new Date(),
+  createdAt = new Date(),
 }) => {
   const [visiblePreview, setVisiblePreview] = useState(false);
 
@@ -69,10 +71,10 @@ const ReviewStepBasic = ({
           {content}
         </Descriptions.Item>
         <Descriptions.Item label='CreatedAt' span={3}>
-          {createdAt}
+          {formatDate(moment(createdAt).toDate())}
         </Descriptions.Item>
         <Descriptions.Item label='UpdatedAt' span={3}>
-          {updatedAt}
+          {formatDate(moment(updatedAt).toDate())}
         </Descriptions.Item>
       </Descriptions>
       <Modal
