@@ -167,7 +167,7 @@ const Exercise = ({
       }
     } catch (e) {
       notification.warn({
-        message: 'Something is wrong.',
+        message: 'Something went wrong.',
       });
       console.log(e);
     }
@@ -343,9 +343,8 @@ Exercise.getInitialProps = async ({ query, store }) => {
       .data.data;
     // have 'id' mean edit page is access, get old data
     if (id) {
-      let userInfo = store.getState().auth.userInfo;
-      let userId = userInfo ? userInfo.id : 0;
-      userId = userId || 0;
+      let userId = store.getState().auth.userInfo.id;
+      userId = userId ? userId : 0;
       console.log({ userId: userId });
       let basicInfoResponse = await axios.get(
         `${process.env.API}/api/exercise/basic-info/${id}?userId=${userId}`

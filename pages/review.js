@@ -24,6 +24,7 @@ import Head from 'next/head';
 import composedAuthHOC from 'hocs';
 import Error404 from './error/404';
 import Error500 from './error/500';
+import Error403 from './error/403';
 
 const ReviewExercise = ({
   exerciseId,
@@ -52,6 +53,8 @@ const ReviewExercise = ({
     return <Error404 />;
   } else if (errorCode === 500) {
     return <Error500 />;
+  } else if (errorCode === 403) {
+    return <Error403 />;
   }
 
   // click on button reject
@@ -77,46 +80,110 @@ const ReviewExercise = ({
   };
 
   const onOkReject = async () => {
+    if (isSelfReview) {
+      await onSelfReview(false);
+    } else {
+      await onNormalReview(false);
+    }
+  };
+
+  const onOkAccept = async () => {
+    if (isSelfReview) {
+      await onSelfReview(true);
+    } else {
+      await onNormalReview(true);
+    }
+  };
+
+  const onNormalReview = async (isAccepted = false) => {
     let comment = form.getFieldValue('comment');
     try {
       const res = await axios.post(`${process.env.API}/api/review`, {
         comment: comment,
-        isAccepted: false,
-        exerciseId: exerciseId,
+        isAccepted: isAccepted,
         userId: currUserId,
         requestId: requestId,
       });
       if (res.data.success) {
         router.push('/exercise-list');
       } else {
-        throw new Error();
+        if (res.data.code === 1) {
+          let isAccepted = res.data.data.isAccepted;
+          let color =
+            isAccepted === 'accepted'
+              ? 'green'
+              : isAccepted === 'rejected'
+              ? 'red'
+              : 'unset';
+          notification.warn({
+            message: (
+              <>
+                {`This exercise already `}
+                <span style={{ textTransform: 'capitalize', color: color }}>
+                  {isAccepted}
+                </span>
+                {` by Self-Review.`}
+              </>
+            ),
+          });
+        } else if (res.data.code === 3) {
+          notification.warn({
+            message: 'Exercise already deleted.',
+          });
+        } else {
+          throw new Error();
+        }
       }
     } catch (e) {
       notification.warn({
-        message: 'Something is wrong.',
+        message: 'Something went wrong.',
       });
       console.log(e);
     }
   };
 
-  const onOkAccept = async () => {
+  const onSelfReview = async (isAccepted = false) => {
     let comment = form.getFieldValue('comment');
     try {
-      const res = await axios.post(`${process.env.API}/api/review`, {
+      const res = await axios.post(`${process.env.API}/api/self-review`, {
         comment: comment,
-        isAccepted: true,
+        isAccepted: isAccepted,
         exerciseId: exerciseId,
         userId: currUserId,
-        requestId: requestId,
       });
       if (res.data.success) {
         router.push('/exercise-list');
       } else {
-        throw new Error();
+        if (res.data.code === 1) {
+          let isAccepted = res.data.data.isAccepted;
+          let color =
+            isAccepted === 'accepted'
+              ? 'green'
+              : isAccepted === 'rejected'
+              ? 'red'
+              : 'unset';
+          notification.warn({
+            message: (
+              <>
+                {`This exercise already `}
+                <span style={{ textTransform: 'capitalize', color: color }}>
+                  {isAccepted}
+                </span>
+                {` by other teachers.`}
+              </>
+            ),
+          });
+        } else if (res.data.code === 3) {
+          notification.warn({
+            message: 'Exercise already deleted.',
+          });
+        } else {
+          throw new Error();
+        }
       }
     } catch (e) {
       notification.warn({
-        message: 'Something is wrong.',
+        message: 'Something went wrong.',
       });
       console.log(e);
     }
@@ -129,7 +196,7 @@ const ReviewExercise = ({
   return (
     <>
       <Head>
-        <title>Review</title>
+        <title>{isSelfReview ? 'Self-Review' : 'Review'}</title>
       </Head>
       <Header />
       <div
@@ -223,8 +290,34 @@ const ReviewExercise = ({
   );
 };
 
-ReviewExercise.getInitialProps = async ({ query }) => {
+ReviewExercise.getInitialProps = async ({ query, store }) => {
   let { request: requestId, exerciseId } = query;
+  let errorCode;
+  if (
+    (requestId !== undefined && exerciseId !== undefined) ||
+    (requestId === undefined && exerciseId === undefined)
+  ) {
+    errorCode = 500;
+  }
+  if (
+    requestId === '' ||
+    (requestId !== undefined && Number.isNaN(Number(requestId)))
+  ) {
+    errorCode = 404;
+    id = null;
+  }
+  if (
+    exerciseId === '' ||
+    (exerciseId !== undefined && Number.isNaN(Number(exerciseId)))
+  ) {
+    errorCode = 404;
+    id = null;
+  }
+  if (errorCode) {
+    return {
+      errorCode: errorCode,
+    };
+  }
   const isSelfReview = !!exerciseId;
   let exerciseInfos = {
     tags: [],
@@ -239,30 +332,41 @@ ReviewExercise.getInitialProps = async ({ query }) => {
     content: '',
     title: '',
   };
-  let errorCode;
+  let userId = store.getState().auth.userInfo.id;
+  userId = userId ? userId : 0;
   if (isSelfReview) {
     const res = await axios.get(
-      `${process.env.API}/api/review/exercise/${exerciseId}`
+      `${process.env.API}/api/review/exercise/${exerciseId}?userId=${userId}`
     );
-    let tags = res.data.data.tags.map((t) => t.name);
-    let testCases = res.data.data.testCases.map((t) => ({
-      ...t,
-      output: t.expectedOutput,
-      key: t.id,
-    }));
-    let codeSnippets = res.data.data.codeSnippets.map((t) => ({
-      ...t,
-      key: t.id,
-    }));
-    exerciseInfos = {
-      ...res.data.data,
-      tags,
-      testCases,
-      codeSnippets,
-    };
+    if (res.data.success) {
+      let tags = res.data.data.tags.map((t) => t.name);
+      let testCases = res.data.data.testCases.map((t) => ({
+        ...t,
+        output: t.expectedOutput,
+        key: t.id,
+      }));
+      let codeSnippets = res.data.data.codeSnippets.map((t) => ({
+        ...t,
+        key: t.id,
+      }));
+      exerciseInfos = {
+        ...res.data.data,
+        tags,
+        testCases,
+        codeSnippets,
+      };
+    } else {
+      if (res.data.code === 500) {
+        errorCode = 500;
+      } else if (res.data.code === 403) {
+        errorCode = 403;
+      } else if (res.data.code === 404) {
+        errorCode = 404;
+      }
+    }
   } else {
     const res = await axios.get(
-      `${process.env.API}/api/review/request/${requestId}`
+      `${process.env.API}/api/review/request/${requestId}?userId=${userId}`
     );
     if (res.data.success) {
       let tags = res.data.data.exerciseInfos.tags.map((t) => t.name);
@@ -284,7 +388,9 @@ ReviewExercise.getInitialProps = async ({ query }) => {
     } else {
       if (res.data.code === 500) {
         errorCode = 500;
-      } else {
+      } else if (res.data.code === 403) {
+        errorCode = 403;
+      } else if (res.data.code === 404) {
         errorCode = 404;
       }
     }

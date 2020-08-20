@@ -90,7 +90,7 @@ const ExerciseList = ({ userInfo }) => {
       }
     } catch (e) {
       notification.warn({
-        message: `Something is wrong.`,
+        message: `Something went wrong.`,
       });
       setTableLoading(false);
       console.log(e);
@@ -107,6 +107,7 @@ const ExerciseList = ({ userInfo }) => {
       setTableLoading(true);
       const res = await axios.post(`${process.env.API}/api/exercise/delete`, {
         id: record.key,
+        userId: currUserId,
       });
       setTableLoading(false);
       if (res.data.success) {
@@ -119,7 +120,7 @@ const ExerciseList = ({ userInfo }) => {
       }
     } catch (e) {
       notification.warn({
-        message: 'Something is wrong.',
+        message: 'Something went wrong.',
       });
       console.log(e);
       setTableLoading(false);
