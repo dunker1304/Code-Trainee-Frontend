@@ -28,6 +28,7 @@ import Footer from '../components/Footer';
 import composedAuthHOC from 'hocs';
 import ExercisePreviewModal from '../components/exercise/ExercisePreviewModal';
 import moment from 'moment';
+import { formatDate } from '../helpers/utils';
 
 const STATUS = {
   ACCEPTED: 'accepted',
@@ -89,7 +90,7 @@ const ExerciseList = ({ userInfo }) => {
       }
     } catch (e) {
       notification.warn({
-        message: `Something is wrong.`,
+        message: `Something went wrong.`,
       });
       setTableLoading(false);
       console.log(e);
@@ -106,6 +107,7 @@ const ExerciseList = ({ userInfo }) => {
       setTableLoading(true);
       const res = await axios.post(`${process.env.API}/api/exercise/delete`, {
         id: record.key,
+        userId: currUserId,
       });
       setTableLoading(false);
       if (res.data.success) {
@@ -118,7 +120,7 @@ const ExerciseList = ({ userInfo }) => {
       }
     } catch (e) {
       notification.warn({
-        message: 'Something is wrong.',
+        message: 'Something went wrong.',
       });
       console.log(e);
       setTableLoading(false);
@@ -150,8 +152,6 @@ const ExerciseList = ({ userInfo }) => {
   };
 
   const handleSelfReview = (record) => {
-    let lastModified = moment(record.lastModified);
-    let timeCanStartSelfReview = moment(lastModified).add(5, 'm').toDate();
     if (record.approved === STATUS.REJECTED) {
       notification.info({
         message: `This exercise is rejected`,
@@ -163,13 +163,22 @@ const ExerciseList = ({ userInfo }) => {
         description: `You cannot self-review this exercise in this time.`,
       });
     } else {
+      let lastModified = moment(record.lastModified);
+      let timeCanStartSelfReview = moment(lastModified).add(5, 'm').toDate();
       if (Date.now() >= timeCanStartSelfReview.getTime()) {
         setTableLoading(true);
         router.push(`/review?exerciseId=${record.key}&self-review`);
       } else {
         notification.info({
           message: `This exercise is waiting for review`,
-          description: `You can self-review this exercise after ${timeCanStartSelfReview}`,
+          description: (
+            <>
+              <p style={{ marginBottom: 5 }}>
+                You can self-review this exercise
+              </p>
+              <p>{`after ${formatDate(timeCanStartSelfReview)}`}</p>
+            </>
+          ),
         });
       }
     }
@@ -360,6 +369,9 @@ const ExerciseList = ({ userInfo }) => {
               key: 'lastModified',
               width: '200px',
               ellipsis: true,
+              render: (text, record) => (
+                <>{formatDate(moment(record.lastModified).toDate())}</>
+              ),
             },
             {
               title: 'Action',

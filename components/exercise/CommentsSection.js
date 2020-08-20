@@ -10,6 +10,8 @@ import {
 } from 'antd';
 import { CloseCircleTwoTone, CaretRightOutlined } from '@ant-design/icons';
 import { useRef } from 'react';
+import moment from 'moment';
+import { formatDate } from '../../helpers/utils';
 
 const { Panel } = Collapse;
 
@@ -39,20 +41,28 @@ const CommentsSection = ({
   return (
     <div>
       <Descriptions size='small' column={4}>
-        <Descriptions.Item label='Total' style={{ width: 130 }}>
-          {totalComments}
+        <Descriptions.Item
+          label={<span style={{ fontSize: 17 }}>Total</span>}
+          style={{ width: 130 }}>
+          <span style={{ fontSize: 17 }}>{totalComments}</span>
         </Descriptions.Item>
-        <Descriptions.Item label='Accepted' style={{ width: 130 }}>
-          {acceptedComments}
+        <Descriptions.Item
+          label={<span style={{ fontSize: 17 }}>Accepted</span>}
+          style={{ width: 130 }}>
+          <span style={{ fontSize: 17 }}>{acceptedComments}</span>
         </Descriptions.Item>
-        <Descriptions.Item label='Rejected' style={{ width: 130 }}>
-          {rejectedComments}
+        <Descriptions.Item
+          label={<span style={{ fontSize: 17 }}>Rejected</span>}
+          style={{ width: 130 }}>
+          <span style={{ fontSize: 17 }}>{rejectedComments}</span>
         </Descriptions.Item>
-        <Descriptions.Item label='Waiting' style={{ width: 130 }}>
-          {waitingComments}
+        <Descriptions.Item
+          label={<span style={{ fontSize: 17 }}>Waiting</span>}
+          style={{ width: 130 }}>
+          <span style={{ fontSize: 17 }}>{waitingComments}</span>
         </Descriptions.Item>
       </Descriptions>
-      <h2
+      <h4
         style={{
           marginTop: 2,
         }}>
@@ -78,16 +88,16 @@ const CommentsSection = ({
             <span style={{ color: 'red' }}>Rejected</span>
           </>
         )}
-      </h2>
-      <h2
+      </h4>
+      <h4
         style={{
           marginTop: 10,
         }}>
         Details:
-      </h2>
+      </h4>
       <div
         style={{
-          maxHeight: 270,
+          maxHeight: 260,
           overflow: 'hidden',
           overflowY: 'scroll',
         }}>
@@ -104,10 +114,16 @@ const CommentsSection = ({
                   style={{
                     textTransform: 'capitalize',
                   }}>
-                  {reviewInfos.isAccepted}
+                  {reviewInfos.isAccepted === 'rejected' && (
+                    <span style={{ color: 'red' }}>Rejected</span>
+                  )}
+                  {reviewInfos.isAccepted === 'accepted' && (
+                    <span style={{ color: 'green' }}>Accepted</span>
+                  )}
+                  {reviewInfos.isAccepted === 'waiting' && <span>Waiting</span>}
                 </Descriptions.Item>
                 <Descriptions.Item label='ReviewedAt'>
-                  {reviewInfos.updatedAt}
+                  {formatDate(moment(reviewInfos.updatedAt).toDate())}
                 </Descriptions.Item>
                 <Descriptions.Item label='Content'>
                   {reviewInfos.selfComment}
@@ -132,12 +148,18 @@ const CommentsSection = ({
                     style={{
                       textTransform: 'capitalize',
                     }}>
-                    {t.isAccepted}
+                    {t.isAccepted === 'rejected' && (
+                      <span style={{ color: 'red' }}>Rejected</span>
+                    )}
+                    {t.isAccepted === 'accepted' && (
+                      <span style={{ color: 'green' }}>Accepted</span>
+                    )}
+                    {t.isAccepted === 'waiting' && <span>Waiting</span>}
                   </Descriptions.Item>
                   {t.isAccepted !== 'waiting' && (
                     <>
                       <Descriptions.Item label='ReviewedAt'>
-                        {t.updatedAt}
+                        {formatDate(moment(t.updatedAt).toDate())}
                       </Descriptions.Item>
                       <Descriptions.Item label='Content'>
                         {t.comment}

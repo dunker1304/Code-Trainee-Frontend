@@ -66,3 +66,14 @@ export const isEmptyObject = (value)=> {
   if(!value) return true;
   return Object.keys(value).length === 0 && value.constructor === Object
 }
+
+// format date to : yyyy-MM-dd hh:mm:ss
+export const formatDate = (date = new Date()) => {
+  const yyyy = date.getFullYear();
+  const MM = date.getMonth() + 1;
+  const dd = date.getDate();
+  const hh = date.getHours();
+  const mm = date.getMinutes();
+  const ss = date.getSeconds();
+  return `${yyyy}-${MM < 10 ? '0' + MM : MM}-${dd}  ${hh}:${mm}:${ss}`;
+};
