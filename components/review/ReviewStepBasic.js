@@ -1,9 +1,11 @@
-import { Descriptions, Row, Button, Tag, Modal } from 'antd';
+import { Row, Button, Tag, Modal, Col } from 'antd';
 import ExercisePreviewModal from '../exercise/ExercisePreviewModal';
 import { useState } from 'react';
 import PreviewSection from '../exercise/PreviewSection';
 import moment from 'moment';
 import { formatDate } from '../../helpers/utils';
+import Highlight, { defaultProps } from 'prism-react-renderer';
+import theme from 'prism-react-renderer/themes/github';
 
 const ReviewStepBasic = ({
   title = '',
@@ -33,17 +35,37 @@ const ReviewStepBasic = ({
           Preview
         </Button>
       </Row>
-      <Descriptions bordered>
-        <Descriptions.Item label='Title' span={3}>
-          {title}
-        </Descriptions.Item>
-        <Descriptions.Item label='Level' span={3}>
-          {level}
-        </Descriptions.Item>
-        <Descriptions.Item label='LOC' span={3}>
-          {points}
-        </Descriptions.Item>
-        <Descriptions.Item label='Tags' span={3}>
+      <Row
+        style={{
+          padding: '10px 24px',
+          display: 'flex',
+        }}>
+        <Col style={{ width: 90, color: '#000000D9' }}>Title:</Col>
+        <Col style={{ flexGrow: 1 }}>{title}</Col>
+      </Row>
+      <Row
+        style={{
+          padding: '10px 24px',
+          display: 'flex',
+        }}>
+        <Col style={{ width: 90, color: '#000000D9' }}>Level:</Col>
+        <Col style={{ flexGrow: 1 }}>{level}</Col>
+      </Row>
+      <Row
+        style={{
+          padding: '10px 24px',
+          display: 'flex',
+        }}>
+        <Col style={{ width: 90, color: '#000000D9' }}>LOC:</Col>
+        <Col style={{ flexGrow: 1 }}>{points}</Col>
+      </Row>
+      <Row
+        style={{
+          padding: '10px 24px',
+          display: 'flex',
+        }}>
+        <Col style={{ width: 90, color: '#000000D9' }}>Tags:</Col>
+        <Col style={{ flexGrow: 1 }}>
           {tags.map((tag, index) => {
             const isLongTag = tag.length > 15;
             const handleLongTag = (tag) => tag.slice(0, 15) + '...';
@@ -63,20 +85,68 @@ const ReviewStepBasic = ({
                 {tagElem}
               </Tooltip>
             ) : (
-              tagElem
+              <>{tagElem}</>
             );
           })}
-        </Descriptions.Item>
-        <Descriptions.Item label='Content' span={3}>
-          {content}
-        </Descriptions.Item>
-        <Descriptions.Item label='CreatedAt' span={3}>
+        </Col>
+      </Row>
+      <Row
+        style={{
+          padding: '10px 24px',
+          display: 'flex',
+        }}>
+        <Col style={{ width: 90, color: '#000000D9' }}>Content:</Col>
+        <Col style={{ flexGrow: 1 }}>
+          <div>
+            <Highlight
+              {...defaultProps}
+              theme={theme}
+              code={content}
+              language='markup'>
+              {({ className, style, tokens, getLineProps, getTokenProps }) => (
+                <pre
+                  className={className}
+                  style={{
+                    textAlign: 'left',
+                    margin: 0,
+                    padding: '0.5em',
+                    overflow: 'scroll',
+                    maxHeight: 300,
+                    ...style,
+                  }}>
+                  {tokens.map((line, i) => (
+                    <div {...getLineProps({ line, key: i })}>
+                      {line.map((token, key) => (
+                        <span {...getTokenProps({ token, key })} />
+                      ))}
+                    </div>
+                  ))}
+                </pre>
+              )}
+            </Highlight>
+          </div>
+        </Col>
+      </Row>
+      <Row
+        style={{
+          padding: '10px 24px',
+          display: 'flex',
+        }}>
+        <Col style={{ width: 90, color: '#000000D9' }}>CreatedAt:</Col>
+        <Col style={{ flexGrow: 1 }}>
           {formatDate(moment(createdAt).toDate())}
-        </Descriptions.Item>
-        <Descriptions.Item label='UpdatedAt' span={3}>
+        </Col>
+      </Row>
+      <Row
+        style={{
+          padding: '10px 24px',
+          display: 'flex',
+        }}>
+        <Col style={{ width: 90, color: '#000000D9' }}>UpdatedAt:</Col>
+        <Col style={{ flexGrow: 1, display: 'flex', flexWrap: 'wrap' }}>
           {formatDate(moment(updatedAt).toDate())}
-        </Descriptions.Item>
-      </Descriptions>
+        </Col>
+      </Row>
       <Modal
         className='preview-exercise-modal'
         title='Preview Exercise'
