@@ -24,6 +24,30 @@ div#playground {
   display: flex;
   justify-content: space-between;
   margin: 3px;
+  span.indicator {
+    display: inline-flex;
+    width: 6px;
+    height: 6px;
+    margin-right: 8px;
+    background-color: rgb(176, 190, 197);
+    border-radius: 3px;
+  }
+
+  button.reset-code {
+      font-size: 13px;
+      border: none;
+      background: transparent;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 85%;
+      margin-left: 10px;
+      border-radius: 3px;
+  }
+
+  button.reset-code:hover {
+      background: rgb(236, 239, 241);
+  }
 }
 
 .content-right, .content-left {
@@ -181,7 +205,12 @@ div#playground {
     align-items: center;
   }
 }
-
+.test-case-wrapper.hidden {
+  display: flex;
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+}
 .submission-detail {
   .title {
     text-align: center;
@@ -221,6 +250,4 @@ div#playground {
         border-color: #204d74;
     }
   }
-
-  
 }

@@ -1,7 +1,8 @@
 import React, { Component, useState, useEffect } from 'react'
 import { render } from 'react-dom'
 import AceEditor from 'react-ace'
-import { Row, Col, Button, Select, Tabs, Spin, message, notification } from 'antd'
+import { Row, Col, Button, Select, Tabs, Spin, message, notification, Tooltip } from 'antd'
+import { SaveOutlined } from '@ant-design/icons';
 import axios from 'axios'
 import TestCase from '../components/TestCase'
 import SettingModal from '../components/SettingModal'
@@ -40,6 +41,7 @@ const Playground = props => {
   const [code, setCode] = useState(props.language[0].codeSnippets[0]?.sampleCode || '')
   const [languageID, setLanguageID] = useState(props.language[0].code)
   const [testCaseProps, setTestCaseProps] = useState(props.question.testCases)
+  const [testCasePropsRun, setTestCasePropsRun] = useState()
   const [consoleEditor, setConsoleEditor] = useState('show')
   const [fontSize, setFontSize] = useState(14)
   const [theme, setTheme] = useState('monokai')
@@ -52,7 +54,7 @@ const Playground = props => {
 
   useEffect(() => {
    let activeTab = router.query.tab ? router.query.tab : "1"
-   setCode(props.language[indexLanguage].codeSnippets[0]?.sampleCode || "")
+   setCode(props.tempCode?.temp?.answer || props.language[indexLanguage].codeSnippets[0]?.sampleCode || "")
    setTestCaseProps(props.question.testCases)
    if(activeTab == 4) {
     let questionId = router.query.questionID
@@ -69,6 +71,10 @@ const Playground = props => {
     setCode(newValue)
     setRunCode(false)
   }
+  const handleResetTemplateCode = () => {
+    setCode(props.language[indexLanguage].codeSnippets[0]?.sampleCode || "");
+    setRunCode(false);
+  }
 
   const handleRunCode = (callback) => {
     setLoading(true);
@@ -79,7 +85,13 @@ const Playground = props => {
     }
     axios.post(`${process.env.API}/api/submissions`, data)
       .then(res => {
-        setTestCaseProps(res.data)
+        for(let i = 0; i < testCaseProps.length; i++) {
+          if(testCaseProps[i].isHidden && res.data[i]?.success){
+            res.data[i].data.isHidden = true
+          }
+        }
+        
+        setTestCasePropsRun(res.data)
         setLoading(false)
         if (typeof callback === 'function') callback(res.data)
       })
@@ -102,7 +114,7 @@ const Playground = props => {
       testcases: testCaseProps,
       answer: code,
       language: langDB,
-      userID: 3
+      userID: props.userInfo.id
     }
     axios.post(`${process.env.API}/api/solution`, data)
       .then(res => {
@@ -126,28 +138,72 @@ const Playground = props => {
       })
   }
 
+  const handleSaveCode = () => {
+    setLoading(true)
+    let langDB
+    props.language.forEach(language => {
+      if (language.code == languageID) {
+        langDB = language.id
+      }
+    });
+    let data = {
+      question: props.question.question,
+      testcases: testCaseProps,
+      answer: code,
+      language: langDB,
+      userID: props.userInfo.id
+    }
+    console.log(data, 'dunker')
+    axios.post(`${process.env.API}/api/exercise/save-code`, data)
+      .then((response) => {
+        setLoading(false)
+        if (response.data.success) {
+          notification.success({
+            message: "Sucessfully save code"
+          })
+        } else {
+          notification.error({
+            message: "Failed!"
+          })
+        }
+      })
+      .catch((error) => {
+        setLoading(false)
+        console.log(error)
+        notification.error({
+          message: "Failed!"
+        })
+      })
+  }
+
   const handleSubmitCode = () => {
     setLoading(true)
     if (!runCode) {
       handleRunCode(addSolution)
     } else {
-      addSolution(testCaseProps)
+      addSolution(testCasePropsRun)
     }
   }
 
   const handleChangeLanguage = (value, option) => {
-    // get code snippet
-    // axios.get(`http://localhost:1337/api/snippet-code?userID=3&exerciseID=${props.question.question.id}&languageID=${languageID}`)
-    //   .then(res => {
-    //     console.log(res)
-    //   })
-    //   .catch(error => {
-    //     console.log(error)
-    //   })
     setRunCode(false);
     setLanguageID(value);
     setIndexLanguage(option.key);
-    setCode(props.language[option.key].codeSnippets[0]?.sampleCode || "")
+    let langDB
+    props.language.forEach(language => {
+      if (language.code == value) {
+        langDB = language.id
+      }
+    })
+    axios.get(`${process.env.API}/api/exercise/temp-code?id=${props.question.question.id}&languageID=${langDB}&userID=${props.userInfo.id}`)
+      .then(res => {
+        console.log(res, 'handleChangeLanguage')
+        setCode(res.data?.temp?.answer || props.language[option.key].codeSnippets[0]?.sampleCode || "")
+      })
+      .catch(error => {
+        console.log(error)
+      })
+    
   }
 
   const handleChangeSettingFontSize = (fontSize) => {
@@ -231,7 +287,7 @@ const Playground = props => {
               <QuestionDescription question={props.question.question} userInfo={props.userInfo} exerciseVote={props.exerciseVote}/>
             </TabPane>
             <TabPane tab="Submissions" key="3">
-              <ExerciseSubmissions handleChangeCodeAce={onChange} exerciseID={props.question.question.id} exercise={props.question.question}></ExerciseSubmissions>
+              <ExerciseSubmissions handleChangeCodeAce={onChange} exerciseID={props.question.question.id} exercise={props.question.question} userInfo={props.userInfo}></ExerciseSubmissions>
             </TabPane>
             <TabPane tab="Discussions" key="4">
               Discussion Here
@@ -265,12 +321,22 @@ const Playground = props => {
             </div>) 
           : null}
           <div className="playground-action">
-            <Select defaultValue={props.language[0].code} style={{ width: 120 }} onSelect={handleChangeLanguage}>
-              {props.language && props.language.map((lang, key) => (
-                lang.codeSnippets.length > 0 ? <Option key={key} value={lang.code}>{lang.name}</Option> : null
-              ))}
-            </Select>
+            <div>
+              <Select defaultValue={props.language[0].code} style={{ width: 120 }} onSelect={handleChangeLanguage}>
+                {props.language && props.language.map((lang, key) => (
+                  lang.codeSnippets.length > 0 ? <Option key={key} value={lang.code}>{lang.name}</Option> : null
+                ))}
+              </Select>
+              <Tooltip placement="bottom" title='Reset to default template code'>
+                <button type="ghost" className="reset-code" onClick={handleResetTemplateCode}>
+                  <span className='indicator'></span>
+                  <span style={{ color: 'rgb(176, 190, 197)'}}>Reset</span>
+                </button>
+              </Tooltip>
 
+            </div>
+            
+            <SaveOutlined onClick={handleSaveCode} style={{ display: 'flex', alignItems: 'center' }}/>
             <SettingModal
               handleChangeSettingFontSize={handleChangeSettingFontSize}
               handleChangeSettingTheme={handleChangeSettingTheme}
@@ -302,6 +368,29 @@ const Playground = props => {
           />
 
           {
+            testCasePropsRun ?
+            (testCasePropsRun.length == 1 && testCasePropsRun[0].success == false) ?
+            <Spin spinning={loading}>
+              <div className="console-status" style={ (consoleEditor == 'hide') ? {display: 'none'} : null }>
+                <div>Status: {testCasePropsRun[0].data ? testCasePropsRun[0].data.status.description : "Code - 400"}</div>
+                <div style={{ whiteSpace: 'pre-wrap' }} 
+                  dangerouslySetInnerHTML={{ __html: testCasePropsRun[0].data ? testCasePropsRun[0].data.compile_output ? testCasePropsRun[0].data.compile_output.toString() : testCastestCasePropsRuneProps[0].data.stderr.toString() 
+                                          :  (testCasePropsRun[0]?.message?.source_code ? ("Source Code: " + testCasePropsRun[0]?.message?.source_code[0]) : "Something went wrong") }}>                            
+              </div>
+              </div>
+            </Spin>
+            :
+            <Spin spinning={loading}>
+              <Tabs tabPosition="left" type="line"
+                style={ (consoleEditor == 'hide') ? {display: 'none'} : null } className="console-status">
+                {testCasePropsRun.map((testCase, key) => (
+                  <TabPane tab={`Test Case ` + (key + 1)} key={key}>
+                    <TestCase testCaseProps={testCase.data || testCase}/>
+                  </TabPane>
+                ))}
+              </Tabs>
+            </Spin> 
+            :
             (testCaseProps.length == 1 && testCaseProps[0].success == false) ?
             <Spin spinning={loading}>
               <div className="console-status" style={ (consoleEditor == 'hide') ? {display: 'none'} : null }>
@@ -354,11 +443,14 @@ Playground.getInitialProps = async function(ctx) {
   const questionResponse = await axios.get(urlExercise)
   const languageResponse = await axios.get(urlLanguage)
   const exerciseVote = await axios.get(urlVote)
-  console.log(languageResponse.data.data[0].codeSnippets.length > 0, 'get initial props')
+
+  let tempCode = `${process.env.API}/api/exercise/temp-code?id=${id}&languageID=${languageResponse.data.data[0].id}&userID=${userInfo.id}`
+  const temp = await axios.get(tempCode)
   return { 
     question: questionResponse.data, 
     language: languageResponse.data.data,
-    exerciseVote: exerciseVote.data.exerciseVote
+    exerciseVote: exerciseVote.data.exerciseVote,
+    tempCode: temp.data
   }
 }
 
