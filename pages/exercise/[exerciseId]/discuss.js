@@ -32,7 +32,9 @@ Discuss.getInitialProps = async (ctx) => {
 function mapStateToProps(state, ownProps) {
   return {
     discuss : state.discuss.discuss,
-    totalDiscuss :  state.discuss.totalDiscuss
+    totalDiscuss :  state.discuss.totalDiscuss,
+    totalPage: state.discuss.totalPage
+
   }
 }
 

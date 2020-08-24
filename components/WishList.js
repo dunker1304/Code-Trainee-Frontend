@@ -4,8 +4,9 @@ import { useState , useEffect } from "react"
 import {connect } from "react-redux"
 import { getWishList , addTypeWishList , getWishListByType ,removeToWishList} from "../store/problem/action"
 import ConfirmModal from "../components/MyConfirm"
-import { translateClassName } from "../helpers/utils"
+import { translateClassName ,validateDisplayName } from "../helpers/utils"
 import Link from "next/link"
+
 
 const WishList = (props)=> {
 
@@ -26,7 +27,7 @@ const WishList = (props)=> {
       dataIndex: 'title',
       key: 'title',
       align : 'center',
-      render: (text,record) => <Link href={{pathname : '/playground', query : { questionID : record['exercise']['id']}}} as={`/playground?questionID=${record['exercise']['id']}`}><a className="status-submission">{record['exercise']['title']}</a></Link>,
+      render: (text,record) => <Link href={{pathname : '/playground', query : { questionID : record['exercise']['id']}}} as={`/playground?questionID=${record['exercise']['id']}`}><a className="status-submission">{validateDisplayName(record['exercise']['title'])}</a></Link>,
     },
     {
       title: 'Level',
@@ -112,7 +113,7 @@ const WishList = (props)=> {
                  }
                
                 </Menu> */}
-                  <Table columns={columns} dataSource={dataSource} pagination={false} align={'center'}/>
+                  <Table columns={columns} dataSource={dataSource} pagination={false} align={'center'} rowKey="index"/>
            </div>
          </div>
          

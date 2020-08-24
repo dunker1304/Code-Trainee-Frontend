@@ -1,8 +1,9 @@
 import { Button ,Pagination, Empty} from "antd";
 import CommentListItem from "../components/CommentListItem"
 import CommentInput from "../components/CommentInput"
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { connect } from 'react-redux'
+import  {isEmptyObject} from "../helpers/utils"
 import { getDiscussByQuestionId ,createACommentChildren} from "../store/discuss/action";
 const ListComment = (props) => {
   const [isShow, setIsShow] = useState(false);
@@ -30,12 +31,13 @@ const ListComment = (props) => {
   }
   
   return (
-    <div className = "discuss-container">
+    <>
+    <div className = "discuss-container" style = {{ display : !isEmptyObject(props.question)? 'block':'none' }}>
       <div className = "topic-container">
         <div className = "header-wrapper">
           <a className = "link_title">
             <div className = "title-wrapper">
-                {props.question.title}
+                {props.question ? props.question.title : ''}
             </div>
           </a>
         </div>
@@ -78,6 +80,10 @@ const ListComment = (props) => {
 
      <CommentInput  creatComment={ (data)=> createACommentChildren(data)} handelClickShow= {()=> handelClickShow()} isShow = {isShow} questionId = {props.questionId}/>
     </div>
+    <div className = "discuss-container" style = {{ display : !isEmptyObject(props.question)? 'none':'block' }}>
+        <Empty/>
+    </div>
+    </>
   )
 }
 

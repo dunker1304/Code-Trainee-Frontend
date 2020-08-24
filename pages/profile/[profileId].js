@@ -1,5 +1,5 @@
 import  { ContactsOutlined ,PhoneOutlined , EnvironmentOutlined  ,ScheduleOutlined ,SketchOutlined,EditOutlined } from '@ant-design/icons'
-import { Menu } from "antd"
+import { Menu, Empty  } from "antd"
 import CalendarHeatmap from 'react-calendar-heatmap';
 import { Table, Tag, Button , Drawer, Form, Col, Row, Input,DatePicker,Tooltip} from 'antd';
 import ReactTooltip from 'react-tooltip';
@@ -9,7 +9,9 @@ import Header from "../../components/Header"
 import Footer from "../../components/Footer"
 import composedAuthHOC from 'hocs';
 import moment from "moment"
+import { disabledDate } from "../../helpers/utils"
 import { openNotificationWithIcon } from "../../components/Notification"
+import Link from "next/link"
 const Profile = (props)=> {
 
   const [visible, setVisible] = useState(false)
@@ -23,9 +25,19 @@ const Profile = (props)=> {
   const today = new Date();
   const columns = [
     {
+      title: 'No.',
+      dataIndex: 'index',
+      key: 'index',
+      },
+    {
     title: 'Name',
     dataIndex: 'name',
     key: 'name',
+    render: (text,record) => <Link  href={{pathname : '/playground', query : { questionID : record['exerciseId']} }} as={`/playground?questionID=${record['exerciseId'] }`}>
+      <Tooltip title='View detail exercise'>
+      <span className="link_title" >{text}</span>
+      </Tooltip>
+      </Link>,
     },
     {
       title: 'Language',
@@ -36,7 +48,11 @@ const Profile = (props)=> {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: text => <span className="status-submission">{text}</span>,
+      render: (text,record) => <Link href="/submission/[submissionId]" as={`/submission/${record['id']}`} >
+        <Tooltip title='View detail submission'>
+         <span className="status-submisson" >{text}</span>
+         </Tooltip>
+        </Link>,
     }
   
   ]
@@ -74,26 +90,30 @@ const submitEditAccount = async ()=> {
     window.location.reload();
   }
   else {
-    openNotificationWithIcon('error', '', resUser.data.data.message ?  resUser.data.data.message : 'Change information fail!')
+    openNotificationWithIcon('error', '', resUser.data.message ?  resUser.data.message : 'Change information fail!')
   }
 
 }
 
 
-useEffect(()=>{
- console.log(props)
- setEditEmail(props.profile['email'])
- setEditUsername(props.profile['username'])
- setEditPhone(props.profile['phone'])
- setEditDisplayName(props.profile['displayName'])
- setEditDOB( props.profile['dateOfBirth'] ? moment(props.profile['dateOfBirth']).format(formatDate) : null)
+useEffect(()=>{ 
+ if(!props.fetchDataRes.success){
+   openNotificationWithIcon('error','',props.fetchDataRes.message ? props.fetchDataRes.message :'Load Data Fail!' )
+ }
+ else {
+  setEditEmail(props.profile['email'])
+  setEditUsername(props.profile['username'])
+  setEditPhone(props.profile['phone'])
+  setEditDisplayName(props.profile['displayName'])
+  setEditDOB( props.profile['dateOfBirth'] ? moment(props.profile['dateOfBirth']).format(formatDate) : null)
+ }
 },[])
 
   return (
     <div>
     <Header/>
     <div className="container container-content profile-container">
-      <div className = "main-content-profile row">
+      <div className = "main-content-profile row" style={{display : !props.fetchDataRes.success ? 'none':'flex'}}>
         <div className = "cv-left col-md-3 col-sm-12 white">
           <div className="user-info">
             <div className="user-avatar">
@@ -103,7 +123,7 @@ useEffect(()=>{
               {props.profile.displayName}
             </span>
             <span className = "user-point">
-              Points : 3000 <SketchOutlined className = "customer-icon"/>
+              Points : {props.profile && props.profile.points ? props.profile.points : 0} <SketchOutlined className = "customer-icon"/>
             </span>
 
           </div>
@@ -193,8 +213,8 @@ useEffect(()=>{
                 name="dob"
                 label="DOB"
               > {
-                editDOB ?   <DatePicker value = {moment(editDOB, formatDate) } format={formatDate} allowClear = {false} onChange={(date,dateString)=> setEditDOB(dateString)} /> :
-                <DatePicker  format={formatDate} allowClear = {false}onChange={(date,dateString)=> { setIsChange(true) ; setEditDOB(dateString) }} /> 
+                editDOB ?   <DatePicker value = {moment(editDOB, formatDate) } format={formatDate} allowClear = {false} onChange={(date,dateString)=> setEditDOB(dateString)} disabledDate = { disabledDate} /> :
+                <DatePicker  format={formatDate} allowClear = {false}onChange={(date,dateString)=> { setIsChange(true) ; setEditDOB(dateString) }}  disabledDate = { disabledDate}/> 
               }
             
             
@@ -250,11 +270,17 @@ useEffect(()=>{
           </div>
           <div className="last-submmition">
             <h3 className="title">Most recent submissions</h3>
-            <Table columns={columns} dataSource={props.listSubmisions} pagination={false}/>
+            <Table rowKey='index' columns={columns} dataSource={props.listSubmisions} pagination={false}/>
           </div>
         </div>
       </div>
-
+      
+      <div  className = "main-content-profile row" style={{display : props.fetchDataRes.success ? 'none':'block'}}>
+        <div style={{margin : "0 auto"}} >
+           <Empty/>
+        </div>
+        
+      </div>
     </div>
     <Footer/>
     </div>
@@ -276,7 +302,7 @@ Profile.getInitialProps = async (ctx) => {
    //get activity submit
    let urlActivity = `${process.env.API}/api/get-activity-calendar/${userId}`
    const activity = await axios.get(urlActivity)
-   return { profile: userRes.data.data , listSubmisions :submiss.data.data, listActivity: activity.data.data  }
+   return { profile: userRes.data.data , listSubmisions :submiss.data.data, listActivity: activity.data.data ,fetchDataRes: userRes.data }
 
 }
 

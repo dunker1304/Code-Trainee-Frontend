@@ -84,7 +84,7 @@ const Login= (props) => {
                 Login your { role == CONSTANTS.ROLE.ROLE_STUDENT ? ' STUDENT ': ' TEACHER '} account
               </span>
               {/* href={`${process.env.API}/oauth/google/${role}`} */}
-              <button  className="btn-google m-b-20" onClick= {(e)=> { googleLogin(e)}}>
+              <button  type ="button" className="btn-google m-b-20" onClick= {(e)=> { googleLogin(e)}}>
                 <img src={Google} alt="GOOGLE" />
                 Google
               </button>

@@ -8,7 +8,7 @@ const ExerciseSubmissions = props => {
   const [openModal, setOpenModal] = useState(false)
   const [rowClicked, setClickedRow] = useState()
   useEffect(() => {
-    let url = `${process.env.API}/api/submissions/all?userID=${3}&exerciseID=${props.exerciseID}`
+    let url = `${process.env.API}/api/submissions/all?userID=${props.userInfo.id}&exerciseID=${props.exerciseID}`
     axios.get(url)
       .then(res => {
         console.log(res.data, 'lis submission')
@@ -81,7 +81,6 @@ const ExerciseSubmissions = props => {
         okButtonProps={{ style: { display: 'none' } }}
       >
         <div className="submission-detail">
-          {console.log(props.exercise, rowClicked, 'row clicked')}
           <div className="result">
             <div className="title">{props.exercise.title}</div>
             <div className="status">Status: {rowClicked?.status}</div>

@@ -67,6 +67,10 @@ export const isEmptyObject = (value)=> {
   return Object.keys(value).length === 0 && value.constructor === Object
 }
 
+export const disabledDate = (current) => {
+  // Can not select days before today and today
+  return current && current.valueOf() >  Date.now();
+}
 // format date to : yyyy-MM-dd hh:mm:ss
 export const formatDate = (date = new Date()) => {
   const yyyy = date.getFullYear();

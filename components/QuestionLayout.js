@@ -43,7 +43,7 @@ const QuestionLayout = (props)=> {
             </TabPane>
             <TabPane tab="Discussions" key="4">
                <div style={{backgroundColor:"#f5f5f5"}}>
-                  {isDetail ?  <DetailComment questionId = {props.questionId} discussDetail = {props.discussDetail} discussId={props.discussDetail['id']}/> : <ListComment questionId = {props.questionId} discuss = {props.discuss} totalDiscuss = {props.totalDiscuss} question={props.question}/>}
+                  {isDetail ?  <DetailComment questionId = {props.questionId} discussDetail = {props.discussDetail} discussId={props.discussDetail ? props.discussDetail['id'] : null}/> : <ListComment questionId = {props.questionId} discuss = {props.discuss} totalDiscuss = {props.totalDiscuss} totalPage = {props.totalPage} question={props.question}/>}
                 
                   <Footer/>
                </div>
