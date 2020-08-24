@@ -1,12 +1,17 @@
 import { useEffect, useState } from "react"
 import { PieChart } from 'react-minimal-pie-chart';
-import  {Table} from "antd"
+import  {Table ,Tooltip} from "antd"
 import axios from "axios"
 import { getExerciseOfUser} from "../store/problem/action"
 import {connect} from "react-redux"
 import Link from 'next/link'
 
 const columns = [
+  {
+    title: 'No.',
+    dataIndex: 'index',
+    key: 'index',
+  },
   {
     title: 'Submit time',
     dataIndex: 'time',
@@ -16,12 +21,23 @@ const columns = [
     title: 'Exercise',
     dataIndex: 'exercise',
     key: 'exercise',
+    render: (text,record) => <Link  href={{pathname : '/playground', query : { questionID : record['exerciseId']} }} as={`/playground?questionID=${record['exerciseId'] }`}>
+      <Tooltip title='View detail exercise'>
+      <span className="link_title" style={{cursor :"pointer"}} >{text}</span>
+      </Tooltip>
+      </Link>,
+    
   },
   {
     title: 'Status',
     dataIndex: 'status',
     key: 'status',
-    render: (text,record) => <Link href="/submission/[submissionId]" as={`/submission/${record['id']}`} ><span className="status-submisson" style={{background : "#d9534f"}}>{text}</span></Link>,
+    render: (text,record) =>
+     <Link href="/submission/[submissionId]" as={`/submission/${record['id']}`} >
+         <Tooltip title='View detail submission'>
+       <span className="status-submisson" style={{background : "#d9534f",cursor:"pointer"}}>{text}</span>
+       </Tooltip>
+      </Link>,
   },
   {
     title: 'Runtime',
@@ -157,7 +173,7 @@ const Process = (props) => {
               <div className="col-md-4 col-sm-4 col-xs-12">
                 <p className="number">
             <span className="text-success" id="ac_rate"  style={{color: "rgb(60, 118, 61)", fontSize: fontSize2}}>{props.exerciseOfUser.rateAcceptedSubmissions}</span>
-                  <span>%</span>
+                  <span style={{color: "rgb(60, 118, 61)"}}>%</span>
                 </p>
                 <h4 className="number-text"> acceptance rate</h4>
               </div>

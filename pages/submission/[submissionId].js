@@ -5,12 +5,13 @@ import Footer from "../../components/Footer"
 import "ace-builds/src-noconflict/mode-java";
 import "ace-builds/src-noconflict/theme-github";
 import axios from "axios"
+import { Empty } from "antd"
 const SubmissionDetail = (props)=> {
   return (
     <div>
     <Header/>
     <div className="submit_wrapper">
-      <div className="container-content container">
+      <div className="container-content container" style={{display : props.submission ? 'block' : 'none'}}>
         <div className="row">
           <div className="col-md-12">
             <h4 className="inline-wrap_title" >
@@ -53,6 +54,9 @@ const SubmissionDetail = (props)=> {
           </div>
         </div>
 
+      </div>
+      <div className="container-content container" style={{display : !props.submission ? 'block' : 'none'}}>
+         <Empty/>
       </div>
     <Footer/>
     </div>

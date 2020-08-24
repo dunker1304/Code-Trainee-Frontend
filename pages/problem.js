@@ -301,7 +301,7 @@ const Problems = (props) => {
               </div>
               <div className="row search-bar-control">
                 <div className="col-sm-6 col-lg-7">
-                  <Input placeholder="Search question title, discription" value={termSearch} onChange={textChange} onKeyUp={submitTermSearch}></Input>
+                  <Input placeholder="Search exercise title, discription" value={termSearch} onChange={textChange} onKeyUp={submitTermSearch}></Input>
                 </div>
                 <div className="pull-right col-sm-6 col-lg-5">
                   <div style={{display:"flex"}}>

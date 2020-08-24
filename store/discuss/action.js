@@ -91,7 +91,7 @@ export const createACommentChildren = (data) => {
       }) .then( res => {
         dispatch({
           type: 'CREATE_A_COMMENT_CHILDREN',
-          payload:  res.data.data
+          payload:  res.data
         })
         resolve(res)
       })

@@ -91,7 +91,7 @@ const     ignoreRouter = (pathname , isAuthenticated ,userInfo) =>{
   // ignore router
   const routerIgnore = [ '/problem' , '/playground', '/accessDeny','/exercise/[exerciseId]/discuss']
 
-  if(pathname == '/' || pathname.includes('admin/login')) {
+  if(pathname == '/' || (!isAuthenticated && pathname.includes('admin/login'))) {
     return {
       isIgnore: true,
       code : 0 //homepage
@@ -126,7 +126,7 @@ const     ignoreRouter = (pathname , isAuthenticated ,userInfo) =>{
 
    // if user -> access teacher router -> return false;
 
-    const privateTeacherRouter = ['/exercise', '/exercise-list'];
+    const privateTeacherRouter = ['/exercise', '/exercise-list','/review','/exercise/[exerciseId]/statistic'];
     if(userInfo && userInfo['role'] && userInfo['role']['id'] == CONSTANTS.ROLE.ROLE_STUDENT ){
        let filterList = privateTeacherRouter.filter(ele=> {
          return pathname !== (ele.toString())

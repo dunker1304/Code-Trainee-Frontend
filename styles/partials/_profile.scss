@@ -103,34 +103,40 @@
       }
     }
 
-    .last-submmition{
-      background-color: #fff;
-      padding-bottom: 20px;
-      box-shadow: 0 5px 15px 0 #dedede;
-      border-radius: 7px;
-      margin-top: 30px;
-      font-weight: bolder;
-      .title {
-        padding: 15px 0px 0px 10px;
-      }
-      .status-submission{
-        background-color: #d9534f;
-        padding: 3px 7px;
-        font-size: 12px;
-        font-weight: 700;
-        line-height: 1;
-        color: #fff;
-        text-align: center;
-        white-space: nowrap;
-        vertical-align: middle;
-        /* background-color: #777; */
-        border-radius: 10px;
-      }
-    }
+    
   }
 }
 
 .profile-container {
   padding: 30px;
   min-height: 100vh;
+}
+.last-submmition{
+  background-color: #fff;
+  padding-bottom: 20px;
+  box-shadow: 0 5px 15px 0 #dedede;
+  border-radius: 7px;
+  margin-top: 30px;
+  font-weight: bolder;
+  .title {
+    padding: 15px 0px 0px 10px;
+  }
+  .status-submisson {
+    background-color: #d9534f;
+    padding: 3px 7px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    /* background-color: #777; */
+    border-radius: 10px;
+    cursor: pointer;
+  }
+  .link_title:hover {
+    cursor: pointer;
+    text-decoration: underline;
+  }
 }
