@@ -5,7 +5,8 @@ import AceEditor from 'react-ace';
 import SnippetTemplate from './SnippetTemplate';
 import axios from 'axios';
 
-import 'ace-builds/src-noconflict/theme-kuroir';
+import 'ace-builds/src-noconflict/theme-monokai';
+import 'ace-builds/src-noconflict/mode-javascript';
 
 const StepSnippet = ({ languages = [], setLanguages }) => {
   // table
@@ -79,19 +80,33 @@ const StepSnippet = ({ languages = [], setLanguages }) => {
         expandable={{
           expandedRowRender: (record) => {
             return (
-              <>
-                <Row>Playground Templates</Row>
+              <div style={{ margin: -16 }}>
                 <AceEditor
-                  className='playground'
-                  theme='kuroir'
                   value={record.sampleCode}
-                  showGutter={true}
                   onChange={(value, event) => {
                     record.sampleCode = value;
                   }}
-                  style={{ width: '100%', height: '300px' }}
+                  placeholder={`Write template for ${record.language}`}
+                  mode='javascript'
+                  theme='monokai'
+                  fontSize={13}
+                  showPrintMargin={true}
+                  showGutter={true}
+                  highlightActiveLine={true}
+                  style={{
+                    width: '100%',
+                    minHeight: 160,
+                    maxHeight: 300,
+                  }}
+                  setOptions={{
+                    enableBasicAutocompletion: false,
+                    enableLiveAutocompletion: false,
+                    enableSnippets: false,
+                    showLineNumbers: true,
+                    tabSize: 2,
+                  }}
                 />
-              </>
+              </div>
             );
           },
           expandIcon: ({ expanded, onExpand, record }) =>
@@ -102,7 +117,7 @@ const StepSnippet = ({ languages = [], setLanguages }) => {
             ) : (
               <Tooltip
                 placement='right'
-                title='Expand to write template for this Language'>
+                title={`Expand to write template for ${record.language}`}>
                 <PlusOutlined onClick={(e) => onExpand(record, e)} />
               </Tooltip>
             ),
