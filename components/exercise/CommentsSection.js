@@ -162,15 +162,13 @@ const CommentsSection = ({
                 <Row style={{ marginBottom: '0.5em' }}>
                   <Col style={{ width: 90, color: '#000000D9' }}>Status:</Col>
                   <Col>
-                    {reviewInfos.isAccepted === 'rejected' && (
+                    {t.isAccepted === 'rejected' && (
                       <span style={{ color: 'red' }}>Rejected</span>
                     )}
-                    {reviewInfos.isAccepted === 'accepted' && (
+                    {t.isAccepted === 'accepted' && (
                       <span style={{ color: 'green' }}>Accepted</span>
                     )}
-                    {reviewInfos.isAccepted === 'waiting' && (
-                      <span>Waiting</span>
-                    )}
+                    {t.isAccepted === 'waiting' && <span>Waiting</span>}
                   </Col>
                 </Row>
                 {t.isAccepted !== 'waiting' && (
