@@ -240,6 +240,10 @@ const Header = (props) => {
         return element['id'] != notiId
       });
       setListNoti(tmpArray);
+      if(resResult.data.data && resResult.data.data.length > 0  ) {
+        let noti = resResult.data.data[0]
+        if(!noti['isRead']) setNotRead(notRead - 1)
+      }
     }
     else {
       openNotificationWithIcon('error','','Sorry, an error occured')
@@ -309,7 +313,7 @@ const Header = (props) => {
            </div>
            <div className="header-right" style= {{ display : props.isAuthenticated ? 'flex' : 'none'}}>
               <div className="header-ring">
-              <div style={{ position: 'relative' }} id="area_noti">
+              <div style={{ position: 'relative', display: props.userInfo['role']['id'] == CONSTANTS.ROLE.ROLE_ADMIN ? 'none':'block' }} id="area_noti">
                
                 <Popover placement="bottomRight" 
                   title={text2} content={content} 

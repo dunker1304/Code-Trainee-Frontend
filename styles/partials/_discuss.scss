@@ -152,7 +152,7 @@
           .user_info {
             margin-left: 10px;
             display: flex;
-            align-items: center;
+            flex-flow: column;
           }
           .post_info {
             margin-left: 20px;
@@ -409,15 +409,9 @@
   position: relative;
  // margin-top: 50px;
   z-index: 99;
-  // .ant-tabs-bar {
-  //   margin: 0;
-  //   position: fixed;
-  //   top:50px;
-  //   left: 0;
-  //   right: 0;
-  //   background-color: #fff;
-  //   z-index: 99;
-  // } 
+  .ant-tabs-bar {
+    margin: 0;
+  } 
   // .ant-tabs-content {
   //   position: relative;
   //   margin-top:40px;

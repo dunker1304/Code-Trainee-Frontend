@@ -46,12 +46,18 @@ export default (state = initState, action) => {
           break;
         }
       case 'CREATE_A_COMMENT_CHILDREN':
+        let childrenCmtRes = action.payload;
+        if(!childrenCmtRes.success){
+          openNotificationWithIcon('error','',ERROR_MESSAGE_FROM_SERVER[childrenCmtRes['error']])
+          break;
+        }
         let tmpCmt =   JSON.parse(JSON.stringify(state.discussDetail)) 
-        let childrenCmt = action.payload;
+        let childrenCmt = childrenCmtRes.data;
             childrenCmt['isYourComment'] = true
         tmpCmt['children'].unshift(childrenCmt)
 
-        draft.discussDetail = {...tmpCmt}
+        draft.discussDetail = {...tmpCmt} 
+        openNotificationWithIcon('success','','Comment Successfully!')
         break;
 
       case 'DELETE_A_COMMENT' : 

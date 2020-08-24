@@ -66,3 +66,8 @@ export const isEmptyObject = (value)=> {
   if(!value) return true;
   return Object.keys(value).length === 0 && value.constructor === Object
 }
+
+export const disabledDate = (current) => {
+  // Can not select days before today and today
+  return current && current.valueOf() >  Date.now();
+}

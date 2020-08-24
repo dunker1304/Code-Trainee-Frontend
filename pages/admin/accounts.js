@@ -8,6 +8,7 @@ import { openNotificationWithIcon} from "../../components/Notification"
 import moment from "moment"
 import _, { filter } from 'lodash'
 import composedAuthHOC from 'hocs';
+import { disabledDate } from "../../helpers/utils"
 const CONSTANTS = require('../../utils/constants')
 
 
@@ -283,16 +284,10 @@ const Admin = (props) => {
       }
     }
     else {
-      fetchData(1,roleActive)
+      fetchData(1,role)
     }
    
   }
-
-  const disabledDate = (current) => {
-    // Can not select days before today and today
-    return current && current.valueOf() >  Date.now();
-  }
- 
 
   const delayedQuery = useRef(_.debounce((e,role) => fetchKeySearchDate(e,role), 500)).current;
   

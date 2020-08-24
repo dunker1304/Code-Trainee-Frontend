@@ -6,6 +6,7 @@ import { useState, useEffect } from "react"
 import Router, {useRouter} from "next/router"
 import axios from "axios"
 import {openNotificationWithIcon} from "../../../components/Notification"
+import composedAuthHOC from '../../../hocs';
 
 
 const ExerciseStatistic = (props)=> {
@@ -149,4 +150,4 @@ const ExerciseStatistic = (props)=> {
  )
 }
 
-export default ExerciseStatistic;
+export default composedAuthHOC(ExerciseStatistic);
