@@ -354,7 +354,6 @@ const Playground = props => {
             fontSize={fontSize}
             tabSize={tabSize}
             keyboardHandler={keyboardHandler}
-            maxLines={Infinity}
             name="playground"
             showGutter={gutter}
             showPrintMargin={false}
