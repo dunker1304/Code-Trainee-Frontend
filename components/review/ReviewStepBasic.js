@@ -1,6 +1,9 @@
-import { Descriptions, Row, Button, Tag } from 'antd';
+import { Descriptions, Row, Button, Tag, Modal } from 'antd';
 import ExercisePreviewModal from '../exercise/ExercisePreviewModal';
 import { useState } from 'react';
+import PreviewSection from '../exercise/PreviewSection';
+import moment from 'moment';
+import { formatDate } from '../../helpers/utils';
 
 const ReviewStepBasic = ({
   title = '',
@@ -10,14 +13,23 @@ const ReviewStepBasic = ({
   content = '',
   like = 0,
   dislike = 0,
-  updatedAt = '',
-  createdAt = '',
+  updatedAt = new Date(),
+  createdAt = new Date(),
 }) => {
   const [visiblePreview, setVisiblePreview] = useState(false);
+
+  const onCancelPreview = () => {
+    setVisiblePreview(false);
+  };
+
+  const onOpenPreview = () => {
+    setVisiblePreview(true);
+  };
+
   return (
     <>
       <Row style={{ marginBottom: 10 }}>
-        <Button type='primary' onClick={() => setVisiblePreview(true)}>
+        <Button type='primary' onClick={onOpenPreview}>
           Preview
         </Button>
       </Row>
@@ -59,19 +71,43 @@ const ReviewStepBasic = ({
           {content}
         </Descriptions.Item>
         <Descriptions.Item label='CreatedAt' span={3}>
-          {createdAt}
+          {formatDate(moment(createdAt).toDate())}
         </Descriptions.Item>
         <Descriptions.Item label='UpdatedAt' span={3}>
-          {updatedAt}
+          {formatDate(moment(updatedAt).toDate())}
         </Descriptions.Item>
       </Descriptions>
-      <ExercisePreviewModal
+      <Modal
+        className='preview-exercise-modal'
         title='Preview Exercise'
-        data={{ content, like, dislike, level, points, title }}
-        raw={false}
         visible={visiblePreview}
-        onCancel={() => setVisiblePreview(false)}
-      />
+        width={700}
+        maskClosable={false}
+        destroyOnClose={true}
+        onCancel={onCancelPreview}
+        footer={
+          <div>
+            <Button
+              style={{
+                width: '100px',
+              }}
+              type='primary'
+              size='large'
+              danger
+              onClick={onCancelPreview}>
+              Cancel
+            </Button>
+          </div>
+        }>
+        <div
+          style={{
+            height: 340,
+          }}>
+          <PreviewSection
+            exerciseInfos={{ content, like, dislike, level, points, title }}
+          />
+        </div>
+      </Modal>
     </>
   );
 };

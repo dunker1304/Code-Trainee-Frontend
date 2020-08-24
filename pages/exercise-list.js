@@ -3,27 +3,18 @@ import {
   Row,
   Col,
   Button,
-  Space,
   Popconfirm,
   Tag,
   notification,
   Tooltip,
-  Modal,
 } from 'antd';
 import {
   CheckCircleTwoTone,
-  EditOutlined,
-  DeleteOutlined,
   LoadingOutlined,
   EditTwoTone,
   DeleteTwoTone,
-  EyeOutlined,
   EyeTwoTone,
-  EyeInvisibleFilled,
   EyeInvisibleTwoTone,
-  CheckCircleOutlined,
-  CloseCircleOutlined,
-  BarChartOutlined,
   LineChartOutlined,
   CloseCircleTwoTone,
 } from '@ant-design/icons';
@@ -37,6 +28,7 @@ import Footer from '../components/Footer';
 import composedAuthHOC from 'hocs';
 import ExercisePreviewModal from '../components/exercise/ExercisePreviewModal';
 import moment from 'moment';
+import { formatDate } from '../helpers/utils';
 
 const STATUS = {
   ACCEPTED: 'accepted',
@@ -65,6 +57,8 @@ const ExerciseList = ({ userInfo }) => {
     dislike: 0,
     content: '',
     points: 1,
+    approved: STATUS.WAITING,
+    lastRequestReview: {},
   });
 
   const loadTable = async () => {
@@ -87,6 +81,7 @@ const ExerciseList = ({ userInfo }) => {
             content: e.content,
             approved: e.isApproved,
             lastModified: e.updatedAt,
+            lastRequestReview: e.lastRequestReview,
           });
         });
         setTableData([...data]);
@@ -95,7 +90,7 @@ const ExerciseList = ({ userInfo }) => {
       }
     } catch (e) {
       notification.warn({
-        message: `Something is wrong.`,
+        message: `Something went wrong.`,
       });
       setTableLoading(false);
       console.log(e);
@@ -112,6 +107,7 @@ const ExerciseList = ({ userInfo }) => {
       setTableLoading(true);
       const res = await axios.post(`${process.env.API}/api/exercise/delete`, {
         id: record.key,
+        userId: currUserId,
       });
       setTableLoading(false);
       if (res.data.success) {
@@ -124,7 +120,7 @@ const ExerciseList = ({ userInfo }) => {
       }
     } catch (e) {
       notification.warn({
-        message: 'Something is wrong.',
+        message: 'Something went wrong.',
       });
       console.log(e);
       setTableLoading(false);
@@ -139,7 +135,7 @@ const ExerciseList = ({ userInfo }) => {
       });
     } else {
       setTableLoading(true);
-      router.push(`/exercise?id=${record.key}`, '/exercise');
+      router.push(`/exercise?id=${record.key}`);
     }
   };
 
@@ -156,21 +152,55 @@ const ExerciseList = ({ userInfo }) => {
   };
 
   const handleSelfReview = (record) => {
-    let lastModified = moment(record.lastModified);
-    let timeCanStartSelfReview = moment(lastModified).add(5, 'm').toDate();
-    if (Date.now() >= timeCanStartSelfReview.getTime()) {
-      setTableLoading(true);
-      router.push(`/review?exerciseId=${record.key}`, `/review`);
-    } else if (record.approved !== STATUS.ACCEPTED) {
+    if (record.approved === STATUS.REJECTED) {
       notification.info({
-        message: `This exercise is waiting for review`,
-        description: `You can self-review this exercise after ${timeCanStartSelfReview}`,
+        message: `This exercise is rejected`,
+        description: `You cannot self-review this exercise in this time.`,
+      });
+    } else if (record.approved === STATUS.ACCEPTED) {
+      notification.info({
+        message: `This exercise is accepted`,
+        description: `You cannot self-review this exercise in this time.`,
       });
     } else {
+      let lastModified = moment(record.lastModified);
+      let timeCanStartSelfReview = moment(lastModified).add(5, 'm').toDate();
+      if (Date.now() >= timeCanStartSelfReview.getTime()) {
+        setTableLoading(true);
+        router.push(`/review?exerciseId=${record.key}&self-review`);
+      } else {
+        notification.info({
+          message: `This exercise is waiting for review`,
+          description: (
+            <>
+              <p style={{ marginBottom: 5 }}>
+                You can self-review this exercise
+              </p>
+              <p>{`after ${formatDate(timeCanStartSelfReview)}`}</p>
+            </>
+          ),
+        });
+      }
+    }
+  };
+
+  const handleStatistics = (record) => {
+    if (record.approved === STATUS.REJECTED) {
       notification.info({
-        message: `This exercise is approved`,
-        description: `You cannot self-review this exercise.`,
+        message: `This exercise is rejected`,
+        description: `You cannot view statistics in this time.`,
       });
+    } else if (record.approved === STATUS.WAITING) {
+      notification.info({
+        message: `This exercise is waiting for review`,
+        description: `You cannot view statistics in this time.`,
+      });
+    } else {
+      setTableLoading(true);
+      Router.push(
+        '/exercise/[exerciseId]/statistic',
+        `/exercise/${record['key']}/statistic`
+      );
     }
   };
 
@@ -187,6 +217,8 @@ const ExerciseList = ({ userInfo }) => {
         dislike: 0,
         content: '',
         points: 1,
+        approved: STATUS.WAITING,
+        lastRequestReview: {},
       });
     }
   }, [visiblePreview]);
@@ -217,6 +249,7 @@ const ExerciseList = ({ userInfo }) => {
           </Col>
           <Col>
             <Button
+              disabled={tableLoading}
               type='primary'
               onClick={handleButtonCreate}
               loading={loadingButtonCreate}>
@@ -336,6 +369,9 @@ const ExerciseList = ({ userInfo }) => {
               key: 'lastModified',
               width: '200px',
               ellipsis: true,
+              render: (text, record) => (
+                <>{formatDate(moment(record.lastModified).toDate())}</>
+              ),
             },
             {
               title: 'Action',
@@ -377,50 +413,30 @@ const ExerciseList = ({ userInfo }) => {
                     </Popconfirm>
                   </Tooltip>
                   <Tooltip placement='top' title={'Self-review'}>
-                    {record.approved === STATUS.WAITING ? (
-                      <Button
-                        onClick={() => handleSelfReview(record)}
-                        ghost
-                        type='link'
-                        style={{
-                          border: 'none',
-                        }}>
+                    <Button
+                      onClick={() => handleSelfReview(record)}
+                      ghost
+                      type='link'
+                      style={{
+                        border: 'none',
+                      }}>
+                      {record.approved === STATUS.WAITING ? (
                         <EyeTwoTone style={{ fontSize: '16px' }} />
-                      </Button>
-                    ) : (
-                      <Button
-                        disabled
-                        ghost
-                        type='link'
-                        style={{
-                          border: 'none',
-                        }}>
+                      ) : (
                         <EyeInvisibleTwoTone style={{ fontSize: '16px' }} />
-                      </Button>
-                    )}
+                      )}
+                    </Button>
                   </Tooltip>
-                  <Tooltip
-                    placement='top'
-                    title={
-                      record.approved == 'accepted'
-                        ? 'Statistics'
-                        : "Exercise hasn't approved"
-                    }>
+                  <Tooltip placement='top' title='Statistics'>
                     <Button
                       type='text'
-                      disabled={! (record.approved == 'accepted')}
                       className='btn_icon'
                       icon={
                         <LineChartOutlined
                           style={{ fontSize: '16px', color: '#1890ff' }}
                         />
                       }
-                      onClick={() => {
-                        Router.push(
-                          '/exercise/[exerciseId]/statistic',
-                          `/exercise/${record['key']}/statistic`
-                        );
-                      }}
+                      onClick={() => handleStatistics(record)}
                     />
                   </Tooltip>
                 </div>
@@ -442,6 +458,8 @@ const ExerciseList = ({ userInfo }) => {
                   title: record.title,
                   level: record.level,
                   points: record.points,
+                  approved: record.approved,
+                  lastRequestReview: record.lastRequestReview,
                 });
               },
             };
@@ -460,9 +478,8 @@ const ExerciseList = ({ userInfo }) => {
       </div>
       <Footer />
       <ExercisePreviewModal
-        title='Preview Exercise'
-        data={contentPreview}
-        raw={false}
+        userInfo={userInfo}
+        exerciseInfos={contentPreview}
         visible={visiblePreview}
         onCancel={() => setVisiblePreview(false)}
       />

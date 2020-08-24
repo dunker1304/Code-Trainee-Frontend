@@ -76,14 +76,33 @@ const StepBasicInfos = ({
           required={isCreate}
           name='title'
           label='Title'
-          rules={[{ required: true, message: `'Title' is required!` }]}>
+          rules={[
+            { required: true, message: `'Title' is required!` },
+            {
+              type: 'string',
+              max: 150,
+              message: `'Title' cannot be longer than 150 characters.`,
+            },
+            {
+              type: 'string',
+              min: 3,
+              message: `'Title' must be at least 3 characters.`,
+            },
+          ]}>
           <Input />
         </Form.Item>
         <Form.Item
           required={isCreate}
           label='Content'
           name='content'
-          rules={[{ required: true, message: `'Content' is required!` }]}>
+          rules={[
+            { required: true, message: `'Content' is required!` },
+            {
+              type: 'string',
+              max: 5000,
+              message: `'Content' cannot be longer than 5000 characters.`,
+            },
+          ]}>
           <TinymceTextArea />
         </Form.Item>
         <Form.Item name='level' label='Level'>

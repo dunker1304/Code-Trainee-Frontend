@@ -10,9 +10,13 @@ import Footer from '../components/Footer';
 import composedAuthHOC from 'hocs';
 import axios from 'axios';
 import { Router, useRouter } from 'next/router';
+import ConfirmModal from '../components/ConfirmModal';
+import Error404 from './error/404';
+import Error500 from './error/500';
+import Error403 from './error/403';
 
 const StepTitles = [
-  { key: 0, title: 'Basic Informations' },
+  { key: 0, title: 'Basic Information' },
   { key: 1, title: 'Code Stubs' },
   { key: 2, title: 'Testcases' },
   { key: 3, title: 'Review' },
@@ -25,9 +29,11 @@ const Exercise = ({
   listTags,
   listLanguages,
   listTeachers,
+  errorCode,
 }) => {
   let router = useRouter();
   let currUserId = userInfo ? userInfo.id : 0;
+  let isCreate = !id;
   // steps
   let [currStep, setCurrStep] = useState(0);
   // step basic infos
@@ -44,6 +50,17 @@ const Exercise = ({
   // loading
   let [nextLoading, setNextLoading] = useState(false);
   let [prevLoading, setPrevLoading] = useState(false);
+  let [finishLoading, setFinishLoading] = useState(false);
+  // visible confirm modal
+  let [confirm, setConfirm] = useState(false);
+
+  if (errorCode === 404) {
+    return <Error404 />;
+  } else if (errorCode === 500) {
+    return <Error500 />;
+  } else if (errorCode === 403) {
+    return <Error403 />;
+  }
 
   const validateStepBasicInfos = async () => {
     try {
@@ -88,30 +105,46 @@ const Exercise = ({
   };
 
   const onNext = async () => {
+    setNextLoading(true);
     switch (currStep) {
       case 0:
-        return (await validateStepBasicInfos()) && setCurrStep(1);
+        (await validateStepBasicInfos()) && setCurrStep(1);
+        break;
       case 1:
-        return validateStepCodeStubs() && setCurrStep(2);
+        validateStepCodeStubs() && setCurrStep(2);
+        break;
       case 2:
-        return validateStepTestcases() && setCurrStep(3);
-      case 3:
-        return validateStepReview() && (await onFinish());
+        validateStepTestcases() && setCurrStep(3);
+        break;
     }
+    setNextLoading(false);
   };
 
   const onPrevious = () => {
     setPrevLoading(true);
-    setCurrStep(currStep - 1);
+    if (isCreate) {
+      setCurrStep(currStep - 1);
+    } else {
+      switch (currStep) {
+        case 1:
+          validateStepCodeStubs() && setCurrStep(0);
+          break;
+        case 2:
+          validateStepTestcases() && setCurrStep(1);
+          break;
+        case 3:
+          validateStepReview() && setCurrStep(2);
+          break;
+      }
+    }
     setPrevLoading(false);
   };
 
   const onFinish = async () => {
-    setNextLoading(true);
     try {
       let { content, title, points, level, tags } = basicInfos;
       let res = await axios.post(
-        `${process.env.API}/api/exercise/${!id ? 'create' : 'update'}`,
+        `${process.env.API}/api/exercise/${isCreate ? 'create' : 'update'}`,
         {
           id: id,
           content: content,
@@ -127,25 +160,33 @@ const Exercise = ({
           createdBy: currUserId,
         }
       );
-      setNextLoading(false);
       if (res.data.success) {
-        router.push('/exercise-list', '/exercise-list');
+        router.push('/exercise-list');
       } else {
         throw new Error();
       }
     } catch (e) {
       notification.warn({
-        message: 'Something is wrong.',
+        message: 'Something went wrong.',
       });
       console.log(e);
-      setNextLoading(false);
     }
+  };
+
+  const onBeforeFinish = async () => {
+    setFinishLoading(true);
+    (await validateStepBasicInfos()) &&
+      validateStepCodeStubs() &&
+      validateStepTestcases() &&
+      validateStepReview() &&
+      setConfirm(true);
+    setFinishLoading(false);
   };
 
   return (
     <React.Fragment>
       <Head>
-        <title>{!id ? 'Create Exercise' : 'Update Exercise'}</title>
+        <title>{isCreate ? 'Create Exercise' : 'Update Exercise'}</title>
       </Head>
       <Header />
       <div
@@ -175,7 +216,7 @@ const Exercise = ({
           }}>
           {currStep === 0 && (
             <StepBasic
-              isCreate={!id}
+              isCreate={isCreate}
               allTags={listTags}
               formRef={formRef}
               setBasicInfos={setBasicInfos}
@@ -215,18 +256,59 @@ const Exercise = ({
               Previous
             </Button>
           )}
-          <Button
-            loading={nextLoading}
-            onClick={onNext}
-            type='primary'
-            size='large'
+          <div
             style={{
-              width: 100,
+              display: 'flex',
+              width: 210,
+              justifyContent: 'flex-end',
             }}>
-            {currStep === StepTitles.length - 1 ? 'Finish' : 'Next'}
-          </Button>
+            {currStep !== StepTitles.length - 1 && (
+              <Button
+                loading={nextLoading}
+                onClick={onNext}
+                type='primary'
+                size='large'
+                style={{
+                  width: 100,
+                }}>
+                Next
+              </Button>
+            )}
+            {(!isCreate || currStep === StepTitles.length - 1) && (
+              <Button
+                disabled={nextLoading || prevLoading}
+                loading={finishLoading}
+                onClick={onBeforeFinish}
+                type='primary'
+                size='large'
+                style={{
+                  width: 100,
+                  marginLeft: 10,
+                }}>
+                Finish
+              </Button>
+            )}
+          </div>
         </div>
       </div>
+      <ConfirmModal
+        visible={confirm}
+        content={
+          <>
+            <p>This exercise will be reviewed by other teachers.</p>
+            <p>
+              After 24h, you can self-review this exercise if it was not
+              reviewed yet.
+            </p>
+          </>
+        }
+        onCancelX={() => setConfirm(false)}
+        onCancel={() => setConfirm(false)}
+        title='Notification'
+        onOk={onFinish}
+        okText='OK'
+        cancelText='Cancel'
+      />
       <Footer />
     </React.Fragment>
   );
@@ -234,6 +316,7 @@ const Exercise = ({
 
 Exercise.getInitialProps = async ({ query, store }) => {
   let { id } = query;
+  let errorCode;
   let exerciseInfos = {
     basicInfos: {
       title: '',
@@ -245,66 +328,91 @@ Exercise.getInitialProps = async ({ query, store }) => {
     testcases: [],
     selectedReviewers: [],
   };
-  let listTags = (
-    await axios.get(`${process.env.API}/api/tags/all`)
-  ).data.data.map((t) => t.name);
+  let listTags = [];
   let listLanguages = [];
-  let listTeachers = (
-    await axios.get(`${process.env.API}/api/user/teacher/all`)
-  ).data.data;
-  // have 'id' mean edit page is access, get old data
-  if (id) {
-    let basicInfos = (
-      await axios.get(`${process.env.API}/api/exercise/basic-info/${id}`)
-    ).data.data;
-    exerciseInfos.basicInfos = {
-      ...basicInfos,
-      tags: [
-        '#',
-        ...basicInfos.tags.map((t) => t.name).filter((t) => t !== '#'),
-      ],
-    };
-    exerciseInfos.testcases = (
-      await axios.get(`${process.env.API}/api/testcase/exercise/${id}`)
-    ).data.data.result.map((t) => ({
-      key: t.id,
-      id: t.id,
-      input: t.input,
-      output: t.expectedOutput,
-      isHidden: t.isHidden,
-    }));
-    listLanguages = (
-      await axios.get(`${process.env.API}/api/language/exercise/${id}`)
-    ).data.data.map((t) => ({
-      key: t.id,
-      id: t.id,
-      language: t.name,
-      isActive: t.codeSnippets.length ? t.codeSnippets[0].isActive : false,
-      sampleCode: t.codeSnippets.length ? t.codeSnippets[0].sampleCode : '',
-    }));
-    let selectedReviewerIds = (
-      await axios.get(`${process.env.API}/api/review/reviewers/${id}`)
-    ).data.data[0].details.map((t) => t.reviewer);
-    exerciseInfos.selectedReviewers = [...listTeachers]
-      .filter((t) => selectedReviewerIds.indexOf(t.id) !== -1)
-      .map((t) => t.email);
-  } else {
-    listLanguages = (
-      await axios.get(`${process.env.API}/api/language/all`)
-    ).data.data.map((t, index) => ({
-      key: t.id,
-      id: t.id,
-      language: t.name,
-      isActive: index === 0 ? true : false,
-      sampleCode: '',
-    }));
+  let listTeachers = [];
+  if (id === '' || (id !== undefined && Number.isNaN(Number(id)))) {
+    errorCode = 404;
+    id = null;
   }
+  try {
+    listTags = (
+      await axios.get(`${process.env.API}/api/tags/all`)
+    ).data.data.map((t) => t.name);
+    listTeachers = (await axios.get(`${process.env.API}/api/user/teacher/all`))
+      .data.data;
+    // have 'id' mean edit page is access, get old data
+    if (id) {
+      let userId = store.getState().auth.userInfo.id;
+      userId = userId ? userId : 0;
+      console.log({ userId: userId });
+      let basicInfoResponse = await axios.get(
+        `${process.env.API}/api/exercise/basic-info/${id}?userId=${userId}`
+      );
+      if (basicInfoResponse.data.success) {
+        let basicInfos = basicInfoResponse.data.data;
+        exerciseInfos.basicInfos = {
+          ...basicInfos,
+          tags: [
+            '#',
+            ...basicInfos.tags.map((t) => t.name).filter((t) => t !== '#'),
+          ],
+        };
+        exerciseInfos.testcases = (
+          await axios.get(`${process.env.API}/api/testcase/exercise/${id}`)
+        ).data.data.result.map((t) => ({
+          key: t.id,
+          id: t.id,
+          input: t.input,
+          output: t.expectedOutput,
+          isHidden: t.isHidden,
+        }));
+        listLanguages = (
+          await axios.get(`${process.env.API}/api/language/exercise/${id}`)
+        ).data.data.map((t) => ({
+          key: t.id,
+          id: t.id,
+          language: t.name,
+          isActive: t.codeSnippets.length ? t.codeSnippets[0].isActive : false,
+          sampleCode: t.codeSnippets.length ? t.codeSnippets[0].sampleCode : '',
+        }));
+        let selectedReviewerIds = (
+          await axios.get(`${process.env.API}/api/review/reviewers/${id}`)
+        ).data.data[0].details.map((t) => t.reviewer);
+        exerciseInfos.selectedReviewers = [...listTeachers]
+          .filter((t) => selectedReviewerIds.indexOf(t.id) !== -1)
+          .map((t) => t.email);
+      } else {
+        if (basicInfoResponse.data.code === 500) {
+          errorCode = 500;
+        } else if (basicInfoResponse.data.code === 403) {
+          errorCode = 403;
+        } else {
+          errorCode = 404;
+        }
+      }
+    } else {
+      listLanguages = (
+        await axios.get(`${process.env.API}/api/language/all`)
+      ).data.data.map((t, index) => ({
+        key: t.id,
+        id: t.id,
+        language: t.name,
+        isActive: index === 0 ? true : false,
+        sampleCode: '',
+      }));
+    }
+  } catch (e) {
+    errorCode = 500;
+  }
+
   return {
     id: id,
     exerciseInfos,
     listTags,
     listLanguages,
     listTeachers,
+    errorCode: errorCode,
   };
 };
 

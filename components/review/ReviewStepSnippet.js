@@ -11,7 +11,7 @@ const ReviewStepSnippet = ({ snippets }) => {
         }}>
         Code template of Languages will be fed in when students do exercise
       </h1>
-      <Collapse accordion>
+      <Collapse>
         {snippets.map((snippet, index) => {
           return (
             <Collapse.Panel header={snippet.languageName} key={index}>
