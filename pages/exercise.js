@@ -339,7 +339,7 @@ Exercise.getInitialProps = async ({ query, store }) => {
     listTags = (
       await axios.get(`${process.env.API}/api/tags/all`)
     ).data.data.map((t) => t.name);
-    listTeachers = (await axios.get(`${process.env.API}/api/user/teacher/all`))
+    listTeachers = (await axios.get(`${process.env.API}/api/user/teacher/all?userId=${userId}`))
       .data.data;
     // have 'id' mean edit page is access, get old data
     if (id) {
