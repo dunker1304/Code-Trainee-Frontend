@@ -124,6 +124,7 @@ const Playground = props => {
             message: "Sucessfully added solution"
           })
         } else {
+          console.log(res)
           notification.error({
             message: "Failed!"
           })
