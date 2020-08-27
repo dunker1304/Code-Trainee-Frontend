@@ -313,7 +313,7 @@ const Header = (props) => {
            </div>
            <div className="header-right" style= {{ display : props.isAuthenticated ? 'flex' : 'none'}}>
               <div className="header-ring">
-              <div style={{ position: 'relative', display: props.userInfo['role']['id'] == CONSTANTS.ROLE.ROLE_ADMIN ? 'none':'block' }} id="area_noti">
+              <div style={{ position: 'relative', display:  !isEmptyObject(props.userInfo) ? props.userInfo['role']['id'] == CONSTANTS.ROLE.ROLE_ADMIN ? 'none':'block' : '' }} id="area_noti">
                
                 <Popover placement="bottomRight" 
                   title={text2} content={content} 
