@@ -124,6 +124,7 @@ const Playground = props => {
             message: "Sucessfully added solution"
           })
         } else {
+          console.log(res)
           notification.error({
             message: "Failed!"
           })
@@ -354,7 +355,6 @@ const Playground = props => {
             fontSize={fontSize}
             tabSize={tabSize}
             keyboardHandler={keyboardHandler}
-            maxLines={Infinity}
             name="playground"
             showGutter={gutter}
             showPrintMargin={false}

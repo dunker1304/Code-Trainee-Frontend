@@ -313,18 +313,6 @@ const ExerciseList = ({ userInfo }) => {
               key: 'content',
               ellipsis: true,
               width: '260px',
-              render: (text, record) => {
-                return (
-                  <div
-                    style={{
-                      width: '260px',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                    }}>
-                    {record.content}
-                  </div>
-                );
-              },
             },
             {
               title: 'Status',

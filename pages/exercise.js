@@ -336,16 +336,19 @@ Exercise.getInitialProps = async ({ query, store }) => {
     id = null;
   }
   try {
+    let userId = store.getState().auth.userInfo.id;
+    userId = userId ? userId : 0;
+    console.log({ userId: userId });
     listTags = (
       await axios.get(`${process.env.API}/api/tags/all`)
     ).data.data.map((t) => t.name);
-    listTeachers = (await axios.get(`${process.env.API}/api/user/teacher/all`))
-      .data.data;
+    listTeachers = (
+      await axios.get(
+        `${process.env.API}/api/user/teacher/all?userId=${userId}`
+      )
+    ).data.data;
     // have 'id' mean edit page is access, get old data
     if (id) {
-      let userId = store.getState().auth.userInfo.id;
-      userId = userId ? userId : 0;
-      console.log({ userId: userId });
       let basicInfoResponse = await axios.get(
         `${process.env.API}/api/exercise/basic-info/${id}?userId=${userId}`
       );
