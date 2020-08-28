@@ -47,7 +47,7 @@ const CommentInput = (props) => {
     }
   }
    return (
-     <div className = {classnames('page-drawer-base', !props.isShow ? 'cancel-class':'show-class')} style={{height :"72%"}}>
+     <div className = {classnames('page-drawer-base', !props.isShow ? 'cancel-class':'show-class')} style={{height :"450px"}}>
        <div className = "content-container">
          <form className = "topic-editor-base" onSubmit= {(e)=>submitComment(e)}>
            <div className = "editor-header">

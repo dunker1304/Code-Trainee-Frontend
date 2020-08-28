@@ -301,10 +301,26 @@ const Header = (props) => {
       </div>
     </div>
   );
+
+  const linkLogo = ()=> {
+    if(isEmptyObject(props.userInfo)){
+      Router.push('/problem')
+    }
+    else {
+      if(props.userInfo.role && props.userInfo.role.id == CONSTANTS.ROLE.ROLE_STUDENT){
+       Router.push('/problem')
+      }
+
+      if(props.userInfo.role && props.userInfo.role.id == CONSTANTS.ROLE.ROLE_TEACHER){
+        Router.push('/exercise-list')
+       }
+      
+    }
+  }
   return (
     <div className="coding-header">
       <div className="container header-content">
-        <div className="coding-logo">
+        <div className="coding-logo" onClick={()=>linkLogo()} style={{cursor :"pointer"}}>
            <img src = {Logo} style={{height : "30px"}}/>
         </div>
         <div className="conding-header-nav">
