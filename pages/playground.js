@@ -154,7 +154,6 @@ const Playground = props => {
       language: langDB,
       userID: props.userInfo.id
     }
-    console.log(data, 'dunker')
     axios.post(`${process.env.API}/api/exercise/save-code`, data)
       .then((response) => {
         setLoading(false)
@@ -198,7 +197,6 @@ const Playground = props => {
     })
     axios.get(`${process.env.API}/api/exercise/temp-code?id=${props.question.question.id}&languageID=${langDB}&userID=${props.userInfo.id}`)
       .then(res => {
-        console.log(res, 'handleChangeLanguage')
         setCode(res.data?.temp?.answer || props.language[option.key].codeSnippets[0]?.sampleCode || "")
       })
       .catch(error => {
