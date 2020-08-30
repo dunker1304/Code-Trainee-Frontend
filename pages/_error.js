@@ -1,10 +1,12 @@
+import Header from '../components/Header'
+import Footer from '../components/Footer'
 function Error({ statusCode }) {
   return (
-    <p>
-      {statusCode
-        ? `An error ${statusCode} occurred on server`
-        : 'An error occurred on client'}
-    </p>
+    <>
+    <Header/>
+      <img src='../static/images/500.jpg' className="error-page"></img>
+    <Footer/>
+   </>
   )
 }
 
