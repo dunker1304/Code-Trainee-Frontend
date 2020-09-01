@@ -85,6 +85,7 @@ const Playground = props => {
     }
     axios.post(`${process.env.API}/api/submissions`, data)
       .then(res => {
+        console.log(res, 'data ne')
         for(let i = 0; i < testCaseProps.length; i++) {
           if(testCaseProps[i].isHidden && res.data[i]?.success){
             res.data[i].data.isHidden = true
@@ -372,7 +373,7 @@ const Playground = props => {
               <div className="console-status" style={ (consoleEditor == 'hide') ? {display: 'none'} : null }>
                 <div>Status: {testCasePropsRun[0].data ? testCasePropsRun[0].data.status.description : "Code - 400"}</div>
                 <div style={{ whiteSpace: 'pre-wrap' }} 
-                  dangerouslySetInnerHTML={{ __html: testCasePropsRun[0].data ? testCasePropsRun[0].data.compile_output ? testCasePropsRun[0].data.compile_output.toString() : testCastestCasePropsRuneProps[0].data.stderr.toString() 
+                  dangerouslySetInnerHTML={{ __html: testCasePropsRun[0].data ? testCasePropsRun[0].data.compile_output ? testCasePropsRun[0].data.compile_output.toString() : testCasePropsRun[0].data.stderr.toString() 
                                           :  (testCasePropsRun[0]?.message?.source_code ? ("Source Code: " + testCasePropsRun[0]?.message?.source_code[0]) : "Something went wrong") }}>                            
               </div>
               </div>
