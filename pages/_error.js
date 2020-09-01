@@ -1,10 +1,15 @@
 import Header from '../components/Header'
 import Footer from '../components/Footer'
+import { Result, Button } from 'antd'
 function Error({ statusCode }) {
   return (
     <>
     <Header/>
-      <img src='../static/images/500.jpg' className="error-page"></img>
+      <Result
+        status="500"
+        title="500"
+        subTitle="Sorry, something went wrong."
+      />
     <Footer/>
    </>
   )
