@@ -22,7 +22,7 @@ const FileItemContent = ({ type = 'editor', value, onChange }) => {
   return (
     <>
       {type === 'editor' && (
-        <Input.TextArea rows='3' value={value} onChange={onChange} />
+        <Input.TextArea rows='3' value={value} onChange={onChange} style={{whiteSpace: 'nowrap'}} />
       )}
       {type === 'upload' && <UploadSection onChange={onChange} value={value} />}
     </>
