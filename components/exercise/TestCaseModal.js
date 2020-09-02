@@ -24,12 +24,12 @@ const FileItemContent = ({ type = 'editor', value, onChange }) => {
       {type === 'editor' && (
         <Input.TextArea rows='3' value={value} onChange={onChange} />
       )}
-      {type === 'upload' && <UploadSection onChange={onChange} />}
+      {type === 'upload' && <UploadSection onChange={onChange} value={value} />}
     </>
   );
 };
 
-const UploadSection = ({ onChange }) => {
+const UploadSection = ({ value, onChange }) => {
   const [files, setFiles] = useState([]);
 
   const handleChange = ({ file, fileList }) => {
@@ -61,6 +61,11 @@ const UploadSection = ({ onChange }) => {
     // return false mean 'file' will be read at client only
     return false;
   };
+  useEffect(() => {
+    if (value === '') {
+      setFiles([]);
+    }
+  }, [value]);
   return (
     <Upload
       accept={`.txt`}
@@ -130,10 +135,18 @@ const TestCaseModal = ({
       form.setFieldsValue({
         input: input,
       });
+    } else {
+      form.setFieldsValue({
+        input: '',
+      });
     }
     if (outputType === 'editor') {
       form.setFieldsValue({
         output: output,
+      });
+    } else {
+      form.setFieldsValue({
+        output: '',
       });
     }
     form.setFieldsValue({
