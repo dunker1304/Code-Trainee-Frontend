@@ -238,7 +238,7 @@ const ReviewExercise = ({
               </Button>
             </div>
           }>
-          <Tabs.TabPane tab='Basic Informations' key='1'>
+          <Tabs.TabPane tab='Basic Information' key='1'>
             <ReviewStepBasic
               content={exercise.content}
               title={exercise.title}
