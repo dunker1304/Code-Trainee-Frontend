@@ -74,9 +74,7 @@ const UploadSection = ({ value, onChange }) => {
       beforeUpload={beforeUpload}
       onChange={handleChange}>
       <Button icon={<UploadOutlined />}>Click to Upload</Button>
-      <Tooltip title={`Only accept .txt file`}>
-        <QuestionCircleOutlined style={{ fontSize: 16, marginLeft: 16 }} />
-      </Tooltip>
+      <i style={{ marginLeft: 10 }}>Only accept .txt file</i>
     </Upload>
   );
 };
@@ -261,6 +259,12 @@ const TestCaseModal = ({
                     alignSelf: 'center',
                   }}>
                   Data Input
+                  <Tooltip
+                    title={`Input testcase, will be fed as STDIN for a submission.`}>
+                    <QuestionCircleOutlined
+                      style={{ marginLeft: 16, fontSize: 16 }}
+                    />
+                  </Tooltip>
                 </div>
                 <Radio.Group
                   defaultValue='editor'
@@ -300,6 +304,12 @@ const TestCaseModal = ({
                     alignSelf: 'center',
                   }}>
                   Expected Output
+                  <Tooltip
+                    title={`Expected output testcase, will be compared with STDOUT of a submission.`}>
+                    <QuestionCircleOutlined
+                      style={{ marginLeft: 16, fontSize: 16 }}
+                    />
+                  </Tooltip>
                 </div>
                 <Radio.Group
                   defaultValue='editor'
