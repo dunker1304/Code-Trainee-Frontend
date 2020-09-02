@@ -175,7 +175,7 @@ class Index extends Component {
                   </div>
                 </div>
                 <div className='col-lg-7 col-12'>
-                  <img src='../static/images/responsive.png' alt='banner'></img>
+                  <img src='../static/images/codetrainee4.png' style={{ border: '3px solid #b5b5b5' }} alt='banner'></img>
                 </div>
               </div>
             </div>

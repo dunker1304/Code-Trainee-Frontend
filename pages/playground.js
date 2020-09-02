@@ -85,6 +85,7 @@ const Playground = props => {
     }
     axios.post(`${process.env.API}/api/submissions`, data)
       .then(res => {
+        console.log(res, 'data ne')
         for(let i = 0; i < testCaseProps.length; i++) {
           if(testCaseProps[i].isHidden && res.data[i]?.success){
             res.data[i].data.isHidden = true
@@ -154,7 +155,6 @@ const Playground = props => {
       language: langDB,
       userID: props.userInfo.id
     }
-    console.log(data, 'dunker')
     axios.post(`${process.env.API}/api/exercise/save-code`, data)
       .then((response) => {
         setLoading(false)
@@ -198,7 +198,6 @@ const Playground = props => {
     })
     axios.get(`${process.env.API}/api/exercise/temp-code?id=${props.question.question.id}&languageID=${langDB}&userID=${props.userInfo.id}`)
       .then(res => {
-        console.log(res, 'handleChangeLanguage')
         setCode(res.data?.temp?.answer || props.language[option.key].codeSnippets[0]?.sampleCode || "")
       })
       .catch(error => {
@@ -374,7 +373,7 @@ const Playground = props => {
               <div className="console-status" style={ (consoleEditor == 'hide') ? {display: 'none'} : null }>
                 <div>Status: {testCasePropsRun[0].data ? testCasePropsRun[0].data.status.description : "Code - 400"}</div>
                 <div style={{ whiteSpace: 'pre-wrap' }} 
-                  dangerouslySetInnerHTML={{ __html: testCasePropsRun[0].data ? testCasePropsRun[0].data.compile_output ? testCasePropsRun[0].data.compile_output.toString() : testCastestCasePropsRuneProps[0].data.stderr.toString() 
+                  dangerouslySetInnerHTML={{ __html: testCasePropsRun[0].data ? testCasePropsRun[0].data.compile_output ? testCasePropsRun[0].data.compile_output.toString() : testCasePropsRun[0].data.stderr.toString() 
                                           :  (testCasePropsRun[0]?.message?.source_code ? ("Source Code: " + testCasePropsRun[0]?.message?.source_code[0]) : "Something went wrong") }}>                            
               </div>
               </div>
