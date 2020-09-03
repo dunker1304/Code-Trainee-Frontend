@@ -87,7 +87,7 @@ const StepTestCases = ({ testcases = [], setTestCases }) => {
         }}>
         <span style={{ fontSize: 12 }}>
           <i>
-            Click cell in below table to view preview 'Data Input' or 'Expected Output'.
+            {`Click cell in below table to view preview 'Data Input' or 'Expected Output'.`}
           </i>
         </span>
         <Button
@@ -150,7 +150,7 @@ const StepTestCases = ({ testcases = [], setTestCases }) => {
               key: 'output',
               width: '340px',
               ellipsis: true,
-              sorter: (a, b) => a.input.localeCompare(b.input),
+              sorter: (a, b) => a.output.localeCompare(b.output),
             },
             {
               title: 'Hidden',
