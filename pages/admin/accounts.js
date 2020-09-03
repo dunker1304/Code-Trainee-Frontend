@@ -146,10 +146,10 @@ const Admin = (props) => {
       title: 'ACTION',
       key: 'action',
       render: (text, record) => (
-        <Tooltip title = { !record['isDeleted'] ? 'Deactive Account' : 'Active Account'}>
+        <Tooltip title = { record['isDeleted'] ? 'Deactive Account' : 'Active Account'}>
           {/* <EditOutlined onClick={()=>showDrawerEdit(record)} /> */}
           {/* <DeleteOutlined /> */}
-          <Switch checked={record['isDeleted']} onChange ={(checked)=>deactiveAccount(record,checked)}/>
+          <Switch checked={!record['isDeleted'] && record['status'] == 'Active' } onChange ={(checked)=>deactiveAccount(record,!checked)}/>
         </Tooltip>
       ),
     },
@@ -315,7 +315,10 @@ const Admin = (props) => {
                   <button className="action_btn">Role <DownOutlined /></button>
                 </Dropdown>
                 </div>
-                <button className="add_btn" onClick={showDrawer} > <PlusOutlined /> Add Account</button>
+                {
+                  roleActive == CONSTANTS.ROLE.ROLE_ADMIN ? <button className="add_btn" onClick={showDrawer} > <PlusOutlined /> Add Account</button> : ''
+                }
+                
 
                 <Drawer
                   title="Create a new account"
