@@ -22,7 +22,12 @@ const FileItemContent = ({ type = 'editor', value, onChange }) => {
   return (
     <>
       {type === 'editor' && (
-        <Input.TextArea rows='3' value={value} onChange={onChange} style={{whiteSpace: 'nowrap'}} />
+        <Input.TextArea
+          rows='3'
+          value={value}
+          onChange={onChange}
+          style={{ whiteSpace: 'nowrap' }}
+        />
       )}
       {type === 'upload' && <UploadSection onChange={onChange} value={value} />}
     </>
@@ -42,7 +47,7 @@ const UploadSection = ({ value, onChange }) => {
       if (files.length !== 0) {
         notification.error({ message: 'You can upload ONE file only!' });
       } else if (file.size === 0) {
-        notification.error({ message: `File'size cannot be 0` });
+        notification.error({ message: `File's size cannot be 0` });
       } else if (!isTxt) {
         notification.error({ message: 'You can only upload .txt file!' });
       } else if (!isLessThan3M) {
@@ -262,7 +267,7 @@ const TestCaseModal = ({
                   <Tooltip
                     title={`Input testcase, will be fed as STDIN for a submission.`}>
                     <QuestionCircleOutlined
-                      style={{ marginLeft: 16, fontSize: 16 }}
+                      style={{ marginLeft: 5, fontSize: 14 }}
                     />
                   </Tooltip>
                 </div>
@@ -307,7 +312,7 @@ const TestCaseModal = ({
                   <Tooltip
                     title={`Expected output testcase, will be compared with STDOUT of a submission.`}>
                     <QuestionCircleOutlined
-                      style={{ marginLeft: 16, fontSize: 16 }}
+                      style={{ marginLeft: 5, fontSize: 14 }}
                     />
                   </Tooltip>
                 </div>
@@ -334,7 +339,15 @@ const TestCaseModal = ({
             name='isHidden'
             valuePropName='checked'
             initialValue={isHidden}>
-            <Checkbox>Hide Test Case</Checkbox>
+            <Checkbox style={{ color: '#000000D9' }}>
+              Hide Test Case
+              <Tooltip
+                title={`If enabled, this testcase will not be seen by students.`}>
+                <QuestionCircleOutlined
+                  style={{ marginLeft: 5, fontSize: 14, position: 'absolute' }}
+                />
+              </Tooltip>
+            </Checkbox>
           </Form.Item>
         </Form>
       </Modal>
