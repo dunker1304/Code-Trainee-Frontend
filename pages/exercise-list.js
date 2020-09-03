@@ -245,7 +245,10 @@ const ExerciseList = ({ userInfo }) => {
             style={{
               fontSize: '19px',
             }}>
-            Exercise List
+            <div>{`Exercise List`}</div>
+            <span style={{ fontSize: 13 }}>
+              <i>{`Click cell in below table to view preview 'Exercise'.`}</i>
+            </span>
           </Col>
           <Col>
             <Button
@@ -276,6 +279,7 @@ const ExerciseList = ({ userInfo }) => {
               key: 'title',
               width: '220px',
               ellipsis: true,
+              sorter: (a, b) => a.title.localeCompare(b.title),
             },
             {
               title: 'Level',
@@ -298,14 +302,34 @@ const ExerciseList = ({ userInfo }) => {
                   </>
                 );
               },
+              sorter: (a, b) => {
+                let x = a.level;
+                let y = b.level;
+                x = x === 'easy' ? 0 : x === 'medium' ? 1 : 2;
+                y = y === 'easy' ? 0 : y === 'medium' ? 1 : 2;
+                return x - y;
+              },
             },
-            { title: 'LOC', dataIndex: 'points', key: 'points', width: '80px' },
-            { title: 'Like', dataIndex: 'like', key: 'like', width: '80px' },
+            {
+              title: 'LOC',
+              dataIndex: 'points',
+              key: 'points',
+              width: '80px',
+              sorter: (a, b) => Number(a.points) - Number(b.points),
+            },
+            {
+              title: 'Like',
+              dataIndex: 'like',
+              key: 'like',
+              width: '80px',
+              sorter: (a, b) => Number(a.like) - Number(b.like),
+            },
             {
               title: 'Dislike',
               dataIndex: 'dislike',
               key: 'dislike',
               width: '80px',
+              sorter: (a, b) => Number(a.dislike) - Number(b.dislike),
             },
             {
               title: 'Content',
@@ -350,6 +374,24 @@ const ExerciseList = ({ userInfo }) => {
                   </>
                 );
               },
+              sorter: (a, b) => {
+                let x = a.approved;
+                let y = b.approved;
+                x = x === 'accepted' ? 2 : x === 'rejected' ? 1 : 0;
+                y = y === 'accepted' ? 2 : y === 'rejected' ? 1 : 0;
+                return x - y;
+              },
+              filters: [
+                {
+                  text: 'Accepted',
+                  value: 'accepted',
+                },
+                { text: 'Rejected', value: 'rejected' },
+                { text: 'Waiting', value: 'waiting' },
+              ],
+              onFilter: (value, record) => {
+                return record.approved === value;
+              },
             },
             {
               title: 'Last Modified',
@@ -360,6 +402,11 @@ const ExerciseList = ({ userInfo }) => {
               render: (text, record) => (
                 <>{formatDate(moment(record.lastModified).toDate())}</>
               ),
+              sorter: (a, b) => {
+                let x = moment(a.lastModified).toDate().getTime();
+                let y = moment(b.lastModified).toDate().getTime();
+                return x - y;
+              },
             },
             {
               title: 'Action',
