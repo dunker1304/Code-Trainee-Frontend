@@ -116,7 +116,7 @@ const StepTestCases = ({ testcases = [], setTestCases }) => {
         output={currRecord.output}
         isHidden={currRecord.isHidden}
       />
-      <div style={{ minHeight: '350px' }}>
+      <div style={{ minHeight: 290 }}>
         <Table
           loading={loading}
           bordered
@@ -135,7 +135,9 @@ const StepTestCases = ({ testcases = [], setTestCases }) => {
               dataIndex: 'input',
               key: 'input',
               width: '340px',
-              ellipsis: true,
+              ellipsis: {
+                showTitle: false,
+              },
             },
             {
               title: 'Expected Output',

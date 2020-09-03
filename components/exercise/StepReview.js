@@ -62,7 +62,7 @@ const StepReview = ({
 
   return (
     <>
-      <div style={{ minHeight: '360px' }}>
+      <div style={{ minHeight: 300 }}>
         <Form labelCol={{ span: 4 }} wrapperCol={{ span: 16 }}>
           <Form.Item name='availableReviewer' label='Find Reviewer'>
             <AutoComplete
