@@ -99,11 +99,11 @@ const Register = (props)=> {
               <span className="login100-form-title p-b-20">
                  Register new { role == CONSTANTS.ROLE.ROLE_STUDENT ? 'STUDENT' : 'TEACHER'} account
               </span>
-              <button onClick= {(e)=>googleLogin(e)} className="btn-google m-b-20">
+              {/* <button onClick= {(e)=>googleLogin(e)} className="btn-google m-b-20">
                 <img src={Google} alt="GOOGLE" />
                 Google
               </button>
-              <p className='label-or'>OR</p>
+              <p className='label-or'>OR</p> */}
               <div className="p-t-20 p-b-9">
                 <span className="txt1">
                   Username
