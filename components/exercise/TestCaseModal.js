@@ -47,7 +47,7 @@ const UploadSection = ({ value, onChange }) => {
       if (files.length !== 0) {
         notification.error({ message: 'You can upload ONE file only!' });
       } else if (file.size === 0) {
-        notification.error({ message: `File'size cannot be 0` });
+        notification.error({ message: `File's size cannot be 0` });
       } else if (!isTxt) {
         notification.error({ message: 'You can only upload .txt file!' });
       } else if (!isLessThan3M) {
