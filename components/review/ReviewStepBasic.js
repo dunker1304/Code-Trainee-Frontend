@@ -111,14 +111,36 @@ const ReviewStepBasic = ({
                     margin: 0,
                     padding: '0.5em',
                     overflow: 'scroll',
-                    maxHeight: 300,
+                    height: 300,
                     ...style,
                   }}>
                   {tokens.map((line, i) => (
-                    <div {...getLineProps({ line, key: i })}>
-                      {line.map((token, key) => (
-                        <span {...getTokenProps({ token, key })} />
-                      ))}
+                    <div
+                      style={{ display: 'table-row' }}
+                      key={i}
+                      {...getLineProps({ line, key: i })}>
+                      <span
+                        style={{
+                          display: 'inline-block',
+                          textAlign: 'right',
+                          paddingRight: '1em',
+                          userSelect: 'none',
+                          opacity: '0.5',
+                          borderRight: '1px solid gray',
+                          width: '40px',
+                        }}>
+                        {i + 1}
+                      </span>
+                      <span
+                        style={{
+                          display: 'inline-block',
+                          paddingLeft: '1em',
+                          paddingRight: '1em',
+                        }}>
+                        {line.map((token, key) => (
+                          <span key={key} {...getTokenProps({ token, key })} />
+                        ))}
+                      </span>
                     </div>
                   ))}
                 </pre>

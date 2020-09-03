@@ -7,13 +7,13 @@ const ReviewStepSnippet = ({ snippets }) => {
   console.log({ snippets });
   return (
     <>
-      <h1
+      <h2
         style={{
           marginTop: 10,
           marginBottom: 10,
         }}>
-        Code template of Languages will be fed in when students do exercise
-      </h1>
+        {`Code template of Languages will be fed in submissions when students do exercise.`}
+      </h2>
       <Collapse>
         {snippets.map((snippet, index) => {
           return (
