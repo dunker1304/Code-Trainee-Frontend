@@ -22,7 +22,12 @@ const FileItemContent = ({ type = 'editor', value, onChange }) => {
   return (
     <>
       {type === 'editor' && (
-        <Input.TextArea rows='3' value={value} onChange={onChange} style={{whiteSpace: 'nowrap'}} />
+        <Input.TextArea
+          rows='3'
+          value={value}
+          onChange={onChange}
+          style={{ whiteSpace: 'nowrap' }}
+        />
       )}
       {type === 'upload' && <UploadSection onChange={onChange} value={value} />}
     </>
@@ -335,6 +340,11 @@ const TestCaseModal = ({
             valuePropName='checked'
             initialValue={isHidden}>
             <Checkbox>Hide Test Case</Checkbox>
+            <Tooltip title={`Hidden testcase will not be seen by student.`}>
+              <QuestionCircleOutlined
+                style={{ marginLeft: 14, fontSize: 16 }}
+              />
+            </Tooltip>
           </Form.Item>
         </Form>
       </Modal>
