@@ -43,6 +43,7 @@ const StepSnippet = ({ languages = [], setLanguages }) => {
             dataIndex: 'language',
             key: 'language',
             ellipsis: true,
+            sorter: (a, b) => a.language.localeCompare(b.language),
           },
         ]}
         rowSelection={{

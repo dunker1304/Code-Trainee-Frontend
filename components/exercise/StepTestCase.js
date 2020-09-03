@@ -14,6 +14,7 @@ import {
   CheckOutlined,
   EditTwoTone,
   DeleteTwoTone,
+  QuestionCircleOutlined,
 } from '@ant-design/icons';
 import Highlight, { defaultProps } from 'prism-react-renderer';
 import theme from 'prism-react-renderer/themes/github';
@@ -82,8 +83,13 @@ const StepTestCases = ({ testcases = [], setTestCases }) => {
       <div
         style={{
           display: 'flex',
-          justifyContent: 'flex-end',
+          justifyContent: 'space-between',
         }}>
+        <span style={{ fontSize: 12 }}>
+          <i>
+            Click cell in below table to view preview 'Data Input' or 'Expected Output'.
+          </i>
+        </span>
         <Button
           type='primary'
           size='middle'
@@ -135,9 +141,8 @@ const StepTestCases = ({ testcases = [], setTestCases }) => {
               dataIndex: 'input',
               key: 'input',
               width: '340px',
-              ellipsis: {
-                showTitle: false,
-              },
+              ellipsis: true,
+              sorter: (a, b) => a.input.localeCompare(b.input),
             },
             {
               title: 'Expected Output',
@@ -145,6 +150,7 @@ const StepTestCases = ({ testcases = [], setTestCases }) => {
               key: 'output',
               width: '340px',
               ellipsis: true,
+              sorter: (a, b) => a.input.localeCompare(b.input),
             },
             {
               title: 'Hidden',
@@ -156,6 +162,23 @@ const StepTestCases = ({ testcases = [], setTestCases }) => {
                   return <CheckOutlined style={{ fontSize: '16px' }} />;
                 } else {
                   // return <CloseOutlined style={{ fontSize: '16px' }} />;
+                }
+              },
+              sorter: (a, b) => (a.isHidden ? -1 : 1),
+              filters: [
+                {
+                  text: 'Public',
+                  value: 'public',
+                },
+                { text: 'Hidden', value: 'hidden' },
+              ],
+              onFilter: (value, record) => {
+                console.log({ value: value });
+                if (value === 'public') {
+                  return record.isHidden === false;
+                }
+                if (value === 'hidden') {
+                  return record.isHidden === true;
                 }
               },
             },

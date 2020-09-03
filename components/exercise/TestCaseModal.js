@@ -341,7 +341,8 @@ const TestCaseModal = ({
             initialValue={isHidden}>
             <Checkbox style={{ color: '#000000D9' }}>
               Hide Test Case
-              <Tooltip title={`Hidden testcase will not be seen by students.`}>
+              <Tooltip
+                title={`If enabled, this testcase will not be seen by students.`}>
                 <QuestionCircleOutlined
                   style={{ marginLeft: 5, fontSize: 14, position: 'absolute' }}
                 />
