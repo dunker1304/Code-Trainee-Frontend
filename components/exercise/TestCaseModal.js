@@ -267,7 +267,7 @@ const TestCaseModal = ({
                   <Tooltip
                     title={`Input testcase, will be fed as STDIN for a submission.`}>
                     <QuestionCircleOutlined
-                      style={{ marginLeft: 16, fontSize: 16 }}
+                      style={{ marginLeft: 5, fontSize: 14 }}
                     />
                   </Tooltip>
                 </div>
@@ -312,7 +312,7 @@ const TestCaseModal = ({
                   <Tooltip
                     title={`Expected output testcase, will be compared with STDOUT of a submission.`}>
                     <QuestionCircleOutlined
-                      style={{ marginLeft: 16, fontSize: 16 }}
+                      style={{ marginLeft: 5, fontSize: 14 }}
                     />
                   </Tooltip>
                 </div>
@@ -339,12 +339,14 @@ const TestCaseModal = ({
             name='isHidden'
             valuePropName='checked'
             initialValue={isHidden}>
-            <Checkbox>Hide Test Case</Checkbox>
-            <Tooltip title={`Hidden testcase will not be seen by student.`}>
-              <QuestionCircleOutlined
-                style={{ marginLeft: 14, fontSize: 16 }}
-              />
-            </Tooltip>
+            <Checkbox style={{ color: '#000000D9' }}>
+              Hide Test Case
+              <Tooltip title={`Hidden testcase will not be seen by students.`}>
+                <QuestionCircleOutlined
+                  style={{ marginLeft: 5, fontSize: 14, position: 'absolute' }}
+                />
+              </Tooltip>
+            </Checkbox>
           </Form.Item>
         </Form>
       </Modal>
