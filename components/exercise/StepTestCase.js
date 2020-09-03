@@ -1,4 +1,12 @@
-import { Table, Button, Space, Popconfirm, notification, Tooltip } from 'antd';
+import {
+  Table,
+  Button,
+  Space,
+  Popconfirm,
+  notification,
+  Tooltip,
+  Modal,
+} from 'antd';
 import TestCaseModal from './TestCaseModal';
 import { useState, useEffect, useRef } from 'react';
 import {
@@ -7,6 +15,8 @@ import {
   EditTwoTone,
   DeleteTwoTone,
 } from '@ant-design/icons';
+import Highlight, { defaultProps } from 'prism-react-renderer';
+import theme from 'prism-react-renderer/themes/github';
 import axios from 'axios';
 
 const StepTestCases = ({ testcases = [], setTestCases }) => {
@@ -20,6 +30,12 @@ const StepTestCases = ({ testcases = [], setTestCases }) => {
   let [currRecord, setCurrRecord] = useState({});
   // keep 'key' for record
   let count = useRef(-1);
+  // preview data
+  let [showPreview, setShowPreview] = useState(false);
+  let [previewData, setPreviewData] = useState({
+    title: '',
+    content: '',
+  });
 
   const onEditRecord = (data) => {
     const key = currRecord.key;
@@ -54,6 +70,11 @@ const StepTestCases = ({ testcases = [], setTestCases }) => {
         key: count.current,
       },
     ]);
+  };
+
+  const onCancelPreview = () => {
+    setShowPreview(false);
+    setPreviewData({ title: '', content: '' });
   };
 
   return (
@@ -182,6 +203,27 @@ const StepTestCases = ({ testcases = [], setTestCases }) => {
               ),
             },
           ]}
+          onRow={(record, rowIndex) => {
+            return {
+              onClick: (event) => {
+                const cellIndex = event.target.cellIndex;
+                if (cellIndex === 1) {
+                  setPreviewData({
+                    title: `Preview Data Input`,
+                    content: record.input,
+                  });
+                  setShowPreview(true);
+                }
+                if (cellIndex === 2) {
+                  setPreviewData({
+                    title: `Preview Expected Output`,
+                    content: record.output,
+                  });
+                  setShowPreview(true);
+                }
+              },
+            };
+          }}
           dataSource={testcases}
           pagination={{
             defaultPageSize: 10,
@@ -194,6 +236,81 @@ const StepTestCases = ({ testcases = [], setTestCases }) => {
           }}
         />
       </div>
+      <Modal
+        className='preview-testcase-modal'
+        title={previewData.title}
+        visible={showPreview}
+        style={{ marginTop: -30 }}
+        width={700}
+        maskClosable={false}
+        destroyOnClose={true}
+        onCancel={onCancelPreview}
+        footer={
+          <div>
+            <Button
+              style={{
+                width: '100px',
+              }}
+              type='primary'
+              size='large'
+              danger
+              onClick={onCancelPreview}>
+              Cancel
+            </Button>
+          </div>
+        }>
+        <div
+          style={{
+            height: 340,
+            width: '100%',
+          }}>
+          <Highlight {...defaultProps} theme={theme} code={previewData.content}>
+            {({ className, style, tokens, getLineProps, getTokenProps }) => (
+              <pre
+                className={className}
+                style={{
+                  textAlign: 'left',
+                  padding: '0.5em',
+                  margin: 0,
+                  overflow: 'scroll',
+                  maxHeight: 500,
+                  height: '100%',
+                  ...style,
+                }}>
+                {tokens.map((line, i) => (
+                  <div
+                    style={{ display: 'table-row' }}
+                    key={i}
+                    {...getLineProps({ line, key: i })}>
+                    <span
+                      style={{
+                        display: 'inline-block',
+                        textAlign: 'right',
+                        paddingRight: '1em',
+                        userSelect: 'none',
+                        opacity: '0.5',
+                        borderRight: '1px solid gray',
+                        width: '40px',
+                      }}>
+                      {i + 1}
+                    </span>
+                    <span
+                      style={{
+                        display: 'inline-block',
+                        paddingLeft: '1em',
+                        paddingRight: '1em',
+                      }}>
+                      {line.map((token, key) => (
+                        <span key={key} {...getTokenProps({ token, key })} />
+                      ))}
+                    </span>
+                  </div>
+                ))}
+              </pre>
+            )}
+          </Highlight>
+        </div>
+      </Modal>
     </div>
   );
 };

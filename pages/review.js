@@ -274,7 +274,7 @@ const ReviewExercise = ({
                   message: `'Comment' cannot be longer than 500 characters.`,
                 },
               ]}>
-              <Input.TextArea rows={3} />
+              <Input.TextArea rows={3} style={{ whiteSpace: 'nowrap' }} />
             </Form.Item>
           </Form>
         }

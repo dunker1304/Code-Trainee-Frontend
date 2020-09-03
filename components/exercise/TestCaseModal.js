@@ -8,10 +8,76 @@ import {
   notification,
   Checkbox,
   Popconfirm,
+  Tooltip,
 } from 'antd';
 import React, { useState, useEffect, Row, useRef } from 'react';
-import { InboxOutlined, UploadOutlined } from '@ant-design/icons';
+import {
+  InboxOutlined,
+  UploadOutlined,
+  QuestionCircleOutlined,
+} from '@ant-design/icons';
 import axios from 'axios';
+
+const FileItemContent = ({ type = 'editor', value, onChange }) => {
+  return (
+    <>
+      {type === 'editor' && (
+        <Input.TextArea rows='3' value={value} onChange={onChange} style={{whiteSpace: 'nowrap'}} />
+      )}
+      {type === 'upload' && <UploadSection onChange={onChange} value={value} />}
+    </>
+  );
+};
+
+const UploadSection = ({ value, onChange }) => {
+  const [files, setFiles] = useState([]);
+
+  const handleChange = ({ file, fileList }) => {
+    if (file.status === 'removed') {
+      setFiles([]);
+      onChange('');
+    } else {
+      const isTxt = file.type === 'text/plain';
+      const isLessThan3M = file.size / 1024 / 1024 < 3;
+      if (files.length !== 0) {
+        notification.error({ message: 'You can upload ONE file only!' });
+      } else if (file.size === 0) {
+        notification.error({ message: `File'size cannot be 0` });
+      } else if (!isTxt) {
+        notification.error({ message: 'You can only upload .txt file!' });
+      } else if (!isLessThan3M) {
+        notification.error({ message: 'File must smaller than 3MB!' });
+      } else {
+        setFiles(fileList);
+        const reader = new FileReader();
+        reader.addEventListener('load', () => {
+          onChange(reader.result);
+        });
+        reader.readAsText(file, 'utf-8');
+      }
+    }
+  };
+  const beforeUpload = (file) => {
+    // return false mean 'file' will be read at client only
+    return false;
+  };
+  useEffect(() => {
+    if (value === '') {
+      setFiles([]);
+    }
+  }, [value]);
+  return (
+    <Upload
+      accept={`.txt`}
+      multiple={false}
+      fileList={files}
+      beforeUpload={beforeUpload}
+      onChange={handleChange}>
+      <Button icon={<UploadOutlined />}>Click to Upload</Button>
+      <i style={{ marginLeft: 10 }}>Only accept .txt file</i>
+    </Upload>
+  );
+};
 
 const TestCaseModal = ({
   input = '',
@@ -63,15 +129,42 @@ const TestCaseModal = ({
   };
 
   const onReset = () => {
+    if (inputType === 'editor') {
+      form.setFieldsValue({
+        input: input,
+      });
+    } else {
+      form.setFieldsValue({
+        input: '',
+      });
+    }
+    if (outputType === 'editor') {
+      form.setFieldsValue({
+        output: output,
+      });
+    } else {
+      form.setFieldsValue({
+        output: '',
+      });
+    }
     form.setFieldsValue({
-      input: input,
-      output: output,
       isHidden: isHidden,
     });
   };
 
-  const onUpload = (file) => {
-    console.log({ file });
+  const changeInputMethod = (item, type) => {
+    if (item === 'input') {
+      setInputType(type);
+      form.setFieldsValue({
+        input: '',
+      });
+    }
+    if (item === 'output') {
+      setOutputType(type);
+      form.setFieldsValue({
+        output: '',
+      });
+    }
   };
 
   useEffect(() => {
@@ -87,6 +180,8 @@ const TestCaseModal = ({
         output: '',
         isHidden: false,
       });
+    !visible && setInputType('editor');
+    !visible && setOutputType('editor');
     return () => {
       form = null;
     };
@@ -98,6 +193,7 @@ const TestCaseModal = ({
         className='test-case-model'
         title={title}
         visible={visible}
+        style={{ marginTop: -40 }}
         maskClosable={false}
         destroyOnClose={true}
         onCancel={hanldeCancelX}
@@ -163,8 +259,16 @@ const TestCaseModal = ({
                     alignSelf: 'center',
                   }}>
                   Data Input
+                  <Tooltip
+                    title={`Input testcase, will be fed as STDIN for a submission.`}>
+                    <QuestionCircleOutlined
+                      style={{ marginLeft: 16, fontSize: 16 }}
+                    />
+                  </Tooltip>
                 </div>
-                <Radio.Group defaultValue='editor'>
+                <Radio.Group
+                  defaultValue='editor'
+                  onChange={(e) => changeInputMethod('input', e.target.value)}>
                   <Radio.Button value='editor'>editor</Radio.Button>
                   <Radio.Button value='upload'>upload</Radio.Button>
                 </Radio.Group>
@@ -179,7 +283,7 @@ const TestCaseModal = ({
                 message: `'Data Input' cannot be longer than 1000 characters.`,
               },
             ]}>
-            <Input.TextArea rows='3' />
+            <FileItemContent type={inputType} />
           </Form.Item>
           <Form.Item
             style={{
@@ -200,8 +304,16 @@ const TestCaseModal = ({
                     alignSelf: 'center',
                   }}>
                   Expected Output
+                  <Tooltip
+                    title={`Expected output testcase, will be compared with STDOUT of a submission.`}>
+                    <QuestionCircleOutlined
+                      style={{ marginLeft: 16, fontSize: 16 }}
+                    />
+                  </Tooltip>
                 </div>
-                <Radio.Group defaultValue='editor'>
+                <Radio.Group
+                  defaultValue='editor'
+                  onChange={(e) => changeInputMethod('output', e.target.value)}>
                   <Radio.Button value='editor'>editor</Radio.Button>
                   <Radio.Button value='upload'>upload</Radio.Button>
                 </Radio.Group>
@@ -216,7 +328,7 @@ const TestCaseModal = ({
                 message: `'Expected Output' cannot be longer than 1000 characters.`,
               },
             ]}>
-            <Input.TextArea rows='3' />
+            <FileItemContent type={outputType} />
           </Form.Item>
           <Form.Item
             name='isHidden'

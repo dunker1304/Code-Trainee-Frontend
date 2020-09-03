@@ -62,6 +62,7 @@ const ReviewStepSnippet = ({ snippets }) => {
                             style={{
                               display: 'table-cell',
                               paddingLeft: '1em',
+                              paddingRight: '1em',
                             }}>
                             {line.map((token, key) => (
                               <span
