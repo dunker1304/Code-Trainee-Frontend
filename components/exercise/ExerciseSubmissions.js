@@ -19,8 +19,8 @@ const ExerciseSubmissions = props => {
             key: index,
             time: submission.createdAt,
             status: submission.status,
-            runtime: NaN,
-            memory: NaN,
+            runtime: submission.timeNeeded,
+            //memory: NaN,
             language: submission.programLanguageId.name,
             code: submission.answer
           }
@@ -49,11 +49,6 @@ const ExerciseSubmissions = props => {
       title: 'Runtime',
       dataIndex: 'runtime',
       key: 'runtime',
-    },
-    {
-      title: 'Memory',
-      dataIndex: 'memory',
-      key: 'memory',
     },
     {
       title: 'Language',
