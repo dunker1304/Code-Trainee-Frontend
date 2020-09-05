@@ -197,7 +197,7 @@ const Exercise = ({
           marginTop: 50,
         }}>
         <Divider />
-        <Steps current={currStep}>
+        <Steps current={currStep} className='exercise-steps'>
           {StepTitles.map((t) => (
             <Steps.Step
               title={t.title}
