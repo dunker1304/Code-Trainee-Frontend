@@ -115,6 +115,7 @@ div#playground {
   h4.question-title {
     font-size: 18px;
     overflow-wrap: break-word;
+    white-space: pre;
   }
   .question-level {
     text-transform: capitalize;
