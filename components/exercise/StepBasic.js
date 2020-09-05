@@ -77,16 +77,22 @@ const StepBasicInfos = ({
           name='title'
           label='Title'
           rules={[
-            { required: true, message: `'Title' is required!` },
             {
-              type: 'string',
-              max: 150,
-              message: `'Title' cannot be longer than 150 characters.`,
-            },
-            {
-              type: 'string',
-              min: 3,
-              message: `'Title' must be at least 3 characters.`,
+              transform: (value) => value + '',
+              validator: (rule, value) => {
+                if (value.length === 0) {
+                  return Promise.reject(`'Title' is required!`);
+                } else if (value.length > 150) {
+                  return Promise.reject(
+                    `'Title' cannot be longer than 150 characters.`
+                  );
+                } else if (value.replaceAll(' ', '').length < 3) {
+                  return Promise.reject(
+                    `'Title' must contain at least 3 non-space characters.`
+                  );
+                }
+                return Promise.resolve();
+              },
             },
           ]}>
           <Input />
