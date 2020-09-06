@@ -83,7 +83,7 @@ class Index extends Component {
                   }
                
                 </Modal>
-                <div className="col-sm-6 col-12">
+                <div className="col-sm-6 col-12" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <ul className='header-btn'>
                     <li><a className='fill-btn'  onClick={()=>this.props.displayLogin(true,1)}>Sign in</a></li>
                     <li><a className='fill-btn'  onClick={()=>this.props.displayLogin(true,2)}>Sign up</a></li>
@@ -118,13 +118,12 @@ class Index extends Component {
             <div className='container'>
               <div className='section-heading'>
                 <div className='item-subtitle'>Code Trainee</div>
-                <h2>Total 4 Home Page</h2>
               </div>
               <div className='row'>
                 <div className="col-sm-6 col-12">
                   <div className='product-box'>
                     <div className='product-box-content'>
-                      <div><a href='#'>Home 01</a></div>
+                      <div><a href='#'>Screen 01</a></div>
                     </div>
                     <div className='product-box-img'>
                       <img className='img-responsive' src='../static/images/codetrainee1.png'></img>
@@ -134,7 +133,7 @@ class Index extends Component {
                 <div className="col-sm-6 col-12">
                   <div className='product-box'>
                     <div className='product-box-content'>
-                      <div><a href='#'>Home 02</a></div>
+                      <div><a href='#'>Screen 02</a></div>
                     </div>
                     <div className='product-box-img'>
                       <img className='img-responsive' src='../static/images/codetrainee2.png'></img>
@@ -144,7 +143,7 @@ class Index extends Component {
                 <div className="col-sm-6 col-12">
                   <div className='product-box'>
                     <div className='product-box-content'>
-                      <div><a href='#'>Home 03</a></div>
+                      <div><a href='#'>Screen 03</a></div>
                     </div>
                     <div className='product-box-img'>
                       <img className='img-responsive' src='../static/images/codetrainee3.png'></img>
@@ -154,7 +153,7 @@ class Index extends Component {
                 <div className="col-sm-6 col-12">
                   <div className='product-box'>
                     <div className='product-box-content'>
-                      <div><a href='#'>Home 04</a></div>
+                      <div><a href='#'>Screen 04</a></div>
                     </div>
                     <div className='product-box-img'>
                       <img className='img-responsive' src='../static/images/codetrainee4.png'></img>
@@ -171,7 +170,7 @@ class Index extends Component {
                 <div className="col-lg-5 col-12">
                   <div className='item-content'>
                     <h3><span>Playground</span> for many languages & <span>Learn</span> about architecture</h3>
-                    <a className='fill-btn' href='/problem' target='_blank'>Do Exercise Now</a>
+                    <a className='fill-btn' href='/problem' >Do Exercise Now</a>
                   </div>
                 </div>
                 <div className='col-lg-7 col-12'>

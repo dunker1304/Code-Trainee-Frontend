@@ -2,7 +2,7 @@ import React, { Component, useState, useEffect } from 'react'
 import { render } from 'react-dom'
 import AceEditor from 'react-ace'
 import { Row, Col, Button, Select, Tabs, Spin, message, notification, Tooltip } from 'antd'
-import { SaveOutlined } from '@ant-design/icons';
+import { SaveOutlined, RollbackOutlined } from '@ant-design/icons';
 import axios from 'axios'
 import TestCase from '../components/TestCase'
 import SettingModal from '../components/SettingModal'
@@ -54,7 +54,7 @@ const Playground = props => {
 
   useEffect(() => {
    let activeTab = router.query.tab ? router.query.tab : "1"
-   setCode(props.tempCode?.temp?.answer || props.language[indexLanguage].codeSnippets[0]?.sampleCode || "")
+   setCode(props.tempCode?.temp?.answer || (props.language[indexLanguage] ? props.language[indexLanguage].codeSnippets[0]?.sampleCode : "") || "")
    setTestCaseProps(props.question.testCases)
    if(activeTab == 4) {
     let questionId = router.query.questionID
@@ -301,7 +301,7 @@ const Playground = props => {
             </Button>
             <Button type='default' onClick={handlePickRandomQuestion}>
               <svg viewBox="0 0 24 24" width="1em" height="1em" className="icon__3Su4 shuffle-icon__dV27"><path fillRule="evenodd" d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"></path></svg>
-              <span>Pick One</span>
+              <span style={{ marginLeft: '3px'}}>Pick One</span>
             </Button>
             {/* <Button type='default'>
               <svg viewBox="0 0 24 24" width="1em" height="1em" className="icon__3Su4 handler-icon__26i5"><path fillRule="evenodd" d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"></path></svg>
@@ -328,15 +328,13 @@ const Playground = props => {
                 ))}
               </Select>
               <Tooltip placement="bottom" title='Reset to default template code'>
-                <button type="ghost" className="reset-code" onClick={handleResetTemplateCode}>
-                  <span className='indicator'></span>
-                  <span style={{ color: 'rgb(176, 190, 197)'}}>Reset</span>
-                </button>
+                <RollbackOutlined className='reset-code' style={{ paddingLeft: '10px' }} onClick={handleResetTemplateCode}/>
               </Tooltip>
-
+              <Tooltip placement="bottom" title='Save your code'>
+                <SaveOutlined onClick={handleSaveCode} style={{ paddingLeft: '10px' }}/>
+              </Tooltip>
             </div>
             
-            <SaveOutlined onClick={handleSaveCode} style={{ display: 'flex', alignItems: 'center' }}/>
             <SettingModal
               handleChangeSettingFontSize={handleChangeSettingFontSize}
               handleChangeSettingTheme={handleChangeSettingTheme}
@@ -374,7 +372,7 @@ const Playground = props => {
                 <div>Status: {testCasePropsRun[0].data ? testCasePropsRun[0].data.status.description : "Code - 400"}</div>
                 <div style={{ whiteSpace: 'pre-wrap' }} 
                   dangerouslySetInnerHTML={{ __html: testCasePropsRun[0].data ? testCasePropsRun[0].data.compile_output ? testCasePropsRun[0].data.compile_output.toString() : testCasePropsRun[0].data.stderr.toString() 
-                                          :  (testCasePropsRun[0]?.message?.source_code ? ("Source Code: " + testCasePropsRun[0]?.message?.source_code[0]) : "Something went wrong") }}>                            
+                                          :  (testCasePropsRun[0]?.message?.source_code ? ("Source Code: " + testCasePropsRun[0]?.message?.source_code[0]) : "Compile Time Error") }}>                            
               </div>
               </div>
             </Spin>
@@ -437,7 +435,7 @@ Playground.getInitialProps = async function(ctx) {
   let userInfo = ctx.store.getState().auth.userInfo
   let id = ctx.query.questionID
   let urlExercise = `${process.env.API}/api/exercise?id=${id}`
-  let urlLanguage = `${process.env.API}/api/language/exercise/${id}`
+  let urlLanguage = `${process.env.API}/api/language/exercise-playground/${id}`
   let urlVote = `${process.env.API}/api/exercise/vote?userID=${userInfo.id}&questionID=${id}`
   const questionResponse = await axios.get(urlExercise)
   const languageResponse = await axios.get(urlLanguage)

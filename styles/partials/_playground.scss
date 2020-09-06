@@ -187,12 +187,19 @@ div#playground {
   button.ant-btn.submit-code {
     background: rgb(69, 90, 100);
     color: white;
+    width: 95px;
+    display: flex;
+    justify-content: center;
   }
   button.ant-btn.show-console {
       margin-left: 10px;
   }
 }
 
+.react-comment {
+  display: inline-block;
+  vertical-align: text-bottom;
+}
 .test-case-wrapper {
   .input {
     white-space: pre-wrap;
