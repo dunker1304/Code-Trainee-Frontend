@@ -19,7 +19,7 @@ const ExerciseSubmissions = props => {
             key: index,
             time: submission.createdAt,
             status: submission.status,
-            runtime: submission.timeNeeded,
+            runtime: submission.timeNeeded + ' ms',
             //memory: NaN,
             language: submission.programLanguageId.name,
             code: submission.answer
@@ -43,7 +43,7 @@ const ExerciseSubmissions = props => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: text => (<div style={(text == 'Wrong Answer') ? {color: 'red'} : null}>{text}</div>)
+      render: text => (<div style={(text == 'Accepted') ? {color: 'green'} : {color: 'red'}}>{text}</div>)
     },
     {
       title: 'Runtime',

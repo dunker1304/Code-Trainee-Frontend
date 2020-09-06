@@ -56,12 +56,12 @@ const CommentDetailItem = (props)=> {
          </div>
          <div className="post_info">
              <div className ="action_vote" style={{display: props.isAuthenticated ? 'block':'none'}}>
-                <span >{props.discussDetail.like} {props.discussDetail.statusVote == 1 ? <LikeFilled onClick= {()=> handleVoteComment(0)}/> : <LikeOutlined onClick= {()=> handleVoteComment(1)}/>}</span>
-                <span >{props.discussDetail.dislike} {props.discussDetail.statusVote == -1 ? <DislikeFilled onClick= {()=> handleVoteComment(0)}/> :<DislikeOutlined onClick= {()=> handleVoteComment(-1)}/>}</span>
+                <span >{props.discussDetail.like} {props.discussDetail.statusVote == 1 ? <LikeFilled className='react-comment' onClick= {()=> handleVoteComment(0)}/> : <LikeOutlined className='react-comment' onClick= {()=> handleVoteComment(1)}/>}</span>
+                <span >{props.discussDetail.dislike} {props.discussDetail.statusVote == -1 ? <DislikeFilled className='react-comment' onClick= {()=> handleVoteComment(0)}/> :<DislikeOutlined className='react-comment' onClick= {()=> handleVoteComment(-1)}/>}</span>
              </div>
         
             <div className = "action_comment" style={{display: props.isAuthenticated ? 'block':'none'}}>
-               {props.discussDetail.isYourComment ? <span> <DeleteFilled onClick= {()=>showConfirm()}/> Delete </span> : ''}
+               {props.discussDetail.isYourComment ? <span> <DeleteFilled onClick= {()=>showConfirm()}/> </span> : ''}
             </div>
 
     
