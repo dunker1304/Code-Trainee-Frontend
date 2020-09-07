@@ -6,6 +6,8 @@ import { getExerciseOfUser} from "../store/problem/action"
 import {connect} from "react-redux"
 import Link from 'next/link'
 import classnames from "classnames"
+import  {formatDate } from "../helpers/utils"
+import moment from "moment"
 
 const columns = [
   {
@@ -16,7 +18,8 @@ const columns = [
   {
     title: 'Submit time',
     dataIndex: 'time',
-    key: 'time',
+    key: 'time', 
+    render: (text,record) => ( <span>{ formatDate(moment(record.time).toDate())}</span>)
   },
   {
     title: 'Exercise',

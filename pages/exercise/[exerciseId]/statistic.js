@@ -8,6 +8,8 @@ import axios from "axios"
 import {openNotificationWithIcon} from "../../../components/Notification"
 import composedAuthHOC from '../../../hocs';
 import classnames from "classnames"
+import { formatDate } from "../../../helpers/utils"
+import moment from "moment"
 
 
 const ExerciseStatistic = (props)=> {
@@ -83,7 +85,7 @@ const ExerciseStatistic = (props)=> {
       title: 'Time',
       key: 'time',
       dataIndex: 'createdAt',
-      render:  (text,record) => <span >{text}</span>
+      render: (text,record) => ( <span>{ formatDate(moment(record.createdAt).toDate())}</span>)
     },
   ];
  return (
@@ -122,7 +124,7 @@ const ExerciseStatistic = (props)=> {
                  <div className="status_detail">
                     <span>CreatedAt:</span> 
                     <strong>
-                      <span className ="time_sub">{exercise ? exercise['createdAt']: ''}</span>
+                      <span className ="time_sub">{exercise ?  formatDate(moment(exercise['createdAt']).toDate()) : ''}</span>
                     </strong>
                  </div>
               </div>
