@@ -4,7 +4,7 @@ const TestCase = props => {
   const testCase = props.testCaseProps
   return (
     testCase.isHidden ? 
-    (<div className='test-case-wrapper hidden'> Hidden </div>)
+    (<div className='test-case-wrapper hidden'> <img src="https://img.icons8.com/ios-glyphs/30/000000/lock.png" style={{marginRight: '5px', width: '18px'}}/> Hidden </div>)
     :
     (<div className="test-case-wrapper">
       <Row>
