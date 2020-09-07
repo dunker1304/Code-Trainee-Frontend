@@ -135,6 +135,14 @@
     border-radius: 10px;
     cursor: pointer;
   }
+  .status-success {
+    background: #007bff
+   
+  }
+  .status-wrong {
+    background: #d9534f;
+   
+  }
   .link_title:hover {
     cursor: pointer;
     text-decoration: underline;

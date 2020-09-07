@@ -1,4 +1,4 @@
-import { List, message, Avatar, Spin } from 'antd';
+import { List, Button, Skeleton , Spin } from 'antd';
 import axios from 'axios';
 import Header from "../components/Header"
 import Footer from "../components/Footer"
@@ -7,49 +7,74 @@ import moment from "moment"
 import InfiniteScroll from 'react-infinite-scroller';
 import composeHOC from "../hocs"
 import {connect} from 'react-redux'
+import classnames from "classnames"
 
 class Notification extends React.Component {
   state = {
-    data: [],
+    initLoading: true,
     loading: false,
-    hasMore: true,
+    data: [],
+    list: [],
+    page : 1,
+    count:1,
+    hasMore : true
   };
 
   async componentDidMount() {
    
-    let data = await this.fetchData();
-    this.setState({data : data.data})
+    let data = await this.fetchData(1,5);
+    this.setState({data : data.data , list : data.data,initLoading:false , count : data.page, hasMore : data.page > 1 ? true : false})
+
   }
 
  
 
-  fetchData = async ()=>{
-    let url = `${process.env.API}/api/get-all-notification/${this.props.userInfo['id']}`
+  fetchData = async (page,limit)=>{
+    let url = `${process.env.API}/api/get-all-notification/${this.props.userInfo['id']}?page=${page}&limit=${limit}`
     let resData = await axios.get(url);
     return resData.data;
   }
 
-  handleInfiniteOnLoad = async () => {
-    let { data } = this.state;
+  onLoadMore = async() => {
+    if(this.state.page >= this.state.count ) {
+        this.setState({hasMore : false})
+        return;
+    }
     this.setState({
       loading: true,
+      page : this.state.page + 1,
+      list: this.state.data.concat([...new Array(5)].map(() => ({ loading: true, name: {} }))),
     });
-    if (data.length > 14) {
-      message.warning('Infinite List loaded all');
-      this.setState({
-        hasMore: false,
+
+    let res = await this.fetchData(this.state.page + 1,5);
+
+    const data = this.state.data.concat(res.data);
+    this.setState(
+      {
+        data :data,
+        list: data,
         loading: false,
-      });
-      return;
-    }
-
-    let tmp = await this.fetchData();
-    data = data.concat(tmp)
-
-    this.setState({data,loading:false})
+      }
+    );
   };
 
   render() {
+    const { initLoading, loading, list, hasMore } = this.state;
+
+    const loadMore =
+      !initLoading && !loading && hasMore ? (
+        <div
+          style={{
+            textAlign: 'center',
+            marginTop: 12,
+            height: 32,
+            lineHeight: '32px',
+          }}
+        >
+          <Button onClick={this.onLoadMore} className="action_button">loading more</Button>
+        </div>
+      ) : null;
+
     return (
       <div>
         <Header/>
@@ -57,17 +82,16 @@ class Notification extends React.Component {
        
       <div className="demo-infinite-container" >
       <h1 className="title_noti">Notifications</h1>
-        <InfiniteScroll
-          initialLoad={false}
-          pageStart={0}
-          loadMore={this.handleInfiniteOnLoad}
-          hasMore={!this.state.loading && this.state.hasMore}
-          useWindow={false}
-        >
+      
           <List
-            dataSource={this.state.data}
+            className="demo-loadmore-list"
+            loading={initLoading}
+            itemLayout="horizontal"
+            loadMore={loadMore}
+            dataSource={list}
             renderItem={item => (
-              <List.Item key={item.id}>
+              <List.Item key={item.id} className = {classnames('item_noti', item.isRead ? 'item-noti-readed':'')}
+             >
                 <div>
                 <div dangerouslySetInnerHTML = {{__html : item['content']}}>
                
@@ -80,13 +104,8 @@ class Notification extends React.Component {
               </List.Item>
             )}
           >
-            {this.state.loading && this.state.hasMore && (
-              <div className="demo-loading-container">
-                <Spin />
-              </div>
-            )}
+           
           </List>
-        </InfiniteScroll>
       </div>
       </div>
       <Footer/>

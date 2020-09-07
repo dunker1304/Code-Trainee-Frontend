@@ -135,7 +135,7 @@ const Header = (props) => {
               <PieChartOutlined style={{color : "#8365cd" ,fontSize :"20px"}} className="icon_prover_header"/>My Process
             </li>
           </Link>  
-          <li> <UndoOutlined style={{color : "#ffdf00" ,fontSize :"20px"}} className="icon_prover_header"/> Change Password</li>
+          {/* <li> <UndoOutlined style={{color : "#ffdf00" ,fontSize :"20px"}} className="icon_prover_header"/> Change Password</li> */}
           <li  onClick= {()=>hanleSignOut()} > <LogoutOutlined style={{color : "#fea116",fontSize :"20px"}} className="icon_prover_header"/> Sign out</li>
         </ul>
          )
@@ -175,7 +175,7 @@ const Header = (props) => {
                 <ContainerOutlined style={{color : "#8365cd" ,fontSize :"20px"}} className="icon_prover_header"/>My Created Exercises
               </li>
             </Link>  
-            <li> <UndoOutlined style={{color : "#ffdf00" ,fontSize :"20px"}} className="icon_prover_header"/> Change Password</li>
+            {/* <li> <UndoOutlined style={{color : "#ffdf00" ,fontSize :"20px"}} className="icon_prover_header"/> Change Password</li> */}
             <li  onClick= {()=>hanleSignOut()} > <LogoutOutlined style={{color : "#fea116",fontSize :"20px"}} className="icon_prover_header"/> Sign out</li>
           </ul>
           )
@@ -337,7 +337,7 @@ const Header = (props) => {
                   overlayClassName="popover_noti"
                   getPopupContainer={() => document.getElementById('area_noti')}
                   >
-                  <Badge count={notRead}>
+                  <Badge count={notRead} onClick={()=> setNotRead(0)}>
                    <BellFilled/>
                    </Badge>
                 </Popover>
