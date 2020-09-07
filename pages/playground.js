@@ -419,8 +419,8 @@ const Playground = props => {
               </span>
             </Button>
             <div className="action">
-              <Button type='primary' onClick={handleRunCode}>Run Code</Button>
-              <Button className="submit-code" onClick={handleSubmitCode}>Submit</Button>
+              <Button type='primary' onClick={handleRunCode} style={loading ? {'pointerEvents': 'none'} : {'pointerEvents' : 'unset'}}>Run Code</Button>
+              <Button className="submit-code" onClick={handleSubmitCode} style={loading ? {'pointerEvents': 'none'} : {'pointerEvents' : 'unset'}}>Submit</Button>
             </div>
           </div>
         </div>
