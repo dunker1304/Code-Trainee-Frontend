@@ -1,6 +1,8 @@
 import { Table, Modal, Button } from 'antd'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+import {formatDate} from "../../helpers/utils"
+import moment from "moment"
 
 const ExerciseSubmissions = props => {
   const [allSubmissions, setAllSubmissions] = useState()
@@ -38,6 +40,7 @@ const ExerciseSubmissions = props => {
       title: 'Time Submitted',
       dataIndex: 'time',
       key: 'time',
+      render : (text,record) => (<span>{formatDate(moment(record.time).toDate())}</span>)
     },
     {
       title: 'Status',

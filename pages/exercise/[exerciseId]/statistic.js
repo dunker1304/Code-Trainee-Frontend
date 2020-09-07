@@ -7,6 +7,7 @@ import Router, {useRouter} from "next/router"
 import axios from "axios"
 import {openNotificationWithIcon} from "../../../components/Notification"
 import composedAuthHOC from '../../../hocs';
+import classnames from "classnames"
 
 
 const ExerciseStatistic = (props)=> {
@@ -76,7 +77,7 @@ const ExerciseStatistic = (props)=> {
       title: 'Status',
       key: 'status',
       dataIndex: 'status',
-      render:  (text,record) => <Link href='/submission/[submissionId]' as={`/submission/${record['id']}`} ><span className="status-submission">{text}</span></Link>
+      render:  (text,record) => <Link href='/submission/[submissionId]' as={`/submission/${record['id']}`} ><span className = {classnames('status-submission',record.status == 'Accepted' ? 'status-success':'status-wrong')}>{text}</span></Link>
     },
     {
       title: 'Time',

@@ -2,7 +2,6 @@
   .status-submisson {
     margin-top: 40px;
     padding: 3px 7px;
-    /* background-color: #777; */
     border-radius: 10px;
     color : #fff;
     cursor: pointer;
@@ -27,6 +26,15 @@
   .title-all-sub {
     margin: 20px 0px;
     font-size: 24px;
+  }
+
+  .status-success {
+    background:  #007bff
+   
+  }
+  .status-wrong {
+    background: #d9534f;
+    
   }
 }
 .process-container {
