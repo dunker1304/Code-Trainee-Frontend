@@ -7,6 +7,8 @@ import "ace-builds/src-noconflict/theme-github";
 import axios from "axios"
 import { Empty } from "antd"
 import Link from "next/link"
+import { formatDate } from "../../helpers/utils"
+import moment from "moment"
 
 const SubmissionDetail = (props)=> {
   return (
@@ -35,14 +37,14 @@ const SubmissionDetail = (props)=> {
                  <div className="status_time">
                     <span>Submitted:</span> 
                     <strong>
-                      <span className ="time_sub">{props.submission ? props.submission.createdAt : ''}</span>
+                      <span className ="time_sub">{props.submission ?  formatDate(moment(props.submission.createdAt).toDate())  : ''}</span>
                     </strong>
                  </div>
               </div>
           </div>
           <div className="col-md-12 submision_code">
                <h4>Submitted Code:
-                      <span >{props.submission ? props.submission.createdAt : ''}</span>
+                      <span >{props.submission ? formatDate(moment(props.submission.createdAt).toDate()) : ''}</span>
                </h4>
                <div className = "language">
                  <span>Language : </span>

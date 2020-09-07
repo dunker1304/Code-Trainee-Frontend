@@ -82,7 +82,7 @@ const ExerciseSubmissions = props => {
           <div className="result">
             <div className="title">{props.exercise.title}</div>
             <div className="status">Status: {rowClicked?.status}</div>
-            <div className="time-submmited">Submitted: {rowClicked?.time}</div>
+            <div className="time-submmited">Submitted: { rowClicked && rowClicked.time ? formatDate(moment(rowClicked.time).toDate()) : ''}</div>
             <div className="language">Language: {rowClicked?.language}</div>
             <div className="alert-info testcase-table">
               {rowClicked?.code}
