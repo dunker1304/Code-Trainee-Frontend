@@ -317,7 +317,7 @@ const Playground = props => {
         <div className="content-left playground-wrapper" >
           { !props.userInfo.id ? (
             <div className="guest-confirm">
-              <div>Vui lòng <a className="login-redirect">Đăng nhập</a> để tiếp tục</div>
+              <div>Please <a className="login-redirect">log in</a> to continue.</div>
             </div>) 
           : null}
           <div className="playground-action">

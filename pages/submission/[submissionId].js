@@ -19,7 +19,7 @@ const SubmissionDetail = (props)=> {
             </h4>
           </div>
           <div className="col-md-12 submision_detail">
-              <h3 className="title">Submission Detail</h3>
+              <h3 className="title">Submitted Codes in Detail</h3>
               <div className="wa_status">
                  <div className="status_detail">
                     <span>Status:</span> 
