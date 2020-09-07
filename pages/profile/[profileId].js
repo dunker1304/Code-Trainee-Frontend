@@ -124,7 +124,7 @@ useEffect(()=>{
               {props.profile.displayName}
             </span>
             <span className = "user-point">
-              Points : {props.profile && props.profile.points ? props.profile.points : 0} <SketchOutlined className = "customer-icon"/>
+              Points (LOC) : {props.profile && props.profile.points ? props.profile.points : 0} <SketchOutlined className = "customer-icon"/>
             </span>
 
           </div>
