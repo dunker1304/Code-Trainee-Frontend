@@ -127,7 +127,7 @@ const SettingModal = props => {
         <Row>
           <Col span={16}>
             <div className="setting-title">Show Gutter</div>
-            <div className="setting-description">Want to practice Vim or Emacs? We have these key binding options available for you.</div>
+            <div className="setting-description">Are you want to show gutter or not.</div>
           </Col>
           <Col span={8}>
             <div className="setting-select">
