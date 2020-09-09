@@ -6,6 +6,10 @@ import "ace-builds/src-noconflict/mode-java";
 import "ace-builds/src-noconflict/theme-github";
 import axios from "axios"
 import { Empty } from "antd"
+import Link from "next/link"
+import { formatDate } from "../../helpers/utils"
+import moment from "moment"
+
 const SubmissionDetail = (props)=> {
   return (
     <div>
@@ -15,7 +19,12 @@ const SubmissionDetail = (props)=> {
         <div className="row">
           <div className="col-md-12">
             <h4 className="inline-wrap_title" >
-  <a className="inline-wrap" href="/problems/additive-number/">{props.submission ?props.submission.exercise.title : '' }</a>
+            <Link href={{pathname : '/playground', query : { questionID : props.submission.exercise ? props.submission.exercise['id']:1}}} as={`/playground?questionID=${props.submission.exercise ?props.submission.exercise['id']:1 }`}>
+               <a className="inline-wrap" >
+                  {props.submission.exercise ? props.submission.exercise['title'] : ''}
+               </a>
+               </Link>
+  {/* <a className="inline-wrap" href="/problems/additive-number/">{props.submission ?props.submission.exercise.title : '' }</a> */}
             </h4>
           </div>
           <div className="col-md-12 submision_detail">
@@ -28,14 +37,14 @@ const SubmissionDetail = (props)=> {
                  <div className="status_time">
                     <span>Submitted:</span> 
                     <strong>
-                      <span className ="time_sub">{props.submission ? props.submission.createdAt : ''}</span>
+                      <span className ="time_sub">{props.submission ?  formatDate(moment(props.submission.createdAt).toDate())  : ''}</span>
                     </strong>
                  </div>
               </div>
           </div>
           <div className="col-md-12 submision_code">
                <h4>Submitted Code:
-                      <span >{props.submission ? props.submission.createdAt : ''}</span>
+                      <span >{props.submission ? formatDate(moment(props.submission.createdAt).toDate()) : ''}</span>
                </h4>
                <div className = "language">
                  <span>Language : </span>

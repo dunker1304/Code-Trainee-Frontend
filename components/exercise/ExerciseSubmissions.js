@@ -1,6 +1,8 @@
 import { Table, Modal, Button } from 'antd'
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+import {formatDate} from "../../helpers/utils"
+import moment from "moment"
 
 const ExerciseSubmissions = props => {
   const [allSubmissions, setAllSubmissions] = useState()
@@ -38,6 +40,7 @@ const ExerciseSubmissions = props => {
       title: 'Time Submitted',
       dataIndex: 'time',
       key: 'time',
+      render : (text,record) => (<span>{formatDate(moment(record.time).toDate())}</span>)
     },
     {
       title: 'Status',
@@ -79,7 +82,7 @@ const ExerciseSubmissions = props => {
           <div className="result">
             <div className="title">{props.exercise.title}</div>
             <div className="status">Status: {rowClicked?.status}</div>
-            <div className="time-submmited">Submitted: {rowClicked?.time}</div>
+            <div className="time-submmited">Submitted: { rowClicked && rowClicked.time ? formatDate(moment(rowClicked.time).toDate()) : ''}</div>
             <div className="language">Language: {rowClicked?.language}</div>
             <div className="alert-info testcase-table">
               {rowClicked?.code}

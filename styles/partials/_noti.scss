@@ -10,6 +10,7 @@
       padding: 0px;
     }
   }
+ 
 }
 
 .wrapper-notification {
@@ -31,5 +32,15 @@
   }
   .demo-infinite-container a:hover {
     text-decoration: underline;
+  }
+}
+.demo-loadmore-list {
+  min-height: 350px;
+}
+
+.item-noti-readed {
+  color : #cbcbc2;
+  a {
+    color : #cbcbc2;
   }
 }

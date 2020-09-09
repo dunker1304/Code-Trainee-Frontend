@@ -12,6 +12,7 @@ import moment from "moment"
 import { disabledDate } from "../../helpers/utils"
 import { openNotificationWithIcon } from "../../components/Notification"
 import Link from "next/link"
+import classnames from "classnames"
 const Profile = (props)=> {
 
   const [visible, setVisible] = useState(false)
@@ -50,7 +51,7 @@ const Profile = (props)=> {
       key: 'status',
       render: (text,record) => <Link href="/submission/[submissionId]" as={`/submission/${record['id']}`} >
         <Tooltip title='View detail submission'>
-         <span className="status-submisson" >{text}</span>
+         <span  className = {classnames('status-submisson',record.status == 'Accepted' ? 'status-success':'status-wrong')} >{text}</span>
          </Tooltip>
         </Link>,
     }

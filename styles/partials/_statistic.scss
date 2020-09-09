@@ -1,5 +1,6 @@
 .statistic_wrapper {
-  .status-submission{
+  .status-submission
+  {
     background-color: #d9534f;
     padding: 3px 7px;
     font-size: 12px;
@@ -11,6 +12,15 @@
     vertical-align: middle;
     /* background-color: #777; */
     border-radius: 10px;
+  }
+
+  .status-success {
+    background: #007bff
+   
+  }
+  .status-wrong {
+    background: #d9534f;
+   
   }
   .status-submission:hover {
     cursor: pointer;

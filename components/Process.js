@@ -5,6 +5,9 @@ import axios from "axios"
 import { getExerciseOfUser} from "../store/problem/action"
 import {connect} from "react-redux"
 import Link from 'next/link'
+import classnames from "classnames"
+import  {formatDate } from "../helpers/utils"
+import moment from "moment"
 
 const columns = [
   {
@@ -15,7 +18,8 @@ const columns = [
   {
     title: 'Submit time',
     dataIndex: 'time',
-    key: 'time',
+    key: 'time', 
+    render: (text,record) => ( <span>{ formatDate(moment(record.time).toDate())}</span>)
   },
   {
     title: 'Exercise',
@@ -35,7 +39,9 @@ const columns = [
     render: (text,record) =>
      <Link href="/submission/[submissionId]" as={`/submission/${record['id']}`} >
          <Tooltip title='View detail submission'>
-       <span className="status-submisson" style={{background : "#d9534f",cursor:"pointer"}}>{text}</span>
+       <span 
+       className = {classnames('status-submisson',record.status == 'Accepted' ? 'status-success':'status-wrong')}
+     >{text}</span>
        </Tooltip>
       </Link>,
   },
@@ -110,7 +116,7 @@ const Process = (props) => {
               animate = {true}
               animationDuration = {3000}
               style={{width:"300px"}}
-              label={({ dataEntry }) => dataEntry.percentage > 0 ? Math.round(dataEntry.percentage) + '%' : ''}
+              label={({ dataEntry }) => dataEntry.percentage > 0 ? (dataEntry.percentage).toFixed(2) + '%' : ''}
               labelStyle={defaultLabelStyle}
        />
            <table style={{position: 'absolute', top: '0px', right: '-20px', fontSize: 'smaller', color: '#545454'}}>
@@ -155,7 +161,7 @@ const Process = (props) => {
               <div className="col-md-12">
                 <p className="number">
             <span className="text-success" style={{ color: "rgb(60, 118, 61)", fontSize: fontSize }}>{props.exerciseOfUser.solved}</span>
-                   <span>/ {props.exerciseOfUser.total}</span>
+                   <span  style={{ color: "#333" }}>/ {props.exerciseOfUser.total}</span>
                 </p>
                 <h3 className="number-text"> questions solved</h3>
               </div>

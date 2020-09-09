@@ -164,7 +164,9 @@ const ExerciseList = ({ userInfo }) => {
       });
     } else {
       let lastModified = moment(record.lastModified);
-      let timeCanStartSelfReview = moment(lastModified).add(5, 'm').toDate();
+      let timeCanStartSelfReview = moment(lastModified)
+        .add(24 * 60, 'm')
+        .toDate();
       if (Date.now() >= timeCanStartSelfReview.getTime()) {
         setTableLoading(true);
         router.push(`/review?exerciseId=${record.key}&self-review`);

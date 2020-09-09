@@ -38,7 +38,7 @@ const Admin = (props) => {
 
   const [visible, setVisible] = useState(false)
   const [visibleEdit, setVisibleEdit] = useState(false)
-  const [roleActive , setRoleActive ] = useState(3)
+  const [roleActive , setRoleActive ] = useState(-1)
   const [dropDownVisible , setDropDownVisible] = useState(0)
   const [listAccount , setListAccount] = useState([])
 
