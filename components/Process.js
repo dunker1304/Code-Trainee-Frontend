@@ -110,7 +110,7 @@ const Process = (props) => {
               data={[
                 { title: 'Wrong Answer', value: props.exerciseOfUser.wrongAnswer, color: 'rgb(175,216,248)' },
                 { title: 'Accepted', value: props.exerciseOfUser.acceptedSubmissions, color: 'rgb(237,194,64)' },
-                { title: 'Runtime Error', value: props.exerciseOfUser.runtimeError, color: 'rgb(203,75,75)' },
+                // { title: 'Runtime Error', value: props.exerciseOfUser.runtimeError, color: 'rgb(203,75,75)' },
                 { title: 'Other', value: props.exerciseOfUser.other, color: 'rgb(148,64,237)' },
               ]}
               animate = {true}
@@ -137,14 +137,14 @@ const Process = (props) => {
                 </td>
                 <td className="legendLabel">Wrong Answer</td>
               </tr>
-              <tr>
+              {/* <tr>
                 <td className="legendColorBox">
                   <div style={{border: '1px solid #ccc', padding: '1px'}}>
                     <div style={{width: '4px', height: 0, border: '5px solid rgb(203,75,75)', overflow: 'hidden'}} />
                     </div>
                 </td>
                 <td className="legendLabel">Runtime Error</td>
-              </tr>
+              </tr> */}
               <tr>
                 <td className="legendColorBox">
                   <div style={{border: '1px solid #ccc', padding: '1px'}}>
